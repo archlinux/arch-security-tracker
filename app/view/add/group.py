@@ -10,7 +10,7 @@ def add_group():
     form = GroupForm()
     if not form.validate_on_submit():
         return render_template('form/group.html',
-                               title='Add vulnerability group',
+                               title='Add AVG',
                                form=form)
 
     group = db.create(CVEGroup, pkgname=form.pkgname.data, affected=form.affected.data, status=Status.fromstring(form.status.data))
