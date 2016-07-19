@@ -4,6 +4,7 @@ from app import db
 from app.model import CVE, CVEGroup, CVEGroupEntry
 
 
+@app.route('/issue/CVE-<cve>')
 @app.route('/CVE-<cve>')
 def cve(cve):
     cve = 'CVE-' + cve
