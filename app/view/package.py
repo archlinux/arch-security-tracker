@@ -20,10 +20,10 @@ def package(pkgname):
 
     package = {
         'pkgname': pkgname,
-        'groups': {'open': filter(lambda group: group.status.open(), groups),
-                   'resolved': filter(lambda group: group.status.resolved(), groups)},
-        'issues': {'open': filter(lambda issue: issue['group'].status.open(), issues),
-                   'resolved': filter(lambda issue: issue['group'].status.resolved(), issues)}
+        'groups': {'open': list(filter(lambda group: group.status.open(), groups)),
+                   'resolved': list(filter(lambda group: group.status.resolved(), groups))},
+        'issues': {'open': list(filter(lambda issue: issue['group'].status.open(), issues)),
+                   'resolved': list(filter(lambda issue: issue['group'].status.resolved(), issues))}
     }
     return render_template('package.html',
                            title='Package {}'.format(pkgname),
