@@ -5,7 +5,7 @@ from app.model.cve import cve_id_regex
 from app.model.enum import Severity, Remote
 
 
-class AddCVEForm(Form):
+class CVEForm(Form):
     cve = StringField(u'CVE', validators=[DataRequired(), Regexp(cve_id_regex)])
     description = TextAreaField(u'Description', validators=[])
     severity = SelectField(u'Severity', choices=[(e.name, e.label) for e in [*Severity]], validators=[])

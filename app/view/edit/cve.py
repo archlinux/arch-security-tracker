@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.form.add import AddCVEForm
+from app.form import CVEForm
 from app.model import CVE
 from app.model.enum import Remote, Severity
 from app.model.cve import cve_id_regex
@@ -11,7 +11,7 @@ def edit_cve(cve):
     cve = db.get(CVE, id=cve)
     if cve is None:
         return "404"
-    form = AddCVEForm()
+    form = CVEForm()
     if not form.is_submitted():
         form.cve.data = cve.id
         form.description.data = cve.description

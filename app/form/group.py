@@ -6,7 +6,7 @@ from app.model.cvegroup import pkgver_regex, pkgname_regex
 from app.model.enum import Status
 
 
-class AddGroupForm(Form):
+class GroupForm(Form):
     cve = TextAreaField(u'CVE', validators=[DataRequired(), Regexp(cve_ids_regex)])
     pkgname = StringField(u'Package', validators=[DataRequired(), Regexp(pkgname_regex)])
     description = TextAreaField(u'Description', validators=[])

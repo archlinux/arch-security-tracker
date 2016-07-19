@@ -1,13 +1,13 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.form.add import AddGroupForm
+from app.form import GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry
 from app.model.enum import Status
 
 
 @app.route('/AVG/add', methods=['GET', 'POST'])
 def add_group():
-    form = AddGroupForm()
+    form = GroupForm()
     if not form.validate_on_submit():
         return render_template('form/group.html',
                                title='Add vulnerability group',

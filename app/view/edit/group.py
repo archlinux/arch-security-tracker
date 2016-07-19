@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.form.add import AddGroupForm
+from app.form import GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry
 from app.model.enum import Status
 from app.model.cvegroup import vulnerability_group_regex
@@ -11,7 +11,7 @@ def edit_group(avg):
     group = db.get(CVEGroup, id=avg[4:])
     if group is None:
         return "404"
-    form = AddGroupForm()
+    form = GroupForm()
     if not form.is_submitted():
         form.affected.data = group.affected
         form.fixed.data = group.fixed
