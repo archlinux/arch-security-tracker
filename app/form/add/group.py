@@ -13,6 +13,6 @@ class AddGroupForm(Form):
     affected = StringField(u'Affected version', validators=[DataRequired(), Regexp(pkgver_regex)])
     fixed = StringField(u'Fixed Version', validators=[Optional(), Regexp(pkgver_regex)])
     status = SelectField(u'Status', choices=[(e.name, e.label) for e in [*Status]], validators=[DataRequired()])
-    bug_ticket = StringField('Bug ticket', validators=[])
+    bug_ticket = StringField('Bug ticket', validators=[Optional(), Regexp(r'^\d+$')])
     notes = TextAreaField(u'Notes', validators=[])
     submit = SubmitField(u'submit')
