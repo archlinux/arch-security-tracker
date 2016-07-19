@@ -11,4 +11,4 @@ class CVEForm(Form):
     severity = SelectField(u'Severity', choices=[(e.name, e.label) for e in [*Severity]], validators=[])
     remote = SelectField(u'Remote', choices=[(e.name, e.label) for e in [*Remote]], validators=[])
     notes = TextAreaField(u'Notes', validators=[])
-    submit = SubmitField(u'create')
+    submit = SubmitField(u'submit')
