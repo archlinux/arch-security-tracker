@@ -9,7 +9,7 @@ from app.model.enum import Remote, Severity
 def add_cve():
     form = AddCVEForm()
     if not form.validate_on_submit():
-        return render_template('add/cve.html',
+        return render_template('form/cve.html',
                                title='Add CVE',
                                form=form)
 

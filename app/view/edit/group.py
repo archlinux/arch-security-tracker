@@ -24,7 +24,7 @@ def edit_group(avg):
         issues = [cve.id for (group, cve) in issues]
         form.cve.data = "\n".join(issues)
     if not form.validate_on_submit():
-        return render_template('add/group.html',
+        return render_template('form/group.html',
                                title='Edit {}'.format(avg),
                                form=form)
 

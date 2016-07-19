@@ -9,7 +9,7 @@ from app.model.enum import Status
 def add_group():
     form = AddGroupForm()
     if not form.validate_on_submit():
-        return render_template('add/group.html',
+        return render_template('form/group.html',
                                title='Add vulnerability group',
                                form=form)
 

@@ -19,7 +19,7 @@ def edit_cve(cve):
         form.remote.data = cve.remote.name
         form.notes.data = cve.notes
     if not form.validate_on_submit():
-        return render_template('add/cve.html',
+        return render_template('form/cve.html',
                                title='Edit {}'.format(cve),
                                form=form)
     cve.description = form.description.data
