@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, bug_ticket %}
+
+{% block content %}
+	<table class="styled_table wide_padding">
+		<tr>
+			<th>group</th>
+			<th>CVE</th>
+			<th>packages</th>
+			<th>affected</th>
+			<th>fixed</th>
+			<th>status</th>
+			<th>ticket</th>
+		</tr>
+		{% for entry in entries %}
+		<tr>
+			<td><a href="/AVG-{{ entry.group.id }}">AVG-{{ entry.group.id }}</a></td>
+			<td>
+				{% for cve in entry.cves %}
+					<a href="/{{ cve.id }}">{{ cve.id }}</a><br />
+				{% endfor %}
+			</td>
+			<td><a href="/package/{{ entry.group.pkgname }}">{{ entry.group.pkgname }}</a></td>
+			<td>{{ entry.group.affected }}</td>
+			<td>{{ entry.group.fixed }}</td>
+			<td>{{ colorize_status(entry.group.status) }}</td>
+			<td>{{ bug_ticket(entry.group.bug_ticket) }}</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

@@ -1,0 +1,4 @@
+#!/bin/sh
+sqlite3 app.db "select ''; select '================ CVE ============='; select * from cve;"
+sqlite3 app.db "select ''; select '=============== GROUP ============'; select * from cve_group;"
+sqlite3 app.db "select ''; select '============== ENTRIES ==========='; select * from cve_group_entry;"

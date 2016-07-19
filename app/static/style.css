@@ -1,0 +1,217 @@
+body {
+  background: #f6f9fc none repeat scroll 0 0;
+  color: #222;
+  font: 100% sans-serif;
+  line-height: 1.3em;
+  min-width: 650px;
+  margin: 0;
+  padding: 0;
+}
+
+.content {
+  margin: 0 auto;
+  text-align: left;
+  width: 95%;
+  font-size: 0.85em;
+}
+
+#archnavbar {
+  background: #333 none repeat scroll 0 0 !important;
+  border-bottom: 5px solid #08c !important;
+  height: 40px !important;
+  padding: 10px 15px !important;
+}
+
+#logo {
+  background: rgba(0, 0, 0, 0) url("archlogo.4fefb38dc270.png") no-repeat scroll 0 0 !important;
+  float: left !important;
+  height: 40px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 190px !important;
+}
+
+#page_footer {
+  font-size: 0.9em;
+  margin: 0 auto;
+  text-align: center;
+  width: 95%;
+}
+
+h1 {
+  font-size: 2em;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+
+hr {
+  border: 0;
+  border-top: 1px dashed #bcd;
+  margin: 10px 0;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:link, a:visited {
+  color: #07b;
+}
+
+a:hover, a:visited:hover {
+  text-decoration: underline;
+}
+
+.edit_link {
+  font-size: 0.45em;
+}
+
+.box {
+  background: #ecf2f5 none repeat scroll 0 0;
+  border: 1px solid #bcd;
+  padding: 0.65em;
+  margin-bottom: 1.5em;
+}
+
+table {
+  border: 0;
+  margin-bottom: 1.5em;
+  padding: 0.65em;
+  font-size: 1.00em;
+  border-collapse: collapse;
+}
+
+table tr td, table th {
+  padding: 0.35em 0.90em;
+  text-align: left
+}
+
+table.styled_table {
+  background: #ecf2f5 none repeat scroll 0 0;
+  border: 1px solid #bcd;
+}
+
+table.styled_table tr td {
+  border-top: 1px dotted #bcd;
+}
+
+table.column_major tr td:first-child {
+  font-weight: bold;
+}
+
+table.wide_padding tr td, .wide_padding th {
+  padding: 0.35em 3.75em;
+}
+
+table.wide_padding tr td:first-child, .wide_padding th:first-child {
+  padding-left: 0.90em;
+}
+
+table.wide_padding tr td:last-child, .wide_padding th:last-child {
+  padding-right: 0.90em;
+}
+
+#archdev-navbar {
+  margin: 1.5em 0;
+}
+
+#archdev-navbar ul {
+  list-style: outside none none;
+  margin: -0.5em 0;
+  padding: 0;
+}
+
+#archdev-navbar li {
+  display: inline;
+  font-size: 1.0em;
+  margin: 0;
+  padding: 0;
+}
+
+#archdev-navbar li a {
+  padding: 0 0.5em;
+}
+
+dt {
+  float: left;
+  clear: left;
+}
+
+dd {
+  padding: 0;
+  margin: 0;
+}
+
+dd input, dd select, dd textarea {
+  float: left;
+  margin: 1px 0;
+  width: 170px;
+}
+
+dd textarea {
+  height: 100px;
+}
+
+form label {
+  width: 100%;
+  float: right;
+}
+
+.errors {
+  float: left;
+  clear: none;
+  color: red;
+}
+
+.errors ul {
+  padding: 0;
+  margin: 0 0 0 15px;
+}
+
+.errors li {
+  list-style: none;
+}
+
+.form_field_inline input {
+  width: auto;
+}
+
+.form_add dt {
+  width: 150px;
+}
+
+.form_login dt {
+  float: none;
+}
+
+.form_login dd {
+  clear: none;
+  float: left;
+}
+
+.form_login dd label {
+  float: none;
+  margin: 0 0 0 5px;
+}
+
+.red {
+  color: rgb(221, 0, 0);
+}
+
+.orange {
+  color: rgb(255, 80, 5);
+}
+
+.light_orange {
+  color: rgb(255, 164, 5)
+}
+
+.green {
+  color: rgb(0, 128, 0);
+}
+
+.purple {
+  color: rgb(127, 32, 139);
+}

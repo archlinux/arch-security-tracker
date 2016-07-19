@@ -1,0 +1,104 @@
+{% macro render_field(field, show_label=True) %}
+  <dt>{% if show_label %}{{ field.label }}{% else %}&nbsp;{% endif %}</dt>
+  <dd>{{ field(**kwargs)|safe }}
+  {% if field.errors %}
+  <div class="errors">
+    <ul>
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  </dd>
+{% endmacro %}
+
+{% macro render_field_unlabeled(field) %}
+	{{ render_field(field, show_label=False) }}
+{% endmacro %}
+
+{% macro render_field_inline(field) %}
+  <dt /><dd class="form_field_inline">{{ field(**kwargs)|safe }} {{ field.label }}
+  {% if field.errors %}
+  <div class="errors">
+    <ul>
+    {% for error in field.errors %}
+      <li>{{ error }}</li>
+    {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  </dd>
+{% endmacro %}
+
+{% macro nullable_value(value, default='') %}
+	{% if value %}{{ value }}{% else %}{{ default }}{% endif %}
+{% endmacro %}
+
+{% macro colorize_severity(severity) %}
+	{% if not severity or severity == "Unknown" %}
+		<span class="purple">Unknown</span>
+	{% elif severity == "Low" %}
+		<span class="green">Low</span>
+	{% elif severity == "Medium" %}
+		<span class="light_orange">Medium</span>
+	{% elif severity == "High" %}
+		<span class="orange">High</span>
+	{% elif severity == "Critical" %}
+		<span class="red">Critical</span>
+	{% else %}
+		<span>{{ severity }}</span>
+	{% endif %}
+{% endmacro %}
+
+{% macro colorize_status(status) %}
+	{% if not status or status == "Unknown" %}
+		<span class="purple">Unknown</span>
+	{% elif status == "Testing" %}
+		<span class="orange">Testing</span>
+	{% elif status == "Vulnerable" %}
+		<span class="red">Vulnerable</span>
+	{% elif status == "Fixed" %}
+		<span class="green">Fixed</span>
+	{% elif status == "Not affected" %}
+		<span>Not affected</span>
+	{% else %}
+		<span>{{ status }}</span>
+	{% endif %}
+{% endmacro %}
+
+{% macro colorize_remote(value) %}
+	{% if value == None or value == "Unknown" %}
+		<span class="purple">Unknown</span>
+	{% elif value == "Remote" %}
+		<span class="red">Yes</span>
+	{% else %}
+		<span class="green">No</span>
+	{% endif %}
+{% endmacro %}
+
+{% macro colorize_boolean(value) %}
+	{% if value == None or value == "Unknown" %}
+		<span class="purple">Unknown</span>
+	{% elif value %}
+		<span class="red">Yes</span>
+	{% else %}
+		<span class="green">No</span>
+	{% endif %}
+{% endmacro %}
+
+{% macro boolean_value(value, default='Unknown') %}
+	{% if value == None %}
+		{{ default }}
+	{% elif value %}
+		Yes
+	{% else %}
+		No
+	{% endif %}
+{% endmacro %}
+
+{% macro bug_ticket(id) %}
+	{% if id %}
+		<a href="https://bugs.archlinux.org/task/{{ id }}">FS#{{ id }}</a>
+	{% endif %}
+{% endmacro %}

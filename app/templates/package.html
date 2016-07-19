@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote %}
+
+{% macro render_groups(groups) %}
+	{% if groups %}
+	<table class="styled_table wide_padding">
+		<tr>
+			<th>Group</th>
+			<th>Packages</th>
+			<th>Affected</th>
+			<th>Fixed</th>
+			<th>Status</th>
+		</tr>
+	{% for group in groups %}
+		<tr>
+			<td><a href="/AVG-{{ group.id }}">AVG-{{ group.id }}</a></td>
+			<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
+			<td>{{ group.affected }}</td>
+			<td>{{ group.fixed }}</td>
+			<td>{{ colorize_status(group.status) }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+{% endmacro %}
+
+{% macro render_issues(issues) %}
+	{% if issues %}
+	<table class="styled_table">
+		<tr>
+			<th>Issue</th>
+			<th>Group</th>
+			<th>Severity</th>
+			<th>Remote</th>
+			<th>Description</th>
+		</tr>
+	{% for issue in issues %}
+		<tr>
+			<td><a href="/{{ issue.cve.id }}">{{ issue.cve.id }}</a></td>
+			<td><a href="/AVG-{{ issue.group.id }}">AVG-{{ issue.group.id }}</a></td>
+			<td>{{ colorize_severity(issue.cve.severity) }}</td>
+			<td>{{ colorize_remote(issue.cve.remote) }}</td>
+			<td>{{ nullable_value(issue.cve.description)|truncate(70) }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+{% endmacro %}
+
+{% block content %}
+	<h1>{{ package.pkgname }}</h1>
+	<table class="styled_table column_major">
+		<tr>
+			<td>Links</td>
+			<td>
+				<a href="https://www.archlinux.org/packages/?name={{ package.pkgname }}">package</a> |
+				<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname }}">bugs open</a> |
+				<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname }}">bugs closed</a> |
+				<a href="https://wiki.archlinux.org/index.php/Special:Search?search={{ package.pkgname }}%22">Wiki</a> |
+				<a href="https://github.com/search?type=Repositories&q=%22{{ package.pkgname }}%22">GitHub</a> |
+				<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ package.pkgname }}%22">web search</a>
+			</td>
+		</tr>
+	</table>
+	{% if package.groups.open or package.issues.open %}
+	<h2>Open</h2>
+	{{ render_groups(package.groups.open) }}
+	{{ render_issues(package.issues.open) }}
+	{% endif %}
+	{% if package.groups.resolved or package.issues.resolved %}
+	<h2>Resolved</h2>
+	{{ render_groups(package.groups.resolved) }}
+	{{ render_issues(package.issues.resolved) }}
+	{% endif %}
+{% endblock %}

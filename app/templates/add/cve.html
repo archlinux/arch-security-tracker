@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<h1>{{ title }}</h1>
+    <form action="" method="post" name="add" class="form_add">
+        {{ form.hidden_tag() }}
+        <dl>
+            {{ render_field(form.cve) }}
+            {{ render_field(form.description) }}
+            {{ render_field(form.severity) }}
+            {{ render_field(form.remote) }}
+            {{ render_field(form.notes) }}
+            {{ render_field_unlabeled(form.submit) }}
+        </dl>
+    </form>
+{% endblock %}

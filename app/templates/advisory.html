@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% for entry in entries %}
+	  [{{ entry.date }}]
+	  <a href="/{{ entry.advisory }}">{{ entry.advisory }}</a>
+	  <a href="/package/{{ entry.package }}">{{ entry.package }}</a>
+	  {{ entry.type }}<br />
+  {% endfor %}
+{% endblock %}

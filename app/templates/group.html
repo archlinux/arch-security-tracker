@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, bug_ticket %}
+
+{% block content %}
+	<h1>AVG-{{ group.detail.id }} <a href="/AVG-{{  group.detail.id }}/edit" class="edit_link">edit</a></h1>
+	<table class="styled_table column_major">
+		<tr>
+			<td>Packages</td>
+			<td><a href="/package/{{ group.detail.pkgname }}">{{ group.detail.pkgname }}</a></td>
+		</tr>
+		<tr>
+			<td>Status</td>
+			<td>{{ colorize_status(group.detail.status) }}</td>
+		</tr>
+		<tr>
+			<td>Affected</td>
+			<td>{{ group.detail.affected }}</td>
+		</tr>
+		<tr>
+			<td>Fixed</td>
+			<td>{{ group.detail.fixed }}</td>
+		</tr>
+		<tr>
+			<td>Tickets</td>
+			<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
+		</tr>
+	</table>
+	<table class="styled_table">
+		<tr>
+			<th>Issue</th>
+			<th>Severity</th>
+			<th>Remote</th>
+			<th>Description</th>
+		</tr>
+	{% for cve in group.cves %}
+		<tr>
+			<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
+			<td>{{ colorize_severity(cve.severity) }}</td>
+			<td>{{ colorize_remote(cve.remote) }}</td>
+			<td>{{ nullable_value(cve.description)|truncate(70) }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	<b>Notes</b><br />
+	<pre>{{ group.detail.notes }}</pre>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% from "_formhelpers.html" import render_field, render_field_inline, render_field_unlabeled %}
+<html>
+	<head>
+		{% if title %}
+		<title>{{ title }} - Arch Linux Security Tracker</title>
+		{% else %}
+		<title>Arch Linux Security Tracker</title>
+		{% endif %}
+		<link rel='icon' href='/static/favicon.ico' />
+		<link rel='stylesheet' href='/static/style.css' type='text/css' media='all' />
+	</head>
+	<body>
+	<div id="archnavbar">
+		<div id="logo"></div>
+	</div>
+	<div class="content">
+		<div id="archdev-navbar">
+			<ul>
+				<li><a href="/">index</a></li>
+				<li><a href="/CVE/add">add CVE</a></li>
+				<li><a href="/AVG/add">add group</a></li>
+				<li><a href="/advisory">advisory</a></li>
+				<li><a href="/login">login</a></li>
+			</ul>
+		</div>
+		<hr />
+		{% with messages = get_flashed_messages() %}
+		{% if messages %}
+		{% for message in messages %}
+			<div class="box">{{ message }}</div>
+		{% endfor %}
+		{% endif %}
+		{% endwith %}
+		{% block content %}{% endblock %}
+	</div>
+	</body>
+</html>

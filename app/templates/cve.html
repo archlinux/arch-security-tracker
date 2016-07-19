@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote %}
+
+{% block content %}
+	<h1>{{ entry.cve }} <a href="/{{  entry.cve }}/edit" class="edit_link">edit</a></h1>
+	<table class="styled_table column_major">
+		<tr>
+			<td>Source</td>
+			<td>
+				<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ entry.cve }}">MITRE</a> |
+				<a href="https://access.redhat.com/security/cve/{{ entry.cve }}">Red Hat</a> |
+				<a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ entry.cve }}">NIST NVD</a> |
+				<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&status%5B%5D=&sort=desc&string={{ entry.cve }}">Arch Linux bugs</a> |
+				<a href="https://security-tracker.debian.org/tracker/{{ entry.cve }}">Debian</a> |
+				<a href="https://people.canonical.com/~ubuntu-security/cve/{{ entry.cve }}">Ubuntu</a> |
+				<a href="https://bugs.gentoo.org/show_bug.cgi?id={{ entry.cve }}">Gentoo</a> |
+				<a href="https://bugzilla.novell.com/show_bug.cgi?id={{ entry.cve }}">SuSe</a> |
+				<a href="https://github.com/search?type=Code&q=%22{{ entry.cve }}%22">GitHub code</a> |
+				<a href="https://github.com/search?type=Issues&q=%22{{ entry.cve }}%22">GitHub issues</a> |
+				<a href="https://marc.info/?l=oss-security&s={{ entry.cve }}">oss-security</a> |
+				<a href="https://marc.info/?l=full-disclosure&s={{ entry.cve }}">full-disclosure</a> |
+				<a href="https://marc.info/?l=bugtraq&s={{ entry.cve }}">bugtraq</a> |
+				<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ entry.cve }}%22">web search</a>
+			</td>
+		</tr>
+		<tr>
+			<td>Description</td>
+			<td>{{ entry.description }}</td>
+		</tr>
+		<tr>
+		<tr>
+			<td>Severity</td>
+			<td>{{ colorize_severity(entry.severity) }}</td>
+		</tr>
+			<td>Remote</td>
+			<td>{{ colorize_remote(entry.remote) }}</td>
+		</tr>
+	</table>
+	{% if entry.groups %}
+	<table class="styled_table wide_padding">
+		<tr>
+			<th>Group</th>
+			<th>Package</th>
+			<th>Affected</th>
+			<th>Fixed</th>
+			<th>Status</th>
+		</tr>
+	{% for group_entry, group in entry.groups %}
+		<tr>
+			<td><a href="/AVG-{{ group.id }}">AVG-{{ group.id }}</a></td>
+			<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
+			<td>{{ group.affected }}</td>
+			<td>{{ group.fixed }}</td>
+			<td>{{ colorize_status(group.status) }}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+	<b>Notes</b><br />
+	<pre>{{ entry.notes }}</pre>
+{% endblock %}
