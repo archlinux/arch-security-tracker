@@ -28,5 +28,5 @@ def add_group():
         db.create(CVEGroupEntry, group=group, cve=cve)
 
     db.session.commit()
-    flash('Added AVG-{}'.format(group.id))
-    return redirect('/AVG-{}'.format(group.id))
+    flash('Added {}'.format(group.name))
+    return redirect('/{}'.format(group.name))

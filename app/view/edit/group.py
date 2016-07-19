@@ -46,5 +46,5 @@ def edit_group(avg):
         db.get_or_create(CVEGroupEntry, group=group, cve=cve)
 
     db.session.commit()
-    flash('Edited AVG-{}'.format(group.id))
-    return redirect('/AVG-{}'.format(group.id))
+    flash('Edited {}'.format(group.name))
+    return redirect('/{}'.format(group.name))

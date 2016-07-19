@@ -24,5 +24,5 @@ def group(group_id):
         'cves': cves
     }
     return render_template('group.html',
-                           title='AVG-{}'.format(group.id),
+                           title='{}'.format(group.name),
                            group=out)

@@ -20,5 +20,12 @@ class CVEGroup(db.Model):
     notes = db.Column(db.String(120))
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
 
+    @property
+    def name(self):
+        return 'AVG-{}'.format(self.id)
+
+    def __str__(self):
+        return self.name
+
     def __repr__(self):
         return '<CVEGroup %r>' % (self.id)

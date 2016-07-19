@@ -14,7 +14,7 @@
 		</tr>
 		{% for entry in entries %}
 		<tr>
-			<td><a href="/AVG-{{ entry.group.id }}">AVG-{{ entry.group.id }}</a></td>
+			<td><a href="/{{ entry.group.name }}">{{ entry.group.name }}</a></td>
 			<td>
 				{% for cve in entry.cves %}
 					<a href="/{{ cve.id }}">{{ cve.id }}</a><br />

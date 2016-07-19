@@ -13,7 +13,7 @@
 		</tr>
 	{% for group in groups %}
 		<tr>
-			<td><a href="/AVG-{{ group.id }}">AVG-{{ group.id }}</a></td>
+			<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 			<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
 			<td>{{ group.affected }}</td>
 			<td>{{ group.fixed }}</td>
@@ -37,7 +37,7 @@
 	{% for issue in issues %}
 		<tr>
 			<td><a href="/{{ issue.cve.id }}">{{ issue.cve.id }}</a></td>
-			<td><a href="/AVG-{{ issue.group.id }}">AVG-{{ issue.group.id }}</a></td>
+			<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
 			<td>{{ colorize_severity(issue.cve.severity) }}</td>
 			<td>{{ colorize_remote(issue.cve.remote) }}</td>
 			<td>{{ nullable_value(issue.cve.description)|truncate(70) }}</td>

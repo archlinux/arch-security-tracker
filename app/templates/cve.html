@@ -47,7 +47,7 @@
 		</tr>
 	{% for group_entry, group in entry.groups %}
 		<tr>
-			<td><a href="/AVG-{{ group.id }}">AVG-{{ group.id }}</a></td>
+			<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 			<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
 			<td>{{ group.affected }}</td>
 			<td>{{ group.fixed }}</td>
