@@ -4,13 +4,14 @@ from app.form import CVEForm
 from app.model import CVE
 from app.model.enum import Remote, Severity
 from app.model.cve import cve_id_regex
+from app.view.error import not_found
 
 
 @app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
 def edit_cve(cve):
     cve = db.get(CVE, id=cve)
     if cve is None:
-        return "404"
+        return not_found()
     form = CVEForm()
     if not form.is_submitted():
         form.cve.data = cve.id

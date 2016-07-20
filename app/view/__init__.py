@@ -7,3 +7,4 @@ from .cve import *
 from .advisory import *
 from .package import *
 from .group import *
+from .error import *

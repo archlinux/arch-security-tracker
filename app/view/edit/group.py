@@ -4,13 +4,14 @@ from app.form import GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry
 from app.model.enum import Status
 from app.model.cvegroup import vulnerability_group_regex
+from app.view.error import not_found
 
 
 @app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
 def edit_group(avg):
     group = db.get(CVEGroup, id=avg[4:])
     if group is None:
-        return "404"
+        return not_found()
     form = GroupForm()
     if not form.is_submitted():
         form.affected.data = group.affected
