@@ -2,7 +2,6 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import ClauseElement
 from werkzeug.routing import BaseConverter
-
 from types import MethodType
 
 app = Flask(__name__)
@@ -20,7 +19,6 @@ app.url_map.converters['regex'] = RegexConverter
 
 from app.view import *
 from app.model import *
-
 
 def get(self, model, defaults=None, **kwargs):
     return self.session.query(model).filter_by(**kwargs).first()

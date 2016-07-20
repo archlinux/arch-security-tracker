@@ -1,6 +1,5 @@
 from flask import render_template, flash, redirect
-from app import app
-from app import db
+from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupEntry
 from app.model.cve import cve_id_regex
 from app.view.error import not_found
