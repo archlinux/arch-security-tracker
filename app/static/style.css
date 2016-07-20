@@ -218,17 +218,17 @@ form label {
 
 .error_icon_box {
   text-align: center;
-  margin-top: -6vw;
+  margin-top: -8vw;
 }
 
 .error_icon_box .icon {
-  font-size: 22vw;
+  font-size: calc(13vw + 13vh + 6vmin);
 }
 
 .error_icon_box .text {
-  margin-top: -9vw;
+  margin-top: -10vw;
   font-family: sans-serif;
-  font-size: 4vw;
   font-weight: bold;
-  line-height: 4vw;
+  font-size: calc(2vw + 2vh + 2vmin);
+  line-height: 1.1em;
 }
