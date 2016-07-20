@@ -1,5 +1,4 @@
 body {
-  font-family: sans-serif;
   background: #f6f9fc none repeat scroll 0 0;
   color: #222;
   font: 100% sans-serif;
@@ -41,6 +40,7 @@ body {
 
 h1 {
   font-size: 2em;
+  margin-bottom: 0.5em;
 }
 
 h2 {
@@ -76,6 +76,17 @@ h1 a, h2 a {
   margin-bottom: 1.5em;
 }
 
+.wrap {
+  white-space: normal;
+}
+
+pre {
+  font-family: sans-serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
 table {
   border: 0;
   margin-bottom: 1.5em;
@@ -88,17 +99,6 @@ table tr td, table th {
   padding: 0.35em 0.90em;
   text-align: left;
   white-space: nowrap;
-}
-
-.wrap {
-  white-space: normal;
-}
-
-pre {
-  font-family: sans-serif;
-  white-space: pre-wrap;
-  word-break: break-word;
-  margin: 0;
 }
 
 table th {
