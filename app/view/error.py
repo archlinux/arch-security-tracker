@@ -2,6 +2,8 @@ from app import app
 from flask import render_template
 from random import randint
 from logging import error
+from os import urandom
+from binascii import hexlify
 
 
 smileys = [u'😐', u'😑', u'😒', u'😓', u'😔', u'😕', u'😖', u'😝', u'😞', u'😟',
@@ -31,8 +33,10 @@ def gone(e='410: Gone'):
 
 @app.errorhandler(Exception)
 @app.errorhandler(500)
-def internal_error(e='500: Deep Shit'):
+def internal_error(e):
     if app.debug:
         raise e
-    error(e, exc_info=True)
-    return handle_error(e if e is str else '500: Deep Shit', 500)
+    code = hexlify(urandom(4)).decode()
+    error(Exception("Code: {}".format(code), e), exc_info=True)
+    text = '500: Deep Shit\n{}'.format(code)
+    return handle_error(text, 500)
