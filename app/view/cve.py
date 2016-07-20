@@ -2,13 +2,13 @@ from flask import render_template, flash, redirect
 from app import app
 from app import db
 from app.model import CVE, CVEGroup, CVEGroupEntry
+from app.model.cve import cve_id_regex
 from app.view.error import not_found
 
 
-@app.route('/issue/CVE-<cve>')
-@app.route('/CVE-<cve>')
-def cve(cve):
-    cve = 'CVE-' + cve
+@app.route('/issue/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
+@app.route('/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
+def show_cve(cve):
     cve_model = CVE.query.get(cve)
     if not cve_model:
         return not_found()
