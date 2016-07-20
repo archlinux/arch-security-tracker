@@ -65,7 +65,7 @@ a:hover, a:visited:hover {
   text-decoration: underline;
 }
 
-.edit_link {
+h1 a, h2 a {
   font-size: 0.45em;
 }
 
