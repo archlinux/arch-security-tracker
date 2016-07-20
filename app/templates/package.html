@@ -3,7 +3,7 @@
 
 {% macro render_groups(groups) %}
 	{% if groups %}
-	<table class="styled_table wide_padding">
+	<table class="styled_table medium_size">
 		<tr>
 			<th>Group</th>
 			<th>Packages</th>
@@ -26,7 +26,7 @@
 
 {% macro render_issues(issues) %}
 	{% if issues %}
-	<table class="styled_table">
+	<table class="styled_table medium_size">
 		<tr>
 			<th>Issue</th>
 			<th>Group</th>
@@ -40,7 +40,7 @@
 			<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
 			<td>{{ colorize_severity(issue.cve.severity) }}</td>
 			<td>{{ colorize_remote(issue.cve.remote) }}</td>
-			<td>{{ nullable_value(issue.cve.description)|truncate(70) }}</td>
+			<td>{{ nullable_value(issue.cve.description)|truncate(80) }}</td>
 		</tr>
 	{% endfor %}
 	</table>

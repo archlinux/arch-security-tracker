@@ -85,7 +85,17 @@ table {
 
 table tr td, table th {
   padding: 0.35em 0.90em;
-  text-align: left
+  text-align: left;
+  white-space: nowrap;
+}
+
+.wrap {
+  white-space: normal;
+}
+
+table th {
+  background: rgb(217, 230, 236) none repeat scroll 0 0;
+  border-bottom: 1px solid #bcd;
 }
 
 table.styled_table {
@@ -101,16 +111,14 @@ table.column_major tr td:first-child {
   font-weight: bold;
 }
 
-table.wide_padding tr td, .wide_padding th {
-  padding: 0.35em 3.75em;
+table.wide_size {
+  width: 100%;
+  max-width: 80em;
 }
 
-table.wide_padding tr td:first-child, .wide_padding th:first-child {
-  padding-left: 0.90em;
-}
-
-table.wide_padding tr td:last-child, .wide_padding th:last-child {
-  padding-right: 0.90em;
+table.medium_size {
+  width: 100%;
+  max-width: 65em;
 }
 
 #archdev-navbar {
