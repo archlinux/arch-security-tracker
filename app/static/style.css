@@ -1,4 +1,5 @@
 body {
+  font-family: sans-serif;
   background: #f6f9fc none repeat scroll 0 0;
   color: #222;
   font: 100% sans-serif;
@@ -93,6 +94,13 @@ table tr td, table th {
   white-space: normal;
 }
 
+pre {
+  font-family: sans-serif;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
 table th {
   background: rgb(217, 230, 236) none repeat scroll 0 0;
   border-bottom: 1px solid #bcd;
@@ -113,12 +121,12 @@ table.column_major tr td:first-child {
 
 table.wide_size {
   width: 100%;
-  max-width: 80em;
+  max-width: 85em;
 }
 
 table.medium_size {
   width: 100%;
-  max-width: 65em;
+  max-width: 70em;
 }
 
 #archdev-navbar {
@@ -235,7 +243,6 @@ form label {
 
 .error_icon_box .text {
   margin-top: -10vw;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: calc(2vw + 2vh + 2vmin);
   line-height: 1.1em;

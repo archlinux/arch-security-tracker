@@ -3,7 +3,7 @@
 
 {% block content %}
 	<h1>{{ entry.cve }} <a href="/{{  entry.cve }}/edit" class="edit_link">edit</a></h1>
-	<table class="styled_table column_major">
+	<table class="styled_table column_major wide_size">
 		<tr>
 			<td>Source</td>
 			<td class="wrap">
@@ -25,7 +25,7 @@
 		</tr>
 		<tr>
 			<td>Description</td>
-			<td>{{ entry.description }}</td>
+			<td><pre>{{ entry.description }}</pre></td>
 		</tr>
 		<tr>
 		<tr>

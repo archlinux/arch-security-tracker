@@ -40,7 +40,7 @@
 			<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
 			<td>{{ colorize_severity(issue.cve.severity) }}</td>
 			<td>{{ colorize_remote(issue.cve.remote) }}</td>
-			<td>{{ nullable_value(issue.cve.description)|truncate(80) }}</td>
+			<td>{{ nullable_value(issue.cve.description)|wordwrap(70, wrapstring=' ')|truncate(100) }}</td>
 		</tr>
 	{% endfor %}
 	</table>
