@@ -2,10 +2,11 @@ from flask import render_template, flash, redirect
 from app import app
 from app import db
 from app.model import CVE, CVEGroup, CVEGroupEntry
+from app.model.cvegroup import pkgname_regex
 
 
-@app.route('/package/<pkgname>')
-def package(pkgname):
+@app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
+def show_package(pkgname):
     entries = (db.session.query(CVEGroup, CVE).filter_by(pkgname=pkgname).join(CVEGroupEntry).join(CVE)).all()
     groups = set()
     issues = []
