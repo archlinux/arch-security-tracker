@@ -56,6 +56,10 @@
 	{% endfor %}
 	</table>
 	{% endif %}
-	<b>Notes</b><br />
-	<pre>{{ entry.notes|urlize }}</pre>
+	{% if entry.notes %}
+	<table class="styled_table medium_size">
+		<tr><th>Notes</th></tr>
+		<tr><td><pre>{{ entry.notes|urlize }}</pre></td></tr>
+	</table>
+	{% endif %}
 {% endblock %}

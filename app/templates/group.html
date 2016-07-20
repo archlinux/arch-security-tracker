@@ -41,6 +41,10 @@
 		</tr>
 	{% endfor %}
 	</table>
-	<b>Notes</b><br />
-	<pre>{{ group.detail.notes|urlize }}</pre>
+	{% if group.detail.notes %}
+	<table class="styled_table medium_size">
+		<tr><th>Notes</th></tr>
+		<tr><td><pre>{{ group.detail.notes|urlize }}</pre></td></tr>
+	</table>
+	{% endif %}
 {% endblock %}
