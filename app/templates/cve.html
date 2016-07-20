@@ -6,7 +6,7 @@
 	<table class="styled_table column_major">
 		<tr>
 			<td>Source</td>
-			<td>
+			<td class="wrap">
 				<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ entry.cve }}">MITRE</a> |
 				<a href="https://access.redhat.com/security/cve/{{ entry.cve }}">Red Hat</a> |
 				<a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ entry.cve }}">NIST NVD</a> |
@@ -37,7 +37,7 @@
 		</tr>
 	</table>
 	{% if entry.groups %}
-	<table class="styled_table wide_padding">
+	<table class="styled_table medium_size">
 		<tr>
 			<th>Group</th>
 			<th>Package</th>
