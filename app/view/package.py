@@ -27,5 +27,5 @@ def show_package(pkgname):
                    'resolved': list(filter(lambda issue: issue['group'].status.resolved(), issues))}
     }
     return render_template('package.html',
-                           title='Package {}'.format(pkgname),
+                           title='{}'.format(pkgname),
                            package=package)
