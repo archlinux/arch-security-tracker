@@ -22,6 +22,27 @@ body {
   padding: 10px 15px !important;
 }
 
+#archdev-navbar {
+  margin: 1.5em 0;
+}
+
+#archdev-navbar ul {
+  list-style: outside none none;
+  margin: -0.5em 0;
+  padding: 0;
+}
+
+#archdev-navbar li {
+  display: inline;
+  font-size: 1.0em;
+  margin: 0;
+  padding: 0;
+}
+
+#archdev-navbar li a {
+  padding: 0 0.5em;
+}
+
 #logo {
   background: rgba(0, 0, 0, 0) url("archlogo.4fefb38dc270.png") no-repeat scroll 0 0 !important;
   float: left !important;
@@ -132,27 +153,6 @@ table.wide_size {
 table.medium_size {
   width: 100%;
   max-width: 70em;
-}
-
-#archdev-navbar {
-  margin: 1.5em 0;
-}
-
-#archdev-navbar ul {
-  list-style: outside none none;
-  margin: -0.5em 0;
-  padding: 0;
-}
-
-#archdev-navbar li {
-  display: inline;
-  font-size: 1.0em;
-  margin: 0;
-  padding: 0;
-}
-
-#archdev-navbar li a {
-  padding: 0 0.5em;
 }
 
 dt {
