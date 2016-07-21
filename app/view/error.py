@@ -13,7 +13,7 @@ smileys = [u'😐', u'😑', u'😒', u'😓', u'😔', u'😕', u'😖', u'😝
 
 
 def handle_error(e, code):
-    return render_template('error.html', smiley=smileys[randint(0, len(smileys) - 1)], text=e), code
+    return render_template('error.html', smiley=smileys[randint(0, len(smileys) - 1)], text=e, title='{}'.format(code)), code
 
 
 @app.errorhandler(404)
