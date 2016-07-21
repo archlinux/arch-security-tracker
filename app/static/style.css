@@ -2,8 +2,8 @@ body {
   background: #f6f9fc none repeat scroll 0 0;
   color: #222;
   font: 100% sans-serif;
+  letter-spacing: 0.02em;
   line-height: 1.3em;
-  min-width: 650px;
   margin: 0;
   padding: 0;
 }
@@ -118,6 +118,10 @@ table.styled_table tr td {
 
 table.column_major tr td:first-child {
   font-weight: bold;
+}
+
+table.full_size {
+  width: 100%;
 }
 
 table.wide_size {
