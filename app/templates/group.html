@@ -4,47 +4,61 @@
 {% block content %}
 	<h1>{{ group.detail.name }} <a href="/{{  group.detail.name }}/edit">edit</a></h1>
 	<table class="styled_table column_major">
-		<tr>
-			<td>Packages</td>
-			<td><a href="/package/{{ group.detail.pkgname }}">{{ group.detail.pkgname }}</a></td>
-		</tr>
-		<tr>
-			<td>Status</td>
-			<td>{{ colorize_status(group.detail.status) }}</td>
-		</tr>
-		<tr>
-			<td>Affected</td>
-			<td>{{ group.detail.affected }}</td>
-		</tr>
-		<tr>
-			<td>Fixed</td>
-			<td>{{ group.detail.fixed }}</td>
-		</tr>
-		<tr>
-			<td>Tickets</td>
-			<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
-		</tr>
+		<tbody>
+			<tr>
+				<td>Packages</td>
+				<td><a href="/package/{{ group.detail.pkgname }}">{{ group.detail.pkgname }}</a></td>
+			</tr>
+			<tr>
+				<td>Status</td>
+				<td>{{ colorize_status(group.detail.status) }}</td>
+			</tr>
+			<tr>
+				<td>Affected</td>
+				<td>{{ group.detail.affected }}</td>
+			</tr>
+			<tr>
+				<td>Fixed</td>
+				<td>{{ group.detail.fixed }}</td>
+			</tr>
+			<tr>
+				<td>Tickets</td>
+				<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
+			</tr>
+		</tbody>
 	</table>
 	<table class="styled_table medium_size">
-		<tr>
-			<th>Issue</th>
-			<th>Severity</th>
-			<th>Remote</th>
-			<th>Description</th>
-		</tr>
-	{% for cve in group.cves %}
-		<tr>
-			<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
-			<td>{{ colorize_severity(cve.severity) }}</td>
-			<td>{{ colorize_remote(cve.remote) }}</td>
-			<td><pre>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(95) }}<pre></td>
-		</tr>
-	{% endfor %}
+		<thead>
+			<tr>
+				<th>Issue</th>
+				<th>Severity</th>
+				<th>Remote</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for cve in group.cves %}
+			<tr>
+				<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
+				<td>{{ colorize_severity(cve.severity) }}</td>
+				<td>{{ colorize_remote(cve.remote) }}</td>
+				<td><pre>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(95) }}<pre></td>
+			</tr>
+		</tbody>
+		{% endfor %}
 	</table>
 	{% if group.detail.notes %}
 	<table class="styled_table medium_size">
-		<tr><th>Notes</th></tr>
-		<tr><td><pre>{{ group.detail.notes|urlize }}</pre></td></tr>
+		<thead>
+			<tr>
+				<th>Notes</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><pre>{{ group.detail.notes|urlize }}</pre></td>
+			</tr>
+		</tbody>
 	</table>
 	{% endif %}
 {% endblock %}

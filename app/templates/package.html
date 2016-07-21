@@ -4,22 +4,26 @@
 {% macro render_groups(groups) %}
 	{% if groups %}
 	<table class="styled_table medium_size">
-		<tr>
-			<th>Group</th>
-			<th>Packages</th>
-			<th>Affected</th>
-			<th>Fixed</th>
-			<th>Status</th>
-		</tr>
-	{% for group in groups %}
-		<tr>
-			<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-			<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
-			<td>{{ group.affected }}</td>
-			<td>{{ group.fixed }}</td>
-			<td>{{ colorize_status(group.status) }}</td>
-		</tr>
-	{% endfor %}
+		<thead>
+			<tr>
+				<th>Group</th>
+				<th>Packages</th>
+				<th>Affected</th>
+				<th>Fixed</th>
+				<th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for group in groups %}
+			<tr>
+				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+				<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
+				<td>{{ group.affected }}</td>
+				<td>{{ group.fixed }}</td>
+				<td>{{ colorize_status(group.status) }}</td>
+			</tr>
+		{% endfor %}
+		</tbody>
 	</table>
 	{% endif %}
 {% endmacro %}
@@ -27,22 +31,26 @@
 {% macro render_issues(issues) %}
 	{% if issues %}
 	<table class="styled_table medium_size">
-		<tr>
-			<th>Issue</th>
-			<th>Group</th>
-			<th>Severity</th>
-			<th>Remote</th>
-			<th>Description</th>
-		</tr>
-	{% for issue in issues %}
-		<tr>
-			<td><a href="/{{ issue.cve.id }}">{{ issue.cve.id }}</a></td>
-			<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
-			<td>{{ colorize_severity(issue.cve.severity) }}</td>
-			<td>{{ colorize_remote(issue.cve.remote) }}</td>
-			<td><pre>{{ nullable_value(issue.cve.description)|wordwrap(60, wrapstring=' ')|truncate(80) }}<pre></td>
-		</tr>
-	{% endfor %}
+		<thead>
+			<tr>
+				<th>Issue</th>
+				<th>Group</th>
+				<th>Severity</th>
+				<th>Remote</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for issue in issues %}
+			<tr>
+				<td><a href="/{{ issue.cve.id }}">{{ issue.cve.id }}</a></td>
+				<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
+				<td>{{ colorize_severity(issue.cve.severity) }}</td>
+				<td>{{ colorize_remote(issue.cve.remote) }}</td>
+				<td><pre>{{ nullable_value(issue.cve.description)|wordwrap(60, wrapstring=' ')|truncate(80) }}<pre></td>
+			</tr>
+		{% endfor %}
+		</tbody>
 	</table>
 	{% endif %}
 {% endmacro %}
@@ -50,17 +58,19 @@
 {% block content %}
 	<h1>{{ package.pkgname }}</h1>
 	<table class="styled_table column_major">
-		<tr>
-			<td>Links</td>
-			<td>
-				<a href="https://www.archlinux.org/packages/?name={{ package.pkgname }}">package</a> |
-				<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname }}">bugs open</a> |
-				<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname }}">bugs closed</a> |
-				<a href="https://wiki.archlinux.org/index.php/Special:Search?search={{ package.pkgname }}%22">Wiki</a> |
-				<a href="https://github.com/search?type=Repositories&q=%22{{ package.pkgname }}%22">GitHub</a> |
-				<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ package.pkgname }}%22">web search</a>
-			</td>
-		</tr>
+		<tbody>
+			<tr>
+				<td>Links</td>
+				<td>
+					<a href="https://www.archlinux.org/packages/?name={{ package.pkgname }}">package</a> |
+					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname }}">bugs open</a> |
+					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname }}">bugs closed</a> |
+					<a href="https://wiki.archlinux.org/index.php/Special:Search?search={{ package.pkgname }}%22">Wiki</a> |
+					<a href="https://github.com/search?type=Repositories&q=%22{{ package.pkgname }}%22">GitHub</a> |
+					<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ package.pkgname }}%22">web search</a>
+				</td>
+			</tr>
+		</tbody>
 	</table>
 	{% if package.groups.open or package.issues.open %}
 	<h2>Open</h2>
