@@ -3,11 +3,11 @@
 
 {% block content %}
 	<h1>{{ group.detail.name }} <a href="/{{  group.detail.name }}/edit">edit</a></h1>
-	<table class="styled_table column_major">
+	<table class="styled_table column_major medium_size">
 		<tbody>
 			<tr>
 				<td>Packages</td>
-				<td><a href="/package/{{ group.detail.pkgname }}">{{ group.detail.pkgname }}</a></td>
+				<td class="full_size"><a href="/package/{{ group.detail.pkgname }}">{{ group.detail.pkgname }}</a></td>
 			</tr>
 			<tr>
 				<td>Status</td>
@@ -33,7 +33,7 @@
 				<th>Issue</th>
 				<th>Severity</th>
 				<th>Remote</th>
-				<th>Description</th>
+				<th class="full_size">Description</th>
 			</tr>
 		</thead>
 		<tbody>

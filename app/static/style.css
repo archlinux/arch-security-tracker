@@ -45,7 +45,6 @@ body {
 
 #logo {
   background: rgba(0, 0, 0, 0) url("archlogo.4fefb38dc270.png") no-repeat scroll 0 0 !important;
-  float: left !important;
   height: 40px !important;
   margin: 0 !important;
   padding: 0 !important;
@@ -61,11 +60,15 @@ body {
 
 h1 {
   font-size: 2em;
-  margin-bottom: 0.5em;
 }
 
 h2 {
   font-size: 1.2em;
+}
+
+h1 a, h2 a {
+  font-size: 0.45em;
+  line-height: 0.45em;
 }
 
 hr {
@@ -84,11 +87,6 @@ a:link, a:visited {
 
 a:hover, a:visited:hover {
   text-decoration: underline;
-}
-
-h1 a, h2 a {
-  font-size: 0.45em;
-  line-height: 1.0em;
 }
 
 .box {
@@ -141,16 +139,20 @@ table.column_major tr td:first-child {
   font-weight: bold;
 }
 
-table.full_size {
+.center {
+  text-align: center;
+}
+
+.full_size {
   width: 100%;
 }
 
-table.wide_size {
+.wide_size {
   width: 100%;
   max-width: 85em;
 }
 
-table.medium_size {
+.medium_size {
   width: 100%;
   max-width: 70em;
 }
