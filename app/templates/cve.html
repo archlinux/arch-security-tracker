@@ -3,13 +3,13 @@
 
 {% block content %}
 	<h1>{{ entry.cve }} <a href="/{{  entry.cve }}/edit">edit</a></h1>
-	<table class="styled_table column_major wide_size">
+	<table class="styled_table column_major medium_size">
 		<tr>
 			<td>Source</td>
 			<td class="wrap">
 				<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ entry.cve }}">MITRE</a> |
 				<a href="https://access.redhat.com/security/cve/{{ entry.cve }}">Red Hat</a> |
-				<a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ entry.cve }}">NIST NVD</a> |
+				<a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ entry.cve }}">NVD</a> |
 				<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&status%5B%5D=&sort=desc&string={{ entry.cve }}">Arch Linux bugs</a> |
 				<a href="https://security-tracker.debian.org/tracker/{{ entry.cve }}">Debian</a> |
 				<a href="https://people.canonical.com/~ubuntu-security/cve/{{ entry.cve }}">Ubuntu</a> |

@@ -37,7 +37,7 @@
 			<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
 			<td>{{ colorize_severity(cve.severity) }}</td>
 			<td>{{ colorize_remote(cve.remote) }}</td>
-			<td>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(100) }}</td>
+			<td><pre>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(95) }}<pre></td>
 		</tr>
 	{% endfor %}
 	</table>
