@@ -32,7 +32,7 @@
 {% endmacro %}
 
 {% macro nullable_value(value, default='') %}
-	{% if value %}{{ value }}{% else %}{{ default }}{% endif %}
+{% if value %}{{ value }}{% else %}{{ default }}{% endif %}
 {% endmacro %}
 
 {% macro colorize_severity(severity) %}
