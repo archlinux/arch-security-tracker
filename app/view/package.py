@@ -12,10 +12,6 @@ def show_package(pkgname):
     if not versions:
         return not_found()
 
-    versions = sorted(versions, key=lambda item: item.version, reverse=True)
-    for pkg in versions:
-        print(pkg.db.name, pkg.name, pkg.version)
-
     entries = (db.session.query(CVEGroup, CVE).filter_by(pkgname=pkgname).join(CVEGroupEntry).join(CVE)).all()
     groups = set()
     issues = []
