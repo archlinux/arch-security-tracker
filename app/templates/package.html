@@ -7,17 +7,15 @@
 		<thead>
 			<tr>
 				<th>Group</th>
-				<th>Packages</th>
 				<th>Affected</th>
 				<th>Fixed</th>
-				<th>Status</th>
+				<th class="full_size">Status</th>
 			</tr>
 		</thead>
 		<tbody>
 		{% for group in groups %}
 			<tr>
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-				<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
 				<td>{{ colorize_status(group.status) }}</td>
@@ -60,7 +58,7 @@
 	<table class="styled_table column_major medium_size">
 		<tbody>
 			<tr>
-				<td>Links</td>
+				<td>Link</td>
 				<td class="full_size">
 					<a href="https://www.archlinux.org/packages/?name={{ package.pkgname }}">package</a> |
 					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname }}">bugs open</a> |
@@ -68,6 +66,14 @@
 					<a href="https://wiki.archlinux.org/index.php/Special:Search?search={{ package.pkgname }}%22">Wiki</a> |
 					<a href="https://github.com/search?type=Repositories&q=%22{{ package.pkgname }}%22">GitHub</a> |
 					<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ package.pkgname }}%22">web search</a>
+				</td>
+			</tr>
+			<tr>
+				<td>Version</td>
+				<td>
+				{% for version in package.versions %}
+					{{ version.version }} {{version.arch}} [{{ version.db.name }}]<br />
+				{% endfor %}
 				</td>
 			</tr>
 		</tbody>
