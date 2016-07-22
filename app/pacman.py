@@ -68,7 +68,7 @@ def filter_duplicates(packages, filter_arch=False):
 
 
 def sort_packages(packages):
-    packages = sorted(packages, key=lambda item: item.version, reverse=True)
-    packages = sorted(packages, key=lambda item: item.db.name)
     packages = sorted(packages, key=lambda item: item.arch)
+    packages = sorted(packages, key=lambda item: item.db.name)
+    packages = sorted(packages, key=lambda item: item.version, reverse=True)
     return packages
