@@ -11,18 +11,22 @@ def update(force=False):
         pkgdb.update(force)
 
 
-def get_pkg(pkgname):
+def get_pkg(pkgname, testing=True):
     results = []
     for syncdb in syncdbs:
+        if not testing and 'testing' in syncdb.name:
+            continue
         result = syncdb.get_pkg(pkgname)
         if result:
             results.append(result)
     return results
 
 
-def search(pkgname):
+def search(pkgname, testing=True):
     results = []
     for syncdb in syncdbs:
+        if not testing and 'testing' in syncdb.name:
+            continue
         result = syncdb.search(pkgname)
         if result:
             results.append(result)
