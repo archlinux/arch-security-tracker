@@ -8,7 +8,7 @@ from app.view.error import not_found
 
 @app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
 def show_package(pkgname):
-    versions = get_pkg(pkgname)
+    versions = get_pkg(pkgname, filter_arch=True)
     if not versions:
         return not_found()
 
