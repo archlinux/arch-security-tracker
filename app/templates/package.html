@@ -78,6 +78,9 @@
 			</tr>
 		</tbody>
 	</table>
+	{% if not package.groups.open and not package.issues.open and not package.groups.resolved and not package.issues.resolved %}
+	<h2>No issues</h2>
+	{% endif %}
 	{% if package.groups.open or package.issues.open %}
 	<h2>Open</h2>
 	{{ render_groups(package.groups.open) }}
