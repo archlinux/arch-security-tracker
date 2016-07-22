@@ -21,7 +21,7 @@ def update(arch=None, force=False):
             syncdb.update(force)
 
 
-def get_pkg(pkgname, arch=None, testing=True):
+def get_pkg(pkgname, arch=None, testing=True, filter_arch=False):
     get_archs = [arch] if arch else archs
     results = set()
     for arch in get_archs:
@@ -31,11 +31,12 @@ def get_pkg(pkgname, arch=None, testing=True):
             result = syncdb.get_pkg(pkgname)
             if result:
                 results.add(result)
-    results = filter_duplicates(results)
-    return sort_packages(results)
+    results = sort_packages(results)
+    results = filter_duplicates(results, filter_arch)
+    return results
 
 
-def search(pkgname, arch=None, testing=True):
+def search(pkgname, arch=None, testing=True, filter_arch=False):
     search_archs = [arch] if arch else archs
     results = []
     for arch in search_archs:
@@ -45,18 +46,22 @@ def search(pkgname, arch=None, testing=True):
             result = syncdb.search(pkgname)
             if result:
                 results.append(result)
-    results = filter_duplicates(results)
-    return sort_packages(results)
+    results = sort_packages(results)
+    results = filter_duplicates(results, filter_arch)
+    return results
 
 
-def filter_duplicates(packages):
+def filter_duplicates(packages, filter_arch=False):
     filtered = []
     for pkg in packages:
         contains = False
         for f in filtered:
-            if f.version == pkg.version and f.arch == pkg.arch and f.db.name == pkg.db.name:
-                contains = True
-                break
+            if f.version != pkg.version or f.db.name != pkg.db.name:
+                continue
+            if not filter_arch and f.arch != pkg.arch:
+                continue
+            contains = True
+            break
         if not contains:
             filtered.append(pkg)
     return filtered
