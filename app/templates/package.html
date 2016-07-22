@@ -72,7 +72,7 @@
 				<td>Version</td>
 				<td>
 				{% for version in package.versions %}
-					{{ version.version }} {{version.arch}} [{{ version.db.name }}]<br />
+					{{ version.version }} [{{ version.db.name }}]<br />
 				{% endfor %}
 				</td>
 			</tr>
