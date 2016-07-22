@@ -4,16 +4,11 @@ from random import randint
 from logging import error
 from os import urandom
 from binascii import hexlify
-
-
-smileys = [u'😐', u'😑', u'😒', u'😓', u'😔', u'😕', u'😖', u'😝', u'😞', u'😟',
-           u'😠', u'😡', u'😢', u'😣', u'😥', u'😦', u'😧', u'😨', u'😩', u'😪',
-           u'😫', u'😭', u'😮', u'😯', u'😰', u'😱', u'😲', u'😵', u'😶', u'😾',
-           u'😿', u'🙀']
+from app.util import smileys_sad
 
 
 def handle_error(e, code):
-    return render_template('error.html', smiley=smileys[randint(0, len(smileys) - 1)], text=e, title='{}'.format(code)), code
+    return render_template('error.html', smiley=smileys_sad[randint(0, len(smileys_sad) - 1)], text=e, title='{}'.format(code)), code
 
 
 @app.errorhandler(404)
