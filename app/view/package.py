@@ -1,12 +1,21 @@
 from flask import render_template, flash, redirect
-from app import app
-from app import db
+from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupEntry
 from app.model.cvegroup import pkgname_regex
+from app.pacman import get_pkg
+from app.view.error import not_found
 
 
 @app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
 def show_package(pkgname):
+    versions = get_pkg(pkgname)
+    if not versions:
+        return not_found()
+
+    versions = sorted(versions, key=lambda item: item.version, reverse=True)
+    for pkg in versions:
+        print(pkg.db.name, pkg.name, pkg.version)
+
     entries = (db.session.query(CVEGroup, CVE).filter_by(pkgname=pkgname).join(CVEGroupEntry).join(CVE)).all()
     groups = set()
     issues = []
@@ -21,6 +30,7 @@ def show_package(pkgname):
 
     package = {
         'pkgname': pkgname,
+        'versions': versions,
         'groups': {'open': list(filter(lambda group: group.status.open(), groups)),
                    'resolved': list(filter(lambda group: group.status.resolved(), groups))},
         'issues': {'open': list(filter(lambda issue: issue['group'].status.open(), issues)),
