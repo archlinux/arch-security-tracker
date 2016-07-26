@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect
 from app import app
 
+
 @app.route('/advisory')
 def advisory():
     entries = [
