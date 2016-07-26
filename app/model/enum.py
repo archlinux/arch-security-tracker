@@ -73,8 +73,8 @@ class OrderedDatabaseEnum(DatabaseEnum):
 
 
 class Status(OrderedDatabaseEnum):
-    unknown = 'Unknown', 2
-    vulnerable = 'Vulnerable', 1
+    unknown = 'Unknown', 1
+    vulnerable = 'Vulnerable', 2
     testing = 'Testing', 3
     fixed = 'Fixed', 4
     not_affected = 'Not affected', 4
@@ -88,10 +88,10 @@ class Status(OrderedDatabaseEnum):
 
 class Severity(OrderedDatabaseEnum):
     unknown = 'Unknown', 1
-    critical = 'Critical', 1
-    high = 'High', 2
-    medium = 'Medium', 3
-    low = 'Low', 4
+    critical = 'Critical', 2
+    high = 'High', 3
+    medium = 'Medium', 4
+    low = 'Low', 5
 
 
 class Remote(OrderedDatabaseEnum):
