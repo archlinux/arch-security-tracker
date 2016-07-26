@@ -5,6 +5,7 @@ from app.model import CVE, CVEGroup, CVEGroupEntry
 from app.model.enum import Status
 from app.model.cvegroup import vulnerability_group_regex
 from app.view.error import not_found
+from app.util import status_to_affected
 
 
 @app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
@@ -17,7 +18,7 @@ def edit_group(avg):
         form.affected.data = group.affected
         form.fixed.data = group.fixed
         form.pkgname.data = group.pkgname
-        form.status.data = group.status.name
+        form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
 

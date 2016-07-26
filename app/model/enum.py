@@ -98,3 +98,9 @@ class Remote(OrderedDatabaseEnum):
     unknown = 'Unknown', 3
     remote = 'Remote', 1
     local = 'Local', 2
+
+
+class Affected(OrderedDatabaseEnum):
+    unknown = 'Unknown', 2
+    affected = 'Affected', 1
+    not_affected = 'Not Affected', 3
