@@ -4,7 +4,7 @@ from random import randint
 from logging import error
 from os import urandom
 from binascii import hexlify
-from app.util import smileys_sad
+from app.symbol import smileys_sad
 
 
 def handle_error(e, code):
