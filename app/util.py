@@ -11,6 +11,11 @@ def status_to_affected(status):
 
 
 def affected_to_status(affected, pkgname, fixed_version):
+    # early exit if unknown or not affected
+    if Affected.not_affected == affected:
+        return Status.not_affected
+    if Affected.unknown == affected:
+        return Status.unknown
     versions = get_pkg(pkgname, filter_arch=True)
     # unknown if no version was found
     if not versions:
