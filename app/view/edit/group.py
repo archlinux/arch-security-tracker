@@ -2,10 +2,10 @@ from flask import render_template, flash, redirect
 from app import app, db
 from app.form import GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry
-from app.model.enum import Status
 from app.model.cvegroup import vulnerability_group_regex
+from app.model.enum import Affected
 from app.view.error import not_found
-from app.util import status_to_affected
+from app.util import status_to_affected, affected_to_status
 
 
 @app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
@@ -32,8 +32,8 @@ def edit_group(avg):
 
     group.pkgname = form.pkgname.data
     group.affected = form.affected.data
-    group.status = Status.fromstring(form.status.data)
     group.fixed = form.fixed.data
+    group.status = affected_to_status(Affected.fromstring(form.status.data), group.pkgname, group.fixed)
     group.bug_ticket = form.bug_ticket.data
     group.notes = form.notes.data
 
