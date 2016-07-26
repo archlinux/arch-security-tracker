@@ -51,6 +51,13 @@ body {
   width: 190px !important;
 }
 
+#logo a {
+  display: block !important;
+  height: 40px !important;
+  width: 190px !important;
+  text-indent: -9999px !important;
+}
+
 #page_footer {
   font-size: 0.9em;
   margin: 0 auto;
