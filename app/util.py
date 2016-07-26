@@ -19,7 +19,7 @@ def affected_to_status(affected, pkgname, fixed_version):
     versions = get_pkg(pkgname, filter_arch=True)
     # unknown if no version was found
     if not versions:
-        return Status.Unknown
+        return Status.unknown
     version = versions[0]
     # vulnerable if the latest version is still affected
     if not fixed_version or version.version < fixed_version:
