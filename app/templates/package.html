@@ -69,6 +69,10 @@
 				</td>
 			</tr>
 			<tr>
+				<td>Description</td>
+				<td>{{ package.versions[0].desc|truncate(80) }}</td>
+			</tr>
+			<tr>
 				<td>Version</td>
 				<td>
 				{% for version in package.versions %}
