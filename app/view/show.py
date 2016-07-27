@@ -39,7 +39,8 @@ def show_cve(cve):
 @app.route('/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
 def show_group(avg):
     avg_id = avg.replace('AVG-', '')
-    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage).filter(CVEGroup.id == avg_id).join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)).all()
+    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage).filter(CVEGroup.id == avg_id)
+               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)).all()
     if not entries:
         return not_found()
 
@@ -72,7 +73,8 @@ def show_package(pkgname):
     if not versions:
         return not_found()
 
-    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage).filter(CVEGroupPackage.pkgname == pkgname).join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)).all()
+    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage).filter(CVEGroupPackage.pkgname == pkgname)
+               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)).all()
     groups = set()
     issues = []
     for group, cve, pkg in entries:
