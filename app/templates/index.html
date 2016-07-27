@@ -24,7 +24,11 @@
 						<a href="/{{ cve.id }}">{{ cve.id }}</a><br />
 					{% endfor %}
 				</td>
-				<td><a href="/package/{{ entry.group.pkgname }}">{{ entry.group.pkgname }}</a></td>
+				<td class="wrap">
+				{% for pkg in entry.pkgs %}
+					<a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
+				{% endfor %}
+				</td>
 				<td>{{ entry.group.affected }}</td>
 				<td>{{ entry.group.fixed }}</td>
 				<td>{{ colorize_status(entry.group.status) }}</td>

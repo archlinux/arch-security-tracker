@@ -6,12 +6,24 @@
 	<table class="styled_table column_major medium_size">
 		<tbody>
 			<tr>
-				<td>Packages</td>
-				<td class="full_size"><a href="/package/{{ group.detail.pkgname }}">{{ group.detail.pkgname }}</a></td>
+				<td>Package</td>
+				<td class="full_size wrap">
+				{% for pkg in group.pkgs %}
+				<a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a>{% if not loop.last %}, {% endif %}
+				{% endfor %}
+				</td>
 			</tr>
 			<tr>
 				<td>Status</td>
 				<td>{{ colorize_status(group.detail.status) }}</td>
+			</tr>
+			<tr>
+				<td>Current</td>
+				<td>
+				{% for version in group.versions %}
+					{{ version.version }} [{{ version.db.name }}]<br />
+				{% endfor %}
+				</td>
 			</tr>
 			<tr>
 				<td>Affected</td>

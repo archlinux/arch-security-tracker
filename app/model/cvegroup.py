@@ -12,12 +12,11 @@ vulnerability_group_regex = r'^AVG-\d+$'
 class CVEGroup(db.Model):
     __tablename__ = 'cve_group'
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
-    pkgname = db.Column(db.String(32), nullable=False, index=True)
-    affected = db.Column(db.String(24), nullable=False)
-    fixed = db.Column(db.String(24))
+    affected = db.Column(db.String(32), nullable=False)
+    fixed = db.Column(db.String(32))
     status = db.Column(Status.as_type(), nullable=False, default=Status.unknown, index=True)
-    bug_ticket = db.Column(db.String(8))
-    notes = db.Column(db.String(120))
+    bug_ticket = db.Column(db.String(9))
+    notes = db.Column(db.String(4096))
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     @property

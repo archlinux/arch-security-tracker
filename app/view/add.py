@@ -1,9 +1,9 @@
 from flask import render_template, flash, redirect
 from app import app, db
 from app.form import CVEForm, GroupForm
-from app.model import CVE, CVEGroup, CVEGroupEntry
-from app.model.enum import Remote, Severity, Affected
-from app.util import affected_to_status
+from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
+from app.model.enum import Remote, Severity, Affected, affected_to_status
+from app.util import multiline_to_list
 
 
 @app.route('/CVE/add', methods=['GET', 'POST'])
@@ -37,24 +37,28 @@ def add_group():
                                title='Add AVG',
                                form=form)
 
-    pkgname = form.pkgname.data
+    pkgnames = multiline_to_list(form.pkgnames.data)
     fixed = form.fixed.data
     affected = Affected.fromstring(form.status.data)
-    status = affected_to_status(affected, pkgname, fixed)
+    status = affected_to_status(affected, pkgnames[0], fixed)
 
-    group = db.create(CVEGroup, pkgname=pkgname, affected=form.affected.data, status=status)
+    group = db.create(CVEGroup, affected=form.affected.data, status=status)
     group.fixed = fixed
     group.bug_ticket = form.bug_ticket.data
     group.notes = form.notes.data
     db.session.commit()
 
-    cve_ids = [form.cve.data] if '\r\n' not in form.cve.data else form.cve.data.split('\r\n')
+    cve_ids = multiline_to_list(form.cve.data)
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
 
     for cve_id in cve_ids:
         cve = db.get_or_create(CVE, id=cve_id)
         flash('Added {}'.format(cve.id))
         db.create(CVEGroupEntry, group=group, cve=cve)
+
+    for pkgname in pkgnames:
+        db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
+        flash('Added {}'.format(pkgname))
 
     db.session.commit()
     flash('Added {}'.format(group.name))

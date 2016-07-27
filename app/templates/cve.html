@@ -50,10 +50,14 @@
 			</tr>
 		</thead>
 		<tbody>
-		{% for group_entry, group in entry.groups %}
+		{% for group_entry, group, pkgs in entry.groups %}
 			<tr>
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-				<td><a href="/package/{{ group.pkgname }}">{{ group.pkgname }}</a></td>
+				<td class="wrap">
+				{% for pkg in pkgs %}
+					<a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
+				{% endfor %}
+				</td>
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
 				<td>{{ colorize_status(group.status) }}</td>

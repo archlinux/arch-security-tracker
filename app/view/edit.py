@@ -1,12 +1,12 @@
 from flask import render_template, flash, redirect
 from app import app, db
 from app.form import CVEForm, GroupForm
-from app.model import CVE, CVEGroup, CVEGroupEntry
-from app.model.enum import Remote, Severity, Affected
+from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
+from app.model.enum import Remote, Severity, Affected, status_to_affected, affected_to_status
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
 from app.view.error import not_found
-from app.util import status_to_affected, affected_to_status
+from app.util import multiline_to_list
 
 
 @app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
@@ -41,25 +41,27 @@ def edit_group(avg):
         return not_found()
     form = GroupForm()
     if not form.is_submitted():
+        group_data = (db.session.query(CVEGroup, CVE, CVEGroupPackage).filter_by(id=group.id).join(CVEGroupEntry)
+                      .join(CVE).join(CVEGroupPackage).order_by(CVEGroup.id)).all()
+
         form.affected.data = group.affected
         form.fixed.data = group.fixed
-        form.pkgname.data = group.pkgname
+        form.pkgnames.data = "\n".join([pkg.pkgname for (group, cve, pkg) in group_data])
         form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
 
-        issues = (db.session.query(CVEGroup, CVE).filter_by(id=group.id).join(CVEGroupEntry).join(CVE).order_by(CVEGroup.id)).all()
-        issues = [cve.id for (group, cve) in issues]
+        issues = set([cve.id for (group, cve, pkg) in group_data])
         form.cve.data = "\n".join(issues)
     if not form.validate_on_submit():
         return render_template('form/group.html',
                                title='Edit {}'.format(avg),
                                form=form)
 
-    group.pkgname = form.pkgname.data
+    pkgnames = multiline_to_list(form.pkgnames.data)
     group.affected = form.affected.data
     group.fixed = form.fixed.data
-    group.status = affected_to_status(Affected.fromstring(form.status.data), group.pkgname, group.fixed)
+    group.status = affected_to_status(Affected.fromstring(form.status.data), pkgnames[0], group.fixed)
     group.bug_ticket = form.bug_ticket.data
     group.notes = form.notes.data
 
@@ -72,6 +74,12 @@ def edit_group(avg):
         cve = db.get_or_create(CVE, id=cve_id)
         flash('Added {}'.format(cve.id))
         db.get_or_create(CVEGroupEntry, group=group, cve=cve)
+
+    db.session.query(CVEGroupPackage).filter(CVEGroupPackage.group_id == group.id).delete()
+
+    for pkgname in pkgnames:
+        db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
+        flash('Added {}'.format(pkgname))
 
     db.session.commit()
     flash('Edited {}'.format(group.name))

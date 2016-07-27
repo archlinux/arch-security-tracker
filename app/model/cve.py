@@ -9,10 +9,10 @@ cve_ids_regex = r'^(CVE\-\d{4}\-\d+[\r\n]*)+$'
 class CVE(db.Model):
     __tablename__ = 'cve'
     id = db.Column(db.String(15), index=True, unique=True, primary_key=True)
-    description = db.Column(db.String())
+    description = db.Column(db.String(4096))
     severity = db.Column(Severity.as_type(), nullable=False, default=Severity.unknown)
     remote = db.Column(Remote.as_type(), nullable=False, default=Remote.unknown)
-    notes = db.Column(db.String())
+    notes = db.Column(db.String(4096))
 
     def __repr__(self):
         return '{}'.format(self.id)
