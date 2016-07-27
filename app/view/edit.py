@@ -1,11 +1,37 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.form import GroupForm
+from app.form import CVEForm, GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry
+from app.model.enum import Remote, Severity, Affected
+from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
-from app.model.enum import Affected
 from app.view.error import not_found
 from app.util import status_to_affected, affected_to_status
+
+
+@app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+def edit_cve(cve):
+    cve = db.get(CVE, id=cve)
+    if cve is None:
+        return not_found()
+    form = CVEForm()
+    if not form.is_submitted():
+        form.cve.data = cve.id
+        form.description.data = cve.description
+        form.severity.data = cve.severity.name
+        form.remote.data = cve.remote.name
+        form.notes.data = cve.notes
+    if not form.validate_on_submit():
+        return render_template('form/cve.html',
+                               title='Edit {}'.format(cve),
+                               form=form)
+    cve.description = form.description.data
+    cve.severity = Severity.fromstring(form.severity.data)
+    cve.remote = Remote.fromstring(form.remote.data)
+    cve.notes = form.notes.data
+    db.session.commit()
+    flash('Edited {}'.format(cve.id))
+    return redirect('/{}'.format(cve.id))
 
 
 @app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
