@@ -21,7 +21,7 @@
 				<td><a href="/{{ entry.group.name }}">{{ entry.group.name }}</a></td>
 				<td>
 					{% for cve in entry.cves %}
-						<a href="/{{ cve.id }}">{{ cve.id }}</a><br />
+						<a href="/{{ cve.id }}">{{ cve.id }}</a>{% if not loop.last %}<br />{% endif %}
 					{% endfor %}
 				</td>
 				<td class="wrap">
