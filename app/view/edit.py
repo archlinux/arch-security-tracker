@@ -7,6 +7,7 @@ from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
 from app.view.error import not_found
 from app.util import multiline_to_list
+from sqlalchemy import func
 
 
 @app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
@@ -41,17 +42,20 @@ def edit_group(avg):
         return not_found()
     form = GroupForm()
     if not form.is_submitted():
-        group_data = (db.session.query(CVEGroup, CVE, CVEGroupPackage).filter_by(id=group.id).join(CVEGroupEntry)
-                      .join(CVE).join(CVEGroupPackage).order_by(CVEGroup.id)).all()
+        group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '))
+                      .filter(CVEGroup.id == group.id)
+                      .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                      .group_by(CVEGroup.id).group_by(CVE.id)
+                      .order_by(CVE.id)).all()
 
         form.affected.data = group.affected
         form.fixed.data = group.fixed
-        form.pkgnames.data = "\n".join([pkg.pkgname for (group, cve, pkg) in group_data])
+        form.pkgnames.data = "\n".join(set([pkg for (group, cve, pkg) in group_data]))
         form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
 
-        issues = set([cve.id for (group, cve, pkg) in group_data])
+        issues = [cve.id for (group, cve, pkg) in group_data]
         form.cve.data = "\n".join(issues)
     if not form.validate_on_submit():
         return render_template('form/group.html',
