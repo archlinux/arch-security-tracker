@@ -2,8 +2,7 @@
 from app.pacman import update
 from app import db
 from app.model import CVEGroup
-from app.model.enum import Status, Affected
-from app.util import affected_to_status
+from app.model.enum import Status, Affected, affected_to_status
 
 
 def update_group_status():

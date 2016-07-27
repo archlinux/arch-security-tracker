@@ -20,6 +20,7 @@ app.url_map.converters['regex'] = RegexConverter
 from app.view import *
 from app.model import *
 
+
 def get(self, model, defaults=None, **kwargs):
     return self.session.query(model).filter_by(**kwargs).first()
 

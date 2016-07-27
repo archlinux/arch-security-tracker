@@ -1,4 +1,7 @@
 from pycman.config import init_with_config
+from pyalpm import vercmp
+from app.util import cmp_to_key
+from operator import attrgetter
 
 archs = ['i686', 'x86_64']
 repos = {'i686': ['core', 'extra', 'community', 'testing', 'community-testing'],
@@ -70,5 +73,5 @@ def filter_duplicates(packages, filter_arch=False):
 def sort_packages(packages):
     packages = sorted(packages, key=lambda item: item.arch)
     packages = sorted(packages, key=lambda item: item.db.name)
-    packages = sorted(packages, key=lambda item: item.version, reverse=True)
+    packages = sorted(packages, key=cmp_to_key(vercmp, attrgetter('version')), reverse=True)
     return packages
