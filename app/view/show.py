@@ -17,6 +17,7 @@ def show_cve(cve):
 
     groups = (db.session.query(CVEGroupEntry, CVEGroup, func.group_concat(CVEGroupPackage.pkgname, ' '))
               .filter_by(cve=cve_model).join(CVEGroup).join(CVEGroupPackage)
+              .group_by(CVEGroup.id)
               .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
     groups = [(cve, group, pkgs.split(' ')) for (cve, group, pkgs) in groups]
     groups = sorted(groups, key=lambda item: item[1].created, reverse=True)
