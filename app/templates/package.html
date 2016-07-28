@@ -9,6 +9,7 @@
 				<th>Group</th>
 				<th>Affected</th>
 				<th>Fixed</th>
+				<th>Severity</th>
 				<th class="full_size">Status</th>
 			</tr>
 		</thead>
@@ -18,6 +19,7 @@
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
+				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ colorize_status(group.status) }}</td>
 			</tr>
 		{% endfor %}

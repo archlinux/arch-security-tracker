@@ -140,3 +140,8 @@ def affected_to_status(affected, pkgname, fixed_version):
         return Status.testing
     # return vulnerable otherwise
     return Status.vulnerable
+
+
+def highest_severity(cves):
+    severity = list(filter(lambda severity: Severity.unknown != severity, cves))
+    return min(severity) if severity else Severity.unknown

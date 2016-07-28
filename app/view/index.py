@@ -12,6 +12,7 @@ def index():
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                .group_by(CVEGroup.id).group_by(CVE.id)
                .order_by(CVEGroup.status.desc()).order_by(CVEGroup.created.desc())).all()
+
     groups = defaultdict(defaultdict)
     for group, cve, pkgs in entries:
         group_entry = groups.setdefault(group.id, {})
@@ -20,7 +21,7 @@ def index():
         group_entry.setdefault('cves', []).append(cve)
 
     for key, group in groups.items():
-        groups[key]['cves'] = sorted(groups[key]['cves'], key=lambda item: item.id, reverse=True)
+        group['cves'] = sorted(group['cves'], key=lambda item: item.id, reverse=True)
 
     groups = groups.values()
     groups = sorted(groups, key=lambda item: item['group'].created, reverse=True)

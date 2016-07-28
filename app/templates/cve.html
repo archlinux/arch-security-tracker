@@ -46,6 +46,7 @@
 				<th>Package</th>
 				<th>Affected</th>
 				<th>Fixed</th>
+				<th>Severity</th>
 				<th>Status</th>
 			</tr>
 		</thead>
@@ -60,6 +61,7 @@
 				</td>
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
+				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ colorize_status(group.status) }}</td>
 			</tr>
 		{% endfor %}

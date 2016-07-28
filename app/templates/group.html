@@ -18,12 +18,8 @@
 				<td>{{ colorize_status(group.detail.status) }}</td>
 			</tr>
 			<tr>
-				<td>Current</td>
-				<td>
-				{% for version in group.versions %}
-					{{ version.version }} [{{ version.db.name }}]<br />
-				{% endfor %}
-				</td>
+				<td>Severity</td>
+				<td>{{ colorize_severity(group.detail.severity) }}</td>
 			</tr>
 			<tr>
 				<td>Affected</td>
@@ -32,6 +28,14 @@
 			<tr>
 				<td>Fixed</td>
 				<td>{{ group.detail.fixed }}</td>
+			</tr>
+			<tr>
+				<td>Current</td>
+				<td>
+				{% for version in group.versions %}
+					{{ version.version }} [{{ version.db.name }}]<br />
+				{% endfor %}
+				</td>
 			</tr>
 			<tr>
 				<td>Tickets</td>

@@ -2,12 +2,14 @@ from flask import render_template, flash, redirect
 from app import app, db
 from app.form import CVEForm, GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
-from app.model.enum import Remote, Severity, Affected, status_to_affected, affected_to_status
+from app.model.enum import Remote, Severity, Affected, status_to_affected, affected_to_status, highest_severity
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
 from app.view.error import not_found
 from app.util import multiline_to_list
 from sqlalchemy import func
+from itertools import chain
+from collections import defaultdict
 
 
 @app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
@@ -26,10 +28,29 @@ def edit_cve(cve):
         return render_template('form/cve.html',
                                title='Edit {}'.format(cve),
                                form=form)
+
+    severity = Severity.fromstring(form.severity.data)
+    severity_changed = cve.severity != severity
+
     cve.description = form.description.data
-    cve.severity = Severity.fromstring(form.severity.data)
+    cve.severity = severity
     cve.remote = Remote.fromstring(form.remote.data)
     cve.notes = form.notes.data
+
+    if severity_changed or True:
+        # update cached group severity for all goups containing this issue
+        groups = (db.session.query(CVEGroupEntry, CVEGroup)
+                  .filter_by(cve=cve).join(CVEGroup)).all()
+        issues = (db.session.query(CVEGroup, CVE)
+                  .filter(CVEGroup.id.in_([group.id for (entry, group) in groups]))
+                  .join(CVEGroupEntry).join(CVE)
+                  .group_by(CVEGroup.id).group_by(CVE.id)).all()
+        group_severity = defaultdict(list)
+        for group, cve in issues:
+            group_severity[group].append(cve.severity)
+        for group, severities in group_severity.items():
+            group.severity = highest_severity(severities)
+
     db.session.commit()
     flash('Edited {}'.format(cve.id))
     return redirect('/{}'.format(cve.id))
@@ -37,20 +58,22 @@ def edit_cve(cve):
 
 @app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
 def edit_group(avg):
-    group = db.get(CVEGroup, id=avg[4:])
-    if group is None:
+    group_id = avg.replace('AVG-', '')
+    group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '))
+                  .filter(CVEGroup.id == group_id)
+                  .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                  .group_by(CVEGroup.id).group_by(CVE.id)
+                  .order_by(CVE.id)).all()
+    if not group_data:
         return not_found()
+    group = group_data[0][0]
+
     form = GroupForm()
     if not form.is_submitted():
-        group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '))
-                      .filter(CVEGroup.id == group.id)
-                      .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
-                      .group_by(CVEGroup.id).group_by(CVE.id)
-                      .order_by(CVE.id)).all()
-
         form.affected.data = group.affected
         form.fixed.data = group.fixed
-        form.pkgnames.data = "\n".join(group_data[0][2].split(' '))
+        form.pkgnames.data = "\n".join(sorted(set(chain.from_iterable(
+                                       [pkg.split(' ') for (group, cve, pkg) in group_data]))))
         form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
@@ -72,13 +95,18 @@ def edit_group(avg):
     cve_ids = [form.cve.data] if '\r\n' not in form.cve.data else form.cve.data.split('\r\n')
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
 
+    # TODO: check before delete, only add/delete deltas
     db.session.query(CVEGroupEntry).filter(CVEGroupEntry.group_id == group.id).delete()
 
+    severities = []
     for cve_id in cve_ids:
         cve = db.get_or_create(CVE, id=cve_id)
+        severities.append(cve.severity)
         flash('Added {}'.format(cve.id))
         db.get_or_create(CVEGroupEntry, group=group, cve=cve)
+    group.severity = highest_severity(severities)
 
+    # TODO: check before delete, only add/delete deltas
     db.session.query(CVEGroupPackage).filter(CVEGroupPackage.group_id == group.id).delete()
 
     for pkgname in pkgnames:

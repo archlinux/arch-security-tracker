@@ -11,6 +11,7 @@
 				<th>Package</th>
 				<th>Affected</th>
 				<th>Fixed</th>
+				<th>Severity</th>
 				<th>Status</th>
 				<th>Ticket</th>
 			</tr>
@@ -31,6 +32,7 @@
 				</td>
 				<td>{{ entry.group.affected }}</td>
 				<td>{{ entry.group.fixed }}</td>
+				<td>{{ colorize_severity(entry.group.severity) }}</td>
 				<td>{{ colorize_status(entry.group.status) }}</td>
 				<td>{{ bug_ticket(entry.group.bug_ticket) }}</td>
 			</tr>
