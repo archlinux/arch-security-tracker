@@ -67,49 +67,63 @@ def edit_group(avg):
     if not group_data:
         return not_found()
     group = group_data[0][0]
+    issues = [cve for (group, cve, pkg) in group_data]
+    issue_ids = [cve.id for cve in issues]
+    pkgnames = set(chain.from_iterable([pkg.split(' ') for (group, cve, pkg) in group_data]))
 
     form = GroupForm()
     if not form.is_submitted():
         form.affected.data = group.affected
         form.fixed.data = group.fixed
-        form.pkgnames.data = "\n".join(sorted(set(chain.from_iterable(
-                                       [pkg.split(' ') for (group, cve, pkg) in group_data]))))
+        form.pkgnames.data = "\n".join(sorted(pkgnames))
         form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
 
-        issues = [cve.id for (group, cve, pkg) in group_data]
-        form.cve.data = "\n".join(issues)
+        form.cve.data = "\n".join(issue_ids)
     if not form.validate_on_submit():
         return render_template('form/group.html',
                                title='Edit {}'.format(avg),
                                form=form)
 
-    pkgnames = multiline_to_list(form.pkgnames.data)
+    pkgnames_edited = multiline_to_list(form.pkgnames.data)
     group.affected = form.affected.data
     group.fixed = form.fixed.data
-    group.status = affected_to_status(Affected.fromstring(form.status.data), pkgnames[0], group.fixed)
+    group.status = affected_to_status(Affected.fromstring(form.status.data), pkgnames_edited[0], group.fixed)
     group.bug_ticket = form.bug_ticket.data
     group.notes = form.notes.data
 
     cve_ids = [form.cve.data] if '\r\n' not in form.cve.data else form.cve.data.split('\r\n')
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
+    issues_removed = set(filter(lambda issue: issue not in cve_ids, issue_ids))
+    issues_added = set(filter(lambda issue: issue not in issue_ids, cve_ids))
 
-    # TODO: check before delete, only add/delete deltas
-    db.session.query(CVEGroupEntry).filter(CVEGroupEntry.group_id == group.id).delete()
+    if issues_removed:
+        (db.session.query(CVEGroupEntry)
+         .filter(CVEGroupEntry.group_id == group.id).filter(CVEGroupEntry.cve_id.in_(issues_removed))
+         .delete(synchronize_session=False))
+        for removed in issues_removed:
+            flash('Removed {}'.format(removed))
 
-    severities = []
-    for cve_id in cve_ids:
+    severities = [issue.severity for issue in list(filter(lambda issue: issue.id not in issues_removed, issues))]
+    for cve_id in issues_added:
         cve = db.get_or_create(CVE, id=cve_id)
+        db.get_or_create(CVEGroupEntry, group=group, cve=cve)
         severities.append(cve.severity)
         flash('Added {}'.format(cve.id))
-        db.get_or_create(CVEGroupEntry, group=group, cve=cve)
     group.severity = highest_severity(severities)
 
-    # TODO: check before delete, only add/delete deltas
-    db.session.query(CVEGroupPackage).filter(CVEGroupPackage.group_id == group.id).delete()
+    pkgnames_removed = set(filter(lambda pkgname: pkgname not in pkgnames_edited, pkgnames))
+    pkgnames_added = set(filter(lambda pkgname: pkgname not in pkgnames, pkgnames_edited))
 
-    for pkgname in pkgnames:
+    if pkgnames_removed:
+        (db.session.query(CVEGroupPackage)
+         .filter(CVEGroupPackage.group_id == group.id).filter(CVEGroupPackage.pkgname.in_(pkgnames_removed))
+         .delete(synchronize_session=False))
+        for removed in pkgnames_removed:
+            flash('Removed {}'.format(removed))
+
+    for pkgname in pkgnames_added:
         db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
         flash('Added {}'.format(pkgname))
 
