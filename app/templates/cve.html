@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote %}
+{% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, nullable_value %}
 
 {% block content %}
 	<h1>{{ entry.cve }} <a href="/{{  entry.cve }}/edit">edit</a></h1>
@@ -26,7 +26,7 @@
 			</tr>
 			<tr>
 				<td>Description</td>
-				<td><pre>{{ entry.description }}</pre></td>
+				<td><pre>{{ nullable_value(entry.description) }}</pre></td>
 			</tr>
 			<tr>
 			<tr>
