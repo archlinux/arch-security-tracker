@@ -35,6 +35,8 @@ class SamePackageVersions(object):
         ref_version = None
         for pkgname in pkgnames:
             versions = get_pkg(pkgname)
+            if not versions:
+                raise ValidationError(self.message.format(pkgname))
             ref_version = ref_version if ref_version else versions[0]
-            if not versions or 0 != vercmp(ref_version.version, versions[0].version):
+            if 0 != vercmp(ref_version.version, versions[0].version):
                 raise ValidationError(self.message.format(pkgname))
