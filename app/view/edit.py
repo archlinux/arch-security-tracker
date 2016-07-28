@@ -50,7 +50,7 @@ def edit_group(avg):
 
         form.affected.data = group.affected
         form.fixed.data = group.fixed
-        form.pkgnames.data = "\n".join(set([pkg for (group, cve, pkg) in group_data]))
+        form.pkgnames.data = "\n".join(group_data[0][2].split(' '))
         form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
