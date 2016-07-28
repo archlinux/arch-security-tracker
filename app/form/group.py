@@ -1,4 +1,4 @@
-from flask_wtf import Form
+from .base import BaseForm
 from wtforms import StringField, SelectField, TextAreaField, SubmitField
 from wtforms.validators import DataRequired, Optional, Regexp
 from app.model.cve import cve_ids_regex
@@ -7,7 +7,7 @@ from app.model.enum import Affected
 from app.form.validators import ValidPackageNames, SamePackageVersions
 
 
-class GroupForm(Form):
+class GroupForm(BaseForm):
     cve = TextAreaField(u'CVE', validators=[DataRequired(), Regexp(cve_ids_regex)])
     # TODO: check if the pkgnames are all belonging to the same pkgbase instead of checking for the versions
     pkgnames = TextAreaField(u'Package', validators=[DataRequired(), Regexp(pkgnames_regex), ValidPackageNames(), SamePackageVersions()])
