@@ -20,9 +20,7 @@ class ValidPackageNames(object):
 
     def __call__(self, form, field):
         pkgnames = multiline_to_list(field.data)
-        print(pkgnames)
         for pkgname in pkgnames:
-            print(pkgname)
             versions = get_pkg(pkgname)
             if not versions:
                 raise ValidationError(self.message.format(pkgname))
