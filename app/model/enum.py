@@ -2,6 +2,7 @@ from enum import Enum
 from sqlalchemy.types import SchemaType, TypeDecorator
 from sqlalchemy.types import Enum as SQLAlchemyEnum
 from app.pacman import get_pkg
+from pyalpm import vercmp
 
 
 class EnumType(SchemaType, TypeDecorator):
@@ -127,12 +128,12 @@ def affected_to_status(affected, pkgname, fixed_version):
         return Status.unknown
     version = versions[0]
     # vulnerable if the latest version is still affected
-    if not fixed_version or version.version < fixed_version:
+    if not fixed_version or 0 > vercmp(version.version, fixed_version):
         return Status.vulnerable
     # check if any non-testing versions are fixed
     non_testing = list(filter(lambda e: 'testing' not in e.db.name, versions))
     latest_non_testing = non_testing[0]
-    if latest_non_testing.version >= fixed_version:
+    if 0 <= vercmp(latest_non_testing.version, fixed_version):
         return Status.fixed
     # check if latest version is testing
     if 'testing' in version.db.name:
