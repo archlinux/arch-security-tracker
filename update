@@ -1,16 +1,68 @@
 #!/usr/bin/env python
-from app.pacman import update
+from app.pacman import update as update_pacman_db
 from app import db
-from app.model import CVEGroup
-from app.model.enum import Status, Affected, affected_to_status
+from app.model import CVEGroup, CVEGroupPackage, CVE, CVEGroupEntry
+from app.model.enum import Status, Affected, affected_to_status, highest_severity
+from sqlalchemy import func
+from collections import defaultdict
+from argparse import ArgumentParser
+from sys import argv
 
 
 def update_group_status():
-    groups = (db.session.query(CVEGroup).filter(CVEGroup.status.in_([Status.vulnerable, Status.testing]))).all()
-    for group in groups:
-        group.status = affected_to_status(Affected.affected, group.pkgname, group.fixed)
+    groups = (db.session.query(CVEGroup, func.group_concat(CVEGroupPackage.pkgname, ' '))
+              .join(CVEGroupPackage)
+              .filter(CVEGroup.status.in_([Status.vulnerable, Status.testing]))
+              .group_by(CVEGroupPackage.group_id)).all()
+    for group, pkgnames in groups:
+        pkgnames = pkgnames.split(' ')
+        group.status = affected_to_status(Affected.affected, pkgnames[0], group.fixed)
     db.session.commit()
 
 
-update()
-update_group_status()
+def recalc_group_status():
+    groups = (db.session.query(CVEGroup, func.group_concat(CVEGroupPackage.pkgname, ' '))
+              .join(CVEGroupPackage)
+              .group_by(CVEGroupPackage.group_id)).all()
+    for group, pkgnames in groups:
+        pkgnames = pkgnames.split(' ')
+        group.status = affected_to_status(Affected.affected, pkgnames[0], group.fixed)
+    db.session.commit()
+
+
+def recalc_group_severity():
+    entries = (db.session.query(CVEGroup, CVEGroupEntry, CVE)
+               .join(CVEGroupEntry).join(CVE)
+               .group_by(CVEGroupEntry.group_id).group_by(CVE.id)).all()
+    issues = defaultdict(set)
+    for group, entry, issue in entries:
+        issues[group].add(issue)
+    for group, issues in issues.items():
+        group.severity = highest_severity([issue.severity for issue in issues])
+    db.session.commit()
+
+
+if __name__ == "__main__":
+    no_args = 1 >= len(argv)
+    parser = ArgumentParser(prog='update')
+    parser.add_argument('--pacman-db', action='store_true', default=no_args)
+    parser.add_argument('--group-status', action='store_true', default=no_args)
+    parser.add_argument('--recalc-group-status', action='store_true')
+    parser.add_argument('--recalc-group-severity', action='store_true')
+    args = parser.parse_args()
+
+    if args.pacman_db:
+        print("[+] Update pacman db...")
+        update_pacman_db()
+
+    if args.group_status:
+        print("[+] Update group status...")
+        update_group_status()
+
+    if args.recalc_group_status:
+        print("[+] Recalc group status...")
+        recalc_group_status()
+
+    if args.recalc_group_severity:
+        print("[+] Recalc group severity...")
+        recalc_group_severity()
