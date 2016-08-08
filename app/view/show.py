@@ -1,12 +1,13 @@
 from flask import render_template, flash, redirect
+from sqlalchemy import and_
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
+from app.model.enum import Publication
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex, pkgname_regex
 from app.view.error import not_found
 from app.pacman import get_pkg
-from sqlalchemy import func
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
 
 @app.route('/issue/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
@@ -18,7 +19,9 @@ def show_cve(cve):
 
     entries = (db.session.query(CVEGroupEntry, CVEGroup, CVEGroupPackage, Advisory)
                .filter_by(cve=cve_model)
-               .join(CVEGroup).join(CVEGroupPackage).outerjoin(Advisory)
+               .join(CVEGroup).join(CVEGroupPackage)
+               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
+                                         Advisory.advisory_status == Publication.published))
                .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
 
     group_packages = defaultdict(set)
@@ -56,7 +59,10 @@ def show_group(avg):
     avg_id = avg.replace('AVG-', '')
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
                .filter(CVEGroup.id == avg_id)
-               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage).outerjoin(Advisory)).all()
+               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
+                                         Advisory.advisory_status == Publication.published))
+               ).all()
     if not entries:
         return not_found()
 
@@ -96,7 +102,10 @@ def show_package(pkgname):
 
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
                .filter(CVEGroupPackage.pkgname == pkgname)
-               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage).outerjoin(Advisory)).all()
+               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
+                                         Advisory.advisory_status == Publication.published))
+               ).all()
     groups = set()
     issues = []
     advisories = set()
