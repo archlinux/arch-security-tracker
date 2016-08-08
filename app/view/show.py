@@ -21,7 +21,7 @@ def show_cve(cve):
                .filter_by(cve=cve_model)
                .join(CVEGroup).join(CVEGroupPackage)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.advisory_status == Publication.published))
+                                         Advisory.publication == Publication.published))
                .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
 
     group_packages = defaultdict(set)
@@ -61,7 +61,7 @@ def show_group(avg):
                .filter(CVEGroup.id == avg_id)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.advisory_status == Publication.published))
+                                         Advisory.publication == Publication.published))
                ).all()
     if not entries:
         return not_found()
@@ -104,7 +104,7 @@ def show_package(pkgname):
                .filter(CVEGroupPackage.pkgname == pkgname)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.advisory_status == Publication.published))
+                                         Advisory.publication == Publication.published))
                ).all()
     groups = set()
     issues = []

@@ -11,8 +11,8 @@ class Advisory(db.Model):
     __tablename__ = 'advisory'
     id = db.Column(db.String(15), index=True, unique=True, primary_key=True)
     group_package_id = db.Column(db.Integer(), db.ForeignKey('cve_group_package.id'), nullable=False, unique=True, index=True)
-    advisory_status = db.Column(Publication.as_type(), nullable=False, default=Publication.scheduled)
-    # created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    publication = db.Column(Publication.as_type(), nullable=False, default=Publication.scheduled)
+    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
 
     group_package = db.relationship("CVEGroupPackage")
 

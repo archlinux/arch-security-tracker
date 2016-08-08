@@ -12,7 +12,7 @@ def index():
     entries = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '), func.group_concat(Advisory.id, ' '))
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.advisory_status == Publication.published))
+                                         Advisory.publication == Publication.published))
                .group_by(CVEGroup.id).group_by(CVE.id)
                .order_by(CVEGroup.status.desc()).order_by(CVEGroup.created.desc())).all()
 
