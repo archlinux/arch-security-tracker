@@ -73,7 +73,12 @@ h2 {
   font-size: 1.2em;
 }
 
-h1 a, h2 a {
+h3 {
+  font-size: 1.0em;
+  margin: 0.75em 0;
+}
+
+h1 a, h2 a, h3 a {
   font-size: 0.45em;
   line-height: 0.45em;
 }

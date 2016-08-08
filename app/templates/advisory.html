@@ -1,10 +1,46 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {% for entry in entries %}
-	  [{{ entry.date }}]
-	  <a href="/{{ entry.advisory }}">{{ entry.advisory }}</a>
-	  <a href="/package/{{ entry.package }}">{{ entry.package }}</a>
-	  {{ entry.type }}<br />
-  {% endfor %}
+	<h1>Advisories</h1>
+	<h2>Scheduled</h2>
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Advisory</th>
+				<th>Package</th>
+				<th class="full_size">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for advisory, pkg in entries.scheduled %}
+			<tr>
+				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
+				<td></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+	<h2>Published</h2>
+	{% for month, advisories in entries.published.items() %}
+	<h3>{{ month }}</h3>
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Advisory</th>
+				<th>Package</th>
+				<th class="full_size">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for advisory, pkg in advisories %}
+			<tr>
+				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
+				<td></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+	{% endfor %}
 {% endblock %}
