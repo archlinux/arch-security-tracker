@@ -2,6 +2,7 @@
 
 {% block content %}
 	<h1>Advisories</h1>
+	{% if entries.scheduled %}
 	<h2>Scheduled</h2>
 	<table class="styled_table medium_size">
 		<thead>
@@ -21,6 +22,7 @@
 		</tbody>
 		{% endfor %}
 	</table>
+	{% endif %}
 	<h2>Published</h2>
 	{% for month, advisories in entries.published.items() %}
 	<h3>{{ month }}</h3>
