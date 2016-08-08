@@ -19,6 +19,7 @@ class CVEGroup(db.Model):
     bug_ticket = db.Column(db.String(9))
     notes = db.Column(db.String(4096))
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    advisory_qualified = db.Column(db.Boolean(), default=True, nullable=False)
 
     @property
     def name(self):

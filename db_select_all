@@ -3,3 +3,4 @@ sqlite3 app.db "select ''; select '================ CVE ============='; select *
 sqlite3 app.db "select ''; select '=============== GROUP ============'; select * from cve_group;"
 sqlite3 app.db "select ''; select '============== ENTRIES ==========='; select * from cve_group_entry;"
 sqlite3 app.db "select ''; select '============= PACKAGES ==========='; select * from cve_group_package;"
+sqlite3 app.db "select ''; select '============ ADVISORIES ==========='; select * from advisory;"

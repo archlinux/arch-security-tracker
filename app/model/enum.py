@@ -108,6 +108,11 @@ class Affected(OrderedDatabaseEnum):
     not_affected = 'Not Affected', 3
 
 
+class Publication(OrderedDatabaseEnum):
+    scheduled = 'Scheduled', 1
+    published = 'Published', 2
+
+
 def status_to_affected(status):
     if Status.unknown == status:
         return Affected.unknown
