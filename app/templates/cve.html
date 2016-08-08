@@ -51,12 +51,12 @@
 			</tr>
 		</thead>
 		<tbody>
-		{% for group_entry, group, pkgs in entry.groups %}
+		{% for group in entry.groups %}
 			<tr>
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td class="wrap">
-				{% for pkg in pkgs %}
-					<a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
+				{% for pkgname in entry.group_packages[group] %}
+					<a href="/package/{{ pkgname }}">{{ pkgname }}</a>{% if not loop.last %}, {% endif %}
 				{% endfor %}
 				</td>
 				<td>{{ group.affected }}</td>
@@ -66,6 +66,26 @@
 			</tr>
 		{% endfor %}
 		</tbody>
+	</table>
+	{% endif %}
+	{% if entry.advisories %}
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Advisory</th>
+				<th>Package</th>
+				<th class="full_size">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for advisory in entry.advisories %}
+			<tr>
+				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td><a href="/package/{{ advisory.group_package.pkgname }}">{{ advisory.group_package.pkgname }}</a></td>
+				<td></td>
+			</tr>
+		</tbody>
+		{% endfor %}
 	</table>
 	{% endif %}
 	{% if entry.notes %}

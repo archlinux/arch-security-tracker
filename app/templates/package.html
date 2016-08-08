@@ -97,4 +97,23 @@
 	{{ render_groups(package.groups.resolved) }}
 	{{ render_issues(package.issues.resolved) }}
 	{% endif %}
+	{% if package.advisories  %}
+	<h2>Advisories</h2>
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Advisory</th>
+				<th class="full_size">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for advisory in package.advisories %}
+			<tr>
+				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+	{% endif %}
 {% endblock %}

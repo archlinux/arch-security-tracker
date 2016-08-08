@@ -63,6 +63,26 @@
 		</tbody>
 		{% endfor %}
 	</table>
+	{% if group.advisories %}
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Advisory</th>
+				<th>Package</th>
+				<th class="full_size">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for advisory in group.advisories %}
+			<tr>
+				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td><a href="/package/{{ advisory.group_package.pkgname }}">{{ advisory.group_package.pkgname }}</a></td>
+				<td></td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+	{% endif %}
 	{% if group.detail.notes %}
 	<table class="styled_table medium_size">
 		<thead>

@@ -14,6 +14,7 @@
 				<th>Severity</th>
 				<th>Status</th>
 				<th>Ticket</th>
+				<th>Advisory</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -35,6 +36,11 @@
 				<td>{{ colorize_severity(entry.group.severity) }}</td>
 				<td>{{ colorize_status(entry.group.status) }}</td>
 				<td>{{ bug_ticket(entry.group.bug_ticket) }}</td>
+				<td>
+				{% for advisory in entry.advisories %}
+					<a href="/{{ advisory }}">{{ advisory }}</a>{% if not loop.last %}<br/>{% endif %}
+				{% endfor %}
+				</td>
 			</tr>
 		{% endfor %}
 		</tbody>
