@@ -4,33 +4,6 @@
 {% block content %}
 	<h1>Advisories</h1>
 	{% if entries.scheduled %}
-	<h2>Open</h2>
-	<table class="styled_table medium_size">
-		<thead>
-			<tr>
-				<th>Group</th>
-				<th>Package</th>
-				<th>Affected</th>
-				<th>Fixed</th>
-				<th>Severity</th>
-				<th>Ticket</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for pkg, group in entries.unhandled %}
-			<tr>
-				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
-				<td>{{ group.affected }}</td>
-				<td>{{ group.fixed }}</td>
-				<td>{{ colorize_severity(group.severity) }}</td>
-				<td>{{ bug_ticket(group.bug_ticket) }}</td>
-			</tr>
-		</tbody>
-		{% endfor %}
-	</table>
-	{% endif %}
-	{% if entries.scheduled %}
 	<h2>Scheduled</h2>
 	<table class="styled_table medium_size">
 		<thead>
