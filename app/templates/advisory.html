@@ -1,21 +1,51 @@
 {% extends "base.html" %}
+{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, bug_ticket %}
 
 {% block content %}
 	<h1>Advisories</h1>
+	{% if entries.scheduled %}
+	<h2>Open</h2>
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Group</th>
+				<th>Package</th>
+				<th>Affected</th>
+				<th>Fixed</th>
+				<th>Severity</th>
+				<th>Ticket</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for pkg, group in entries.unhandled %}
+			<tr>
+				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
+				<td>{{ group.affected }}</td>
+				<td>{{ group.fixed }}</td>
+				<td>{{ colorize_severity(group.severity) }}</td>
+				<td>{{ bug_ticket(group.bug_ticket) }}</td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+	{% endif %}
 	{% if entries.scheduled %}
 	<h2>Scheduled</h2>
 	<table class="styled_table medium_size">
 		<thead>
 			<tr>
 				<th>Advisory</th>
+				<th>Group</th>
 				<th>Package</th>
 				<th class="full_size">Description</th>
 			</tr>
 		</thead>
 		<tbody>
-		{% for advisory, pkg in entries.scheduled %}
+		{% for advisory, pkg, group in entries.scheduled %}
 			<tr>
 				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
 				<td></td>
 			</tr>
@@ -30,14 +60,16 @@
 		<thead>
 			<tr>
 				<th>Advisory</th>
+				<th>Group</th>
 				<th>Package</th>
 				<th class="full_size">Description</th>
 			</tr>
 		</thead>
 		<tbody>
-		{% for advisory, pkg in advisories %}
+		{% for advisory, pkg, group in advisories %}
 			<tr>
 				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
 				<td></td>
 			</tr>
