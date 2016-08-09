@@ -17,4 +17,5 @@ class GroupForm(BaseForm):
     status = SelectField(u'Status', choices=[(e.name, e.label) for e in [*Affected]], validators=[DataRequired()])
     bug_ticket = StringField('Bug ticket', validators=[Optional(), Regexp(r'^\d+$')])
     notes = TextAreaField(u'Notes', validators=[])
+    advisory_qualified = SelectField(u'Advisory qualified', choices=[('true', 'Yes'), ('false', 'No')], validators=[DataRequired()])
     submit = SubmitField(u'submit')

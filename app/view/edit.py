@@ -79,6 +79,7 @@ def edit_group(avg):
         form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
+        form.advisory_qualified.data = 'true' if group.advisory_qualified else 'false'
 
         form.cve.data = "\n".join(issue_ids)
     if not form.validate_on_submit():
@@ -92,6 +93,7 @@ def edit_group(avg):
     group.status = affected_to_status(Affected.fromstring(form.status.data), pkgnames_edited[0], group.fixed)
     group.bug_ticket = form.bug_ticket.data
     group.notes = form.notes.data
+    group.advisory_qualified = 'true' == form.advisory_qualified.data
 
     cve_ids = [form.cve.data] if '\r\n' not in form.cve.data else form.cve.data.split('\r\n')
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
