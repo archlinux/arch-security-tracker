@@ -6,7 +6,8 @@ from collections import OrderedDict
 from sqlalchemy import func
 
 
-@app.route('/advisory')
+@app.route('/advisory', methods=['GET'])
+@app.route('/advisories', methods=['GET'])
 def advisory():
     entries = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
                .join(CVEGroupPackage).join(CVEGroup)

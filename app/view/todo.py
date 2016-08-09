@@ -5,7 +5,7 @@ from app.model.enum import Status, Remote, Severity
 from sqlalchemy import func, or_
 
 
-@app.route('/todo')
+@app.route('/todo', methods=['GET'])
 def todo():
     unhandled_advisories = (db.session.query(CVEGroupPackage, CVEGroup)
                             .join(CVEGroup)

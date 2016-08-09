@@ -6,8 +6,10 @@ from collections import defaultdict
 from sqlalchemy import func, and_
 
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
+@app.route('/issue', methods=['GET'])
+@app.route('/issues', methods=['GET'])
 def index():
     entries = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '), func.group_concat(Advisory.id, ' '))
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
