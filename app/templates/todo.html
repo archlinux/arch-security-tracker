@@ -4,8 +4,7 @@
 {% block content %}
 	<h1>Todo Lists</h1>
 	{% if entries.unhandled_advisories %}
-	<h2>Advisories</h2>
-	<h3>Unhandled</h3>
+	<h2>Unhandled advisories</h2>
 	<table class="styled_table medium_size">
 		<thead>
 			<tr>
@@ -32,8 +31,7 @@
 	</table>
 	{% endif %}
 	{% if entries.unknown_issues %}
-	<h2>Issues</h2>
-	<h3>Missing attribute</h3>
+	<h3>Issues missing attributes</h3>
 	<table class="styled_table medium_size">
 		<thead>
 			<tr>
