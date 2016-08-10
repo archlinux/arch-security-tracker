@@ -1,12 +1,18 @@
 from flask import render_template, flash, redirect
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupPackage, Advisory
-from app.model.enum import Status, Remote, Severity
+from app.model.enum import Status, Remote, Severity, Publication
 from sqlalchemy import func, or_
 
 
 @app.route('/todo', methods=['GET'])
 def todo():
+    scheduled_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
+                            .join(CVEGroupPackage).join(CVEGroup)
+                            .filter(Advisory.publication == Publication.scheduled)
+                            .group_by(CVEGroupPackage.id)
+                            .order_by(Advisory.created.desc())).all()
+
     unhandled_advisories = (db.session.query(CVEGroup, func.group_concat(CVEGroupPackage.pkgname, ' '))
                             .join(CVEGroupPackage)
                             .outerjoin(Advisory)
@@ -26,6 +32,7 @@ def todo():
                       .order_by(CVE.id.desc())).all()
 
     entries = {
+        'scheduled_advisories': scheduled_advisories,
         'unhandled_advisories': unhandled_advisories,
         'unknown_issues': unknown_issues,
     }

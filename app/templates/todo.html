@@ -3,6 +3,33 @@
 
 {% block content %}
 	<h1>Todo Lists</h1>
+	{% if entries.scheduled_advisories %}
+	<h2>Scheduled advisories</h2>
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Advisory</th>
+				<th>Group</th>
+				<th>Package</th>
+				<th>Severity</th>
+				<th class="full_size">Description</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for advisory, package, group in entries.scheduled_advisories %}
+			<tr>
+				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+				<td><a href="/package/{{ package.pkgname }}">{{ package.pkgname }}</a></td>
+				<td>{{ colorize_severity(group.severity) }}</td>
+				<td>{{ advisory.description }}</td>
+				<td>published</td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+	{% endif %}
 	{% if entries.unhandled_advisories %}
 	<h2>Pending advisories</h2>
 	<table class="styled_table medium_size">
@@ -14,6 +41,7 @@
 				<th>Fixed</th>
 				<th>Severity</th>
 				<th>Ticket</th>
+				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -29,6 +57,7 @@
 				<td>{{ group.fixed }}</td>
 				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ bug_ticket(group.bug_ticket) }}</td>
+				<td>schedule</td>
 			</tr>
 		</tbody>
 		{% endfor %}
