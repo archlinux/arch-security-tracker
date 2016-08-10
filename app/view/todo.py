@@ -7,14 +7,16 @@ from sqlalchemy import func, or_
 
 @app.route('/todo', methods=['GET'])
 def todo():
-    unhandled_advisories = (db.session.query(CVEGroupPackage, CVEGroup)
-                            .join(CVEGroup)
+    unhandled_advisories = (db.session.query(CVEGroup, func.group_concat(CVEGroupPackage.pkgname, ' '))
+                            .join(CVEGroupPackage)
                             .outerjoin(Advisory)
                             .filter(CVEGroup.advisory_qualified)
                             .filter(CVEGroup.status == Status.fixed)
-                            .group_by(CVEGroupPackage.id)
+                            .group_by(CVEGroup.id)
                             .having(func.count(Advisory.id) == 0)
-                            .order_by(CVEGroupPackage.id)).all()
+                            .order_by(CVEGroup.id)).all()
+    for index, item in enumerate(unhandled_advisories):
+        unhandled_advisories[index] = (item[0], item[1].split(' '))
 
     unknown_issues = (db.session.query(CVE)
                       .filter(or_(CVE.remote == Remote.unknown,
