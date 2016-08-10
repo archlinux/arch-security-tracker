@@ -37,9 +37,9 @@
 			<tr>
 				<th>Group</th>
 				<th>Package</th>
+				<th>Severity</th>
 				<th>Affected</th>
 				<th>Fixed</th>
-				<th>Severity</th>
 				<th>Ticket</th>
 				<th>Action</th>
 			</tr>
@@ -53,9 +53,9 @@
 					<a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
 				{% endfor %}
 				</td>
+				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
-				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ bug_ticket(group.bug_ticket) }}</td>
 				<td>schedule</td>
 			</tr>
