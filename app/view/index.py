@@ -31,6 +31,7 @@ def index():
 
     groups = groups.values()
     groups = sorted(groups, key=lambda item: item['group'].created, reverse=True)
+    groups = sorted(groups, key=lambda item: item['group'].severity)
     groups = sorted(groups, key=lambda item: item['group'].status)
 
     return render_template('index.html',
