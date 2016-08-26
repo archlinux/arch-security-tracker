@@ -5,6 +5,7 @@ from app.model.cve import cve_ids_regex
 from app.model.cvegroup import pkgver_regex, pkgnames_regex
 from app.model.enum import Affected
 from app.form.validators import ValidPackageNames, SamePackageVersions
+from pyalpm import vercmp
 
 
 class GroupForm(BaseForm):
@@ -19,3 +20,12 @@ class GroupForm(BaseForm):
     notes = TextAreaField(u'Notes', validators=[])
     advisory_qualified = SelectField(u'Advisory qualified', choices=[('true', 'Yes'), ('false', 'No')], validators=[DataRequired()])
     submit = SubmitField(u'submit')
+
+    def validate(self):
+        rv = BaseForm.validate(self)
+        if not rv:
+            return False
+        if 0 <= vercmp(self.affected.data, self.fixed.data):
+            self.fixed.errors.append('Version must be newer.')
+            return False
+        return True
