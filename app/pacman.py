@@ -2,6 +2,8 @@ from pycman.config import init_with_config
 from pyalpm import vercmp
 from app.util import cmp_to_key
 from operator import attrgetter
+from os.path import dirname
+from os import chdir, getcwd
 
 archs = ['i686', 'x86_64']
 repos = {'i686': ['core', 'extra', 'community', 'testing', 'community-testing'],
@@ -11,10 +13,13 @@ configpath = './pacman/arch/{}/pacman.conf'
 handles = {}
 syncdbs = {}
 
+cwd = getcwd()
+chdir(dirname(dirname(__file__)))
 for arch in archs:
     handle = init_with_config(configpath.format(arch))
     handles[arch] = handle
     syncdbs[arch] = handle.get_syncdbs()
+chdir(cwd)
 
 
 def update(arch=None, force=False):
