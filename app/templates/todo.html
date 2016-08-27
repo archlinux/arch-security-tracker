@@ -13,7 +13,7 @@
 				<th>Package</th>
 				<th>Severity</th>
 				<th class="full_size">Description</th>
-				<th>Action</th>
+				<th class="center size-collapse">Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -24,7 +24,7 @@
 				<td><a href="/package/{{ package.pkgname }}">{{ package.pkgname }}</a></td>
 				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ advisory.description }}</td>
-				<td>published</td>
+				<td class="no-padding"><a href="{{ group.name }}/publish" class="button button-table button-primary">publish</a></td>
 			</tr>
 		</tbody>
 		{% endfor %}
@@ -41,7 +41,7 @@
 				<th>Affected</th>
 				<th>Fixed</th>
 				<th>Ticket</th>
-				<th>Action</th>
+				<th class="center size-collapse">Action</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -57,7 +57,7 @@
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
 				<td>{{ bug_ticket(group.bug_ticket) }}</td>
-				<td>schedule</td>
+				<td class="no-padding"><a href="{{ group.name }}/schedule" class="button button-table  button-primary">schedule</a></td>
 			</tr>
 		</tbody>
 		{% endfor %}
