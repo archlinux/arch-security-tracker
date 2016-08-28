@@ -210,7 +210,7 @@ dd input,
 dd select,
 dd textarea {
   margin: 6px 0;
-  width: 190px;
+  width: 200px;
   float: left;
 }
 
@@ -369,8 +369,8 @@ input[type="button"].button-primary:focus {
 }
 
 .form_login dd,
-.firm_login dt {
-  margin: 4px 0;
+.form_login dt {
+  margin: 2px 0;
 }
 
 .form_login dd label {
