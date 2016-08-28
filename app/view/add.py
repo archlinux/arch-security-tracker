@@ -12,7 +12,8 @@ def add_cve():
     if not form.validate_on_submit():
         return render_template('form/cve.html',
                                title='Add CVE',
-                               form=form)
+                               form=form,
+                               CVE=CVE)
 
     cve = db.get(CVE, id=form.cve.data)
     if cve is not None:
@@ -35,7 +36,8 @@ def add_group():
     if not form.validate_on_submit():
         return render_template('form/group.html',
                                title='Add AVG',
-                               form=form)
+                               form=form,
+                               CVEGroup=CVEGroup)
 
     issues = []
     cve_ids = multiline_to_list(form.cve.data)
