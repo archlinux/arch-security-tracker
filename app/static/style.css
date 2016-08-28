@@ -202,9 +202,8 @@ dd {
 dd input,
 dd select,
 dd textarea {
-  float: left;
-  margin: 1px 0;
-  width: 170px;
+  margin: 4px 0;
+  width: 190px;
 }
 
 dd textarea {
@@ -225,8 +224,8 @@ input[type="url"],
 input[type="password"],
 textarea,
 select {
-  height: 2.0em;
-  padding: 0px 5px;
+  height: 2.3em;
+  padding: 1px 7px;
   background-color: #fff;
   border: 1px solid #d1d1d1;
   border-radius: 4px;
