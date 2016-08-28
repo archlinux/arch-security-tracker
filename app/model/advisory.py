@@ -3,10 +3,6 @@ from app.model.enum import Publication
 from datetime import datetime
 
 
-cve_id_regex = r'^CVE\-\d{4}\-\d+$'
-cve_ids_regex = r'^(CVE\-\d{4}\-\d+[\r\n]*)+$'
-
-
 class Advisory(db.Model):
     __tablename__ = 'advisory'
     id = db.Column(db.String(15), index=True, unique=True, primary_key=True)
