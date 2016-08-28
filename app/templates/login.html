@@ -21,7 +21,7 @@
             {{ render_field(form.username) }}
             {{ render_field(form.password) }}
             {{ render_field_inline(form.remember_me) }}
-            {{ render_field_inline(form.login) }}
+            {{ render_field_unlabeled(form.login, class_='button-primary') }}
         </dl>
     </form>
 {% endblock %}
