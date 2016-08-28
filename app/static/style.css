@@ -412,9 +412,9 @@ input[type="button"].button-primary:focus {
   font-size: calc(13vw + 13vh + 6vmin); !important
 }
 
-.error_icon_box .text {
+.error_icon_box pre {
   margin-top: -10vw; !important
   font-weight: bold;
-  font-size: calc(2vw + 2vh + 2vmin); !important
-  line-height: 1.1em; !important
+  font-size: calc(2vw + 2vh + 2vmin);
+  line-height: calc(2vw + 4vh + 2vmin);
 }
