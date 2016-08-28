@@ -2,8 +2,7 @@ from app import db
 from .enum import Severity, Remote
 
 
-cve_id_regex = r'^CVE\-\d{4}\-\d+$'
-cve_ids_regex = r'^(CVE\-\d{4}\-\d+[\r\n]*)+$'
+cve_id_regex = r'^(CVE\-\d{4}\-\d+)$'
 
 
 class CVE(db.Model):
