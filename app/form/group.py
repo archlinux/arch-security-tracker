@@ -1,7 +1,7 @@
 from .base import BaseForm
 from wtforms import StringField, SelectField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, Optional, Regexp
-from app.model.cvegroup import pkgver_regex
+from wtforms.validators import DataRequired, Optional, Regexp, Length
+from app.model.cvegroup import pkgver_regex, CVEGroup
 from app.model.enum import Affected
 from app.form.validators import ValidPackageNames, SamePackageVersions, ValidIssues
 from pyalpm import vercmp
@@ -16,7 +16,7 @@ class GroupForm(BaseForm):
     fixed = StringField(u'Fixed Version', validators=[Optional(), Regexp(pkgver_regex)])
     status = SelectField(u'Status', choices=[(e.name, e.label) for e in [*Affected]], validators=[DataRequired()])
     bug_ticket = StringField('Bug ticket', validators=[Optional(), Regexp(r'^\d+$')])
-    notes = TextAreaField(u'Notes', validators=[])
+    notes = TextAreaField(u'Notes', validators=[Length(CVEGroup.NOTES_LENGTH)])
     advisory_qualified = SelectField(u'Advisory qualified', choices=[('true', 'Yes'), ('false', 'No')], validators=[DataRequired()])
     submit = SubmitField(u'submit')
 
