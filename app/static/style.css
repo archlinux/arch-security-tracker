@@ -203,18 +203,23 @@ dd {
 
 dt,
 dd {
-  margin: 6px 0;
+  margin: 10px 0;
 }
 
 dd input,
 dd select,
 dd textarea {
-  margin: 2px 0;
+  margin: 6px 0;
   width: 190px;
+  float: left;
 }
 
 dd textarea {
   height: 100px;
+}
+
+dd div.errors {
+  margin: 10px 0;
 }
 
 form label {
@@ -361,6 +366,11 @@ input[type="button"].button-primary:focus {
 .form_login dd {
   clear: none;
   float: left;
+}
+
+.form_login dd,
+.firm_login dt {
+  margin: 4px 0;
 }
 
 .form_login dd label {
