@@ -2,6 +2,7 @@ from wtforms.validators import ValidationError
 from app.pacman import get_pkg
 from app.util import multiline_to_list
 from app.model.cvegroup import pkgname_regex
+from app.model.cve import cve_id_regex
 from pyalpm import vercmp
 from re import match
 
@@ -52,3 +53,26 @@ class SamePackageVersions(object):
             ref_version = ref_version if ref_version else versions[0]
             if 0 != vercmp(ref_version.version, versions[0].version):
                 self.fail(pkgname)
+
+
+class ValidIssue(object):
+    def __init__(self):
+        self.message = u'Invalid issue.'
+
+    def __call__(self, form, field):
+        if not match(cve_id_regex, field.data):
+            raise ValidationError(self.message)
+
+
+class ValidIssues(object):
+    def __init__(self):
+        self.message = u'Invalid issue {}.'
+
+    def fail(self, issue):
+        raise ValidationError(self.message.format(issue))
+
+    def __call__(self, form, field):
+        issues = multiline_to_list(field.data)
+        for issue in issues:
+            if not match(cve_id_regex, issue):
+                self.fail(issue)
