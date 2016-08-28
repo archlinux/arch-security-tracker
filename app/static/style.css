@@ -93,11 +93,15 @@ a {
   text-decoration: none;
 }
 
-a:link, a:visited {
+a:link,
+a:visited {
   color: #07b;
 }
 
-a:hover, a:visited:hover {
+a:hover,
+a:focus,
+a:visited:hover,
+a:visited:focus {
   text-decoration: underline;
 }
 
@@ -198,7 +202,48 @@ form label {
   float: right;
 }
 
-.button, button, input[type="submit"], input[type="reset"], input[type="button"] {
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 2.0em;
+  padding: 0px 5px;
+  background-color: #fff;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box;
+  font: 0.8rem sans-serif;
+}
+
+textarea {
+  min-height: 65px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 1px solid rgb(155, 187, 224);
+}
+
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
   display: inline-block;
   height: 30px;
   line-height: 30px;
@@ -219,22 +264,44 @@ form label {
   box-sizing: border-box;
 }
 
-.button:hover, button:hover, input[type="submit"]:hover, input[type="reset"]:hover, input[type="button"]:hover {
+.button:hover,
+.button:focus,
+button:hover,
+button:focus,
+input[type="submit"]:hover,
+input[type="submit"]:focus,
+input[type="reset"]:hover,
+input[type="reset"]:focus,
+input[type="button"]:hover,
+input[type="button"]:focus {
   text-decoration: none;
   border-color: #555;
 }
 
-.button.button-primary, button.button-primary, input[type="submit"].button-primary, input[type="reset"].button-primary, input[type="button"].button-primary {
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
   background-color: rgb(217, 230, 236);
   border-color: #bcd;
 }
 
-.button.button-primary:hover, button.button-primary:hover, input[type="submit"].button-primary:hover, input[type="reset"].button-primary:hover, input[type="button"].button-primary:hover {
+.button.button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:hover,
+button.button-primary:focus,
+input[type="submit"].button-primary:hover,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:hover,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:hover,
+input[type="button"].button-primary:focus {
   background-color: rgb(197, 217, 226);
   border-color: rgb(155, 187, 224);
 }
 
-.button-table {
+.button.button-table {
   height: 2.2em;
   line-height: 1.9em;
   padding: 0 25px;
