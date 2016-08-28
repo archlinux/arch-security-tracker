@@ -201,10 +201,15 @@ dd {
   margin: 0;
 }
 
+dt,
+dd {
+  margin: 6px 0;
+}
+
 dd input,
 dd select,
 dd textarea {
-  margin: 4px 0;
+  margin: 2px 0;
   width: 190px;
 }
 
