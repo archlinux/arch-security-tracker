@@ -156,6 +156,10 @@ table th {
   border-bottom: 1px solid #bcd;
 }
 
+table tr:hover {
+  background-color: rgb(228, 237, 241)
+}
+
 table.styled_table {
   background: #ecf2f5 none repeat scroll 0 0;
   border: 1px solid #bcd;
