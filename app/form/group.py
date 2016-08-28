@@ -24,7 +24,7 @@ class GroupForm(BaseForm):
         rv = BaseForm.validate(self)
         if not rv:
             return False
-        if 0 <= vercmp(self.affected.data, self.fixed.data):
+        if self.fixed.data and 0 <= vercmp(self.affected.data, self.fixed.data):
             self.fixed.errors.append('Version must be newer.')
             return False
         return True
