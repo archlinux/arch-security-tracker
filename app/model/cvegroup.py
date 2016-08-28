@@ -3,8 +3,7 @@ from app import db
 from .enum import Status, Severity
 
 
-pkgname_regex = r'^([a-z\d@\.\_\+]+[\-]*)+$'
-pkgnames_regex = r'^(([a-z\d@\.\_\+]+[\-]*)+[\r\n]*)+$'
+pkgname_regex = r'^([a-z\d@\.\_\+-]+)$'
 pkgver_regex = r'^(\d+:)?([\w]+[\._]*)+\-\d+$'
 vulnerability_group_regex = r'^AVG-\d+$'
 

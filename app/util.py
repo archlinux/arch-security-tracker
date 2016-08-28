@@ -1,5 +1,10 @@
-def multiline_to_list(data):
-    return data.replace('\r', '').split('\n')
+def multiline_to_list(data, whitespace_separator=True, unique_only=True):
+    if whitespace_separator:
+        data = data.replace(' ', '\n')
+    data_list = data.replace('\r', '').split('\n')
+    if unique_only:
+        return list(set(data_list))
+    return data_list
 
 
 def cmp_to_key(cmp_func, getter=None):

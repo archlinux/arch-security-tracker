@@ -226,7 +226,7 @@ form label {
 
 .button.button-primary, button.button-primary, input[type="submit"].button-primary, input[type="reset"].button-primary, input[type="button"].button-primary {
   background-color: rgb(217, 230, 236);
-  border-color: #bdc;
+  border-color: #bcd;
 }
 
 .button.button-primary:hover, button.button-primary:hover, input[type="submit"].button-primary:hover, input[type="reset"].button-primary:hover, input[type="button"].button-primary:hover {
