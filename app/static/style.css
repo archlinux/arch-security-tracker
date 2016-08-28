@@ -330,6 +330,7 @@ input[type="button"].button-primary:focus {
   height: 2.2em;
   line-height: 2.0em;
   padding: 0 25px;
+  margin: 2px 2px;
 }
 
 .no-padding {
