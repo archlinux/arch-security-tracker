@@ -1,11 +1,21 @@
 body {
   background: #f6f9fc none repeat scroll 0 0;
   color: #222;
-  font: 100% sans-serif;
-  letter-spacing: 0.02em;
   line-height: 1.3em;
   margin: 0;
   padding: 0;
+}
+
+body,
+pre,
+input,
+textarea,
+select {
+  font: 100% 'Open Sans', 'DejaVu Sans', sans-serif; !important
+  -webkit-font-smoothing: antialiased; !important
+  -moz-font-smoothing: antialiased; !important
+  -moz-osx-font-smoothing: grayscale; !important
+  letter-spacing: 0.02em; !important
 }
 
 .content {
@@ -119,7 +129,6 @@ a:visited:focus {
 }
 
 pre {
-  font-family: sans-serif;
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
@@ -223,7 +232,7 @@ select {
   border-radius: 4px;
   box-shadow: none;
   box-sizing: border-box;
-  font: 0.8rem sans-serif;
+  font-size: 0.8rem; !important
 }
 
 textarea {
@@ -308,7 +317,7 @@ input[type="button"].button-primary:focus {
 
 .button.button-table {
   height: 2.2em;
-  line-height: 1.9em;
+  line-height: 2.0em;
   padding: 0 25px;
 }
 
