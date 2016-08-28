@@ -11,11 +11,11 @@ pre,
 input,
 textarea,
 select {
-  font: 100% 'Open Sans', 'Droid Sans', 'DejaVu Sans', sans-serif; !important
-  -webkit-font-smoothing: antialiased; !important
-  -moz-font-smoothing: antialiased; !important
-  -moz-osx-font-smoothing: grayscale; !important
-  letter-spacing: 0.02em; !important
+  font-family: 'Open Sans', 'Droid Sans', 'DejaVu Sans', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.02em;
 }
 
 .content {
@@ -384,16 +384,16 @@ input[type="button"].button-primary:focus {
 
 .error_icon_box {
   text-align: center;
-  margin-top: -8vw;
+  margin-top: -8vw; !important
 }
 
 .error_icon_box .icon {
-  font-size: calc(13vw + 13vh + 6vmin);
+  font-size: calc(13vw + 13vh + 6vmin); !important
 }
 
 .error_icon_box .text {
-  margin-top: -10vw;
+  margin-top: -10vw; !important
   font-weight: bold;
-  font-size: calc(2vw + 2vh + 2vmin);
-  line-height: 1.1em;
+  font-size: calc(2vw + 2vh + 2vmin); !important
+  line-height: 1.1em; !important
 }
