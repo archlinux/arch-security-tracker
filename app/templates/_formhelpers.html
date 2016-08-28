@@ -1,6 +1,6 @@
 {% macro render_field(field, show_label=True, class_=None) %}
   <dt>{% if show_label %}{{ field.label }}{% else %}&nbsp;{% endif %}</dt>
-  <dd>{{ field(class_=class_, **kwargs)|safe }}
+  <dd>{% if class_ %}{{ field(class_=class_, **kwargs)|safe }}{% else %}{{ field(**kwargs)|safe }}{% endif %}
   {% if field.errors %}
   <div class="errors">
     <ul>
@@ -14,11 +14,12 @@
 {% endmacro %}
 
 {% macro render_field_unlabeled(field, class_=None) %}
-	{{ render_field(field, show_label=False, class_=class_) }}
+	{% if class_ %}{{ render_field(field, show_label=False, class_=class_) }}{% else %}{{ render_field(field, show_label=False, **kwargs)|safe }}{% endif %}
 {% endmacro %}
 
 {% macro render_field_inline(field, class_=None) %}
-  <dt /><dd class="form_field_inline">{{ field(class_=class_, **kwargs)|safe }} {{ field.label }}
+  <dt />
+  <dd class="form_field_inline">{% if class_ %}{{ field(class_=class_, **kwargs)|safe }}{% else %}{{ field(**kwargs)|safe }}{% endif %} {{ field.label }}
   {% if field.errors %}
   <div class="errors">
     <ul>
