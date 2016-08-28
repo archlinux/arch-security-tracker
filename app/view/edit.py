@@ -27,7 +27,8 @@ def edit_cve(cve):
     if not form.validate_on_submit():
         return render_template('form/cve.html',
                                title='Edit {}'.format(cve),
-                               form=form)
+                               form=form,
+                               CVE=CVE)
 
     severity = Severity.fromstring(form.severity.data)
     severity_changed = cve.severity != severity
@@ -85,7 +86,8 @@ def edit_group(avg):
     if not form.validate_on_submit():
         return render_template('form/group.html',
                                title='Edit {}'.format(avg),
-                               form=form)
+                               form=form,
+                               CVEGroup=CVEGroup)
 
     pkgnames_edited = multiline_to_list(form.pkgnames.data)
     group.affected = form.affected.data
