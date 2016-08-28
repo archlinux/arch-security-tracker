@@ -11,7 +11,7 @@ pre,
 input,
 textarea,
 select {
-  font: 100% 'Open Sans', 'DejaVu Sans', sans-serif; !important
+  font: 100% 'Open Sans', 'Droid Sans', 'DejaVu Sans', sans-serif; !important
   -webkit-font-smoothing: antialiased; !important
   -moz-font-smoothing: antialiased; !important
   -moz-osx-font-smoothing: grayscale; !important
