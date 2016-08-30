@@ -130,6 +130,10 @@ a:visited:focus {
   white-space: normal;
 }
 
+.no-wrap {
+  white-space: nowrap;
+}
+
 pre {
   white-space: pre-wrap;
   word-break: break-word;

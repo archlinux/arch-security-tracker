@@ -28,7 +28,7 @@
 				</td>
 				<td class="wrap">
 				{% for pkg in entry.pkgs %}
-					<a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
+					<span class="no-wrap"><a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}</span>
 				{% endfor %}
 				</td>
 				<td>{{ entry.group.affected }}</td>
