@@ -28,7 +28,9 @@ def todo():
                       .filter(or_(CVE.remote == Remote.unknown,
                                   CVE.severity == Severity.unknown,
                                   CVE.description.is_(None),
-                                  CVE.description == ''))
+                                  CVE.description == '',
+                                  CVE.issue_type.is_(None),
+                                  CVE.issue_type == 'unknown'))
                       .order_by(CVE.id.desc())).all()
 
     entries = {
