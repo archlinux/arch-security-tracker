@@ -21,6 +21,7 @@ def add_cve():
         return redirect('/{}/edit'.format(cve.id))
 
     cve = db.create(CVE, id=form.cve.data)
+    cve.issue_type = form.issue_type.data
     cve.description = form.description.data
     cve.severity = Severity.fromstring(form.severity.data)
     cve.remote = Remote.fromstring(form.remote.data)

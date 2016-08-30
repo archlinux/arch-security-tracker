@@ -38,19 +38,12 @@ def show_cve(cve):
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     group_packages = dict(map(lambda item: (item[0], sorted(item[1])), group_packages.items()))
 
-    entry = {
-        'cve': cve_model.id,
-        'description': cve_model.description,
-        'severity': cve_model.severity,
-        'remote': cve_model.remote,
-        'notes': cve_model.notes,
-        'groups': groups,
-        'group_packages': group_packages,
-        'advisories': advisories
-    }
     return render_template('cve.html',
                            title=cve_model.id,
-                           entry=entry)
+                           issue=cve_model,
+                           groups=groups,
+                           group_packages=group_packages,
+                           advisories=advisories)
 
 
 @app.route('/group/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
