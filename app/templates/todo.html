@@ -81,7 +81,7 @@
 				<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
 				<td>{{ colorize_severity(cve.severity) }}</td>
 				<td>{{ colorize_remote(cve.remote) }}</td>
-				<td>{{ colorize_unknown(cve.issue_type) }}</td>
+				<td>{{ colorize_unknown(cve.issue_type|capitalize) }}</td>
 				<td><pre>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(95) }}<pre></td>
 			</tr>
 		</tbody>
