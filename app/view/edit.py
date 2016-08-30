@@ -20,6 +20,7 @@ def edit_cve(cve):
     form = CVEForm()
     if not form.is_submitted():
         form.cve.data = cve.id
+        form.issue_type.data = cve.issue_type
         form.description.data = cve.description
         form.severity.data = cve.severity.name
         form.remote.data = cve.remote.name
@@ -33,6 +34,7 @@ def edit_cve(cve):
     severity = Severity.fromstring(form.severity.data)
     severity_changed = cve.severity != severity
 
+    cve.issue_type = form.issue_type.data
     cve.description = form.description.data
     cve.severity = severity
     cve.remote = Remote.fromstring(form.remote.data)

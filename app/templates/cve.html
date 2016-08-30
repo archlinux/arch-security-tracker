@@ -2,43 +2,47 @@
 {% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, nullable_value %}
 
 {% block content %}
-	<h1>{{ entry.cve }} <a href="/{{  entry.cve }}/edit">edit</a></h1>
+	<h1>{{ issue.id }} <a href="/{{  issue.id }}/edit">edit</a></h1>
 	<table class="styled_table column_major medium_size">
 		<tbody>
 			<tr>
 				<td>Source</td>
 				<td class="wrap">
-					<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ entry.cve }}">MITRE</a> |
-					<a href="https://access.redhat.com/security/cve/{{ entry.cve }}">Red Hat</a> |
-					<a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ entry.cve }}">NVD</a> |
-					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&status%5B%5D=&sort=desc&string={{ entry.cve }}">Arch Linux bugs</a> |
-					<a href="https://security-tracker.debian.org/tracker/{{ entry.cve }}">Debian</a> |
-					<a href="https://people.canonical.com/~ubuntu-security/cve/{{ entry.cve }}">Ubuntu</a> |
-					<a href="https://bugs.gentoo.org/show_bug.cgi?id={{ entry.cve }}">Gentoo</a> |
-					<a href="https://bugzilla.novell.com/show_bug.cgi?id={{ entry.cve }}">SuSe</a> |
-					<a href="https://github.com/search?type=Code&q=%22{{ entry.cve }}%22">GitHub code</a> |
-					<a href="https://github.com/search?type=Issues&q=%22{{ entry.cve }}%22">GitHub issues</a> |
-					<a href="https://marc.info/?l=oss-security&s={{ entry.cve }}">oss-security</a> |
-					<a href="https://marc.info/?l=full-disclosure&s={{ entry.cve }}">full-disclosure</a> |
-					<a href="https://marc.info/?l=bugtraq&s={{ entry.cve }}">bugtraq</a> |
-					<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ entry.cve }}%22">web search</a>
+					<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ issue.id }}">MITRE</a> |
+					<a href="https://access.redhat.com/security/cve/{{ issue.id }}">Red Hat</a> |
+					<a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ issue.id }}">NVD</a> |
+					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&status%5B%5D=&sort=desc&string={{ issue.id }}">Arch Linux bugs</a> |
+					<a href="https://security-tracker.debian.org/tracker/{{ issue.id }}">Debian</a> |
+					<a href="https://people.canonical.com/~ubuntu-security/cve/{{ issue.id }}">Ubuntu</a> |
+					<a href="https://bugs.gentoo.org/show_bug.cgi?id={{ issue.id }}">Gentoo</a> |
+					<a href="https://bugzilla.novell.com/show_bug.cgi?id={{ issue.id }}">SuSe</a> |
+					<a href="https://github.com/search?type=Code&q=%22{{ issue.id }}%22">GitHub code</a> |
+					<a href="https://github.com/search?type=Issues&q=%22{{ issue.id }}%22">GitHub issues</a> |
+					<a href="https://marc.info/?l=oss-security&s={{ issue.id }}">oss-security</a> |
+					<a href="https://marc.info/?l=full-disclosure&s={{ issue.id }}">full-disclosure</a> |
+					<a href="https://marc.info/?l=bugtraq&s={{ issue.id }}">bugtraq</a> |
+					<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ issue.id }}%22">web search</a>
 				</td>
 			</tr>
 			<tr>
-				<td>Description</td>
-				<td><pre>{{ nullable_value(entry.description) }}</pre></td>
+				<td>Type</td>
+				<td><pre>{{ issue.issue_type }}</pre></td>
 			</tr>
-			<tr>
 			<tr>
 				<td>Severity</td>
-				<td>{{ colorize_severity(entry.severity) }}</td>
+				<td>{{ colorize_severity(issue.severity) }}</td>
 			</tr>
+			<tr>
 				<td>Remote</td>
-				<td>{{ colorize_remote(entry.remote) }}</td>
+				<td>{{ colorize_remote(issue.remote) }}</td>
+			</tr>
+			<tr>
+				<td>Description</td>
+				<td><pre>{{ nullable_value(issue.description) }}</pre></td>
 			</tr>
 		</tbody>
 	</table>
-	{% if entry.groups %}
+	{% if groups %}
 	<table class="styled_table medium_size">
 		<thead>
 			<tr>
@@ -51,11 +55,11 @@
 			</tr>
 		</thead>
 		<tbody>
-		{% for group in entry.groups %}
+		{% for group in groups %}
 			<tr>
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td class="wrap">
-				{% for pkgname in entry.group_packages[group] %}
+				{% for pkgname in group_packages[group] %}
 					<a href="/package/{{ pkgname }}">{{ pkgname }}</a>{% if not loop.last %}, {% endif %}
 				{% endfor %}
 				</td>
@@ -68,7 +72,7 @@
 		</tbody>
 	</table>
 	{% endif %}
-	{% if entry.advisories %}
+	{% if advisories %}
 	<table class="styled_table medium_size">
 		<thead>
 			<tr>
@@ -78,7 +82,7 @@
 			</tr>
 		</thead>
 		<tbody>
-		{% for advisory in entry.advisories %}
+		{% for advisory in advisories %}
 			<tr>
 				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 				<td><a href="/package/{{ advisory.group_package.pkgname }}">{{ advisory.group_package.pkgname }}</a></td>
@@ -88,7 +92,7 @@
 		{% endfor %}
 	</table>
 	{% endif %}
-	{% if entry.notes %}
+	{% if issue.notes %}
 	<table class="styled_table medium_size">
 		<thead>
 			<tr>
@@ -97,7 +101,7 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td><pre>{{ entry.notes|urlize }}</pre></td>
+				<td><pre>{{ issue.notes|urlize }}</pre></td>
 			</tr>
 		</tbody>
 	</table>

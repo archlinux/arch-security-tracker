@@ -11,12 +11,12 @@ class GroupForm(BaseForm):
     cve = TextAreaField(u'CVE', validators=[DataRequired(), ValidIssues()])
     # TODO: check if the pkgnames are all belonging to the same pkgbase instead of checking for the versions
     pkgnames = TextAreaField(u'Package', validators=[DataRequired(), ValidPackageNames(), SamePackageVersions()])
-    description = TextAreaField(u'Description', validators=[])
+    description = TextAreaField(u'Description', validators=[Optional()])
     affected = StringField(u'Affected version', validators=[DataRequired(), Regexp(pkgver_regex)])
     fixed = StringField(u'Fixed Version', validators=[Optional(), Regexp(pkgver_regex)])
     status = SelectField(u'Status', choices=[(e.name, e.label) for e in [*Affected]], validators=[DataRequired()])
     bug_ticket = StringField('Bug ticket', validators=[Optional(), Regexp(r'^\d+$')])
-    notes = TextAreaField(u'Notes', validators=[Length(max=CVEGroup.NOTES_LENGTH)])
+    notes = TextAreaField(u'Notes', validators=[Optional(), Length(max=CVEGroup.NOTES_LENGTH)])
     advisory_qualified = SelectField(u'Advisory qualified', choices=[('true', 'Yes'), ('false', 'No')], validators=[DataRequired()])
     submit = SubmitField(u'submit')
 
