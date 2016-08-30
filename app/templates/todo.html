@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, bug_ticket %}
+{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket %}
 
 {% block content %}
 	<h1>Todo Lists</h1>
@@ -71,6 +71,7 @@
 				<th>Issue</th>
 				<th>Severity</th>
 				<th>Remote</th>
+				<th>Type</th>
 				<th class="full_size">Description</th>
 			</tr>
 		</thead>
@@ -80,6 +81,7 @@
 				<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
 				<td>{{ colorize_severity(cve.severity) }}</td>
 				<td>{{ colorize_remote(cve.remote) }}</td>
+				<td>{{ colorize_unknown(cve.issue_type) }}</td>
 				<td><pre>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(95) }}<pre></td>
 			</tr>
 		</tbody>
