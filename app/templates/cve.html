@@ -61,7 +61,7 @@
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td class="wrap">
 				{% for pkgname in group_packages[group] %}
-				<span style="white-space: nowrap"><a href="/package/{{ pkgname }}">{{ pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
+					<span class="no-wrap"><a href="/package/{{ pkgname }}">{{ pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
 				{% endfor %}
 				</td>
 				<td>{{ group.affected }}</td>
