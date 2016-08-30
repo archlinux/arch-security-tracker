@@ -78,6 +78,14 @@
 	{% endif %}
 {% endmacro %}
 
+{% macro colorize_unknown(value) %}
+	{% if value == None or value == "Unknown" %}
+		<span class="purple">Unknown</span>
+	{% else %}
+		{{ value }}
+	{% endif %}
+{% endmacro %}
+
 {% macro colorize_boolean(value) %}
 	{% if value == None or value == "Unknown" %}
 		<span class="purple">Unknown</span>
