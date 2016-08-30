@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, nullable_value, bug_ticket %}
+{% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, colorize_unknown, nullable_value, bug_ticket %}
 
 {% block content %}
 	<h1>{{ issue.id }} <a href="/{{  issue.id }}/edit">edit</a></h1>
@@ -34,7 +34,7 @@
 			</tr>
 			<tr>
 				<td>Type</td>
-				<td>{{ issue.issue_type|capitalize }}</td>
+				<td>{{ colorize_unknown(issue.issue_type|capitalize) }}</td>
 			</tr>
 			<tr>
 				<td>Description</td>
