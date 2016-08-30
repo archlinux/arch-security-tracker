@@ -3,7 +3,7 @@
 
 {% block content %}
 	<h1>{{ group.detail.name }} <a href="/{{  group.detail.name }}/edit">edit</a></h1>
-	<table class="styled_table column_major medium_size">
+	<table class="styled_table column_major full_size">
 		<tbody>
 			<tr>
 				<td>Package</td>
@@ -38,17 +38,18 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Tickets</td>
+				<td>Ticket</td>
 				<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
 			</tr>
 		</tbody>
 	</table>
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Issue</th>
 				<th>Severity</th>
 				<th>Remote</th>
+				<th>Type</th>
 				<th class="full_size">Description</th>
 			</tr>
 		</thead>
@@ -58,13 +59,14 @@
 				<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
 				<td>{{ colorize_severity(cve.severity) }}</td>
 				<td>{{ colorize_remote(cve.remote) }}</td>
-				<td><pre>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(95) }}<pre></td>
+				<td>{{ cve.issue_type|capitalize }}</td>
+				<td><pre>{{ nullable_value(cve.description)|wordwrap(70, wrapstring=' ')|truncate(160) }}<pre></td>
 			</tr>
 		</tbody>
 		{% endfor %}
 	</table>
 	{% if group.advisories %}
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Advisory</th>
@@ -84,7 +86,7 @@
 	</table>
 	{% endif %}
 	{% if group.detail.notes %}
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Notes</th>

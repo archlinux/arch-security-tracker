@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, nullable_value %}
+{% from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, nullable_value, bug_ticket %}
 
 {% block content %}
 	<h1>{{ issue.id }} <a href="/{{  issue.id }}/edit">edit</a></h1>
-	<table class="styled_table column_major medium_size">
+	<table class="styled_table column_major full_size">
 		<tbody>
 			<tr>
 				<td>Source</td>
@@ -25,10 +25,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Type</td>
-				<td><pre>{{ issue.issue_type }}</pre></td>
-			</tr>
-			<tr>
 				<td>Severity</td>
 				<td>{{ colorize_severity(issue.severity) }}</td>
 			</tr>
@@ -37,13 +33,17 @@
 				<td>{{ colorize_remote(issue.remote) }}</td>
 			</tr>
 			<tr>
+				<td>Type</td>
+				<td>{{ issue.issue_type|capitalize }}</td>
+			</tr>
+			<tr>
 				<td>Description</td>
 				<td><pre>{{ nullable_value(issue.description) }}</pre></td>
 			</tr>
 		</tbody>
 	</table>
 	{% if groups %}
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Group</th>
@@ -52,6 +52,7 @@
 				<th>Fixed</th>
 				<th>Severity</th>
 				<th>Status</th>
+				<th class="full_size">Ticket</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -60,20 +61,21 @@
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td class="wrap">
 				{% for pkgname in group_packages[group] %}
-					<a href="/package/{{ pkgname }}">{{ pkgname }}</a>{% if not loop.last %}, {% endif %}
+				<span style="white-space: nowrap"><a href="/package/{{ pkgname }}">{{ pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
 				{% endfor %}
 				</td>
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
 				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ colorize_status(group.status) }}</td>
+				<td>{{ bug_ticket(group.bug_ticket) }}</td>
 			</tr>
 		{% endfor %}
 		</tbody>
 	</table>
 	{% endif %}
 	{% if advisories %}
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Advisory</th>
@@ -93,7 +95,7 @@
 	</table>
 	{% endif %}
 	{% if issue.notes %}
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Notes</th>

@@ -4,7 +4,7 @@ from .enum import Severity, Remote
 
 cve_id_regex = r'^(CVE\-\d{4}\-\d+)$'
 issue_types = [
-    'Unknown',
+    'unknown',
     'access restriction bypass',
     'arbitrary code execution',
     'arbitrary command execution',
