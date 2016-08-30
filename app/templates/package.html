@@ -1,16 +1,17 @@
 {% extends "base.html" %}
-{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote %}
+{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, bug_ticket %}
 
 {% macro render_groups(groups) %}
 	{% if groups %}
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Group</th>
 				<th>Affected</th>
 				<th>Fixed</th>
 				<th>Severity</th>
-				<th class="full_size">Status</th>
+				<th>Status</th>
+				<th class="full_size">Ticket</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -21,6 +22,7 @@
 				<td>{{ group.fixed }}</td>
 				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ colorize_status(group.status) }}</td>
+				<td>{{ bug_ticket(group.bug_ticket) }}</td>
 			</tr>
 		{% endfor %}
 		</tbody>
@@ -30,13 +32,14 @@
 
 {% macro render_issues(issues) %}
 	{% if issues %}
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Issue</th>
 				<th>Group</th>
 				<th>Severity</th>
 				<th>Remote</th>
+				<th>Type</th>
 				<th class="full_size">Description</th>
 			</tr>
 		</thead>
@@ -47,7 +50,8 @@
 				<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
 				<td>{{ colorize_severity(issue.cve.severity) }}</td>
 				<td>{{ colorize_remote(issue.cve.remote) }}</td>
-				<td><pre>{{ nullable_value(issue.cve.description)|wordwrap(60, wrapstring=' ')|truncate(80) }}<pre></td>
+				<td>{{ issue.cve.issue_type|capitalize }}</td>
+				<td><pre>{{ nullable_value(issue.cve.description)|wordwrap(70, wrapstring=' ')|truncate(160) }}<pre></td>
 			</tr>
 		{% endfor %}
 		</tbody>
@@ -57,7 +61,7 @@
 
 {% block content %}
 	<h1>{{ package.pkgname }}</h1>
-	<table class="styled_table column_major medium_size">
+	<table class="styled_table column_major full_size">
 		<tbody>
 			<tr>
 				<td>Link</td>
@@ -99,7 +103,7 @@
 	{% endif %}
 	{% if package.advisories  %}
 	<h2>Advisories</h2>
-	<table class="styled_table medium_size">
+	<table class="styled_table full_size">
 		<thead>
 			<tr>
 				<th>Advisory</th>
