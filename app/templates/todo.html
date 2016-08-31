@@ -12,7 +12,7 @@
 				<th>Group</th>
 				<th>Package</th>
 				<th>Severity</th>
-				<th class="full_size">Description</th>
+				<th class="full_size">Type</th>
 				<th class="center size-collapse">Action</th>
 			</tr>
 		</thead>
@@ -21,9 +21,9 @@
 			<tr>
 				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-				<td><a href="/package/{{ package.pkgname }}">{{ package.pkgname }}</a></td>
+				<td><a href="/package/{{ package.pkgname }}" class="no-wrap">{{ package.pkgname }}</a></td>
 				<td>{{ colorize_severity(group.severity) }}</td>
-				<td>{{ advisory.description }}</td>
+				<td>{{ advisory.advisory_type }}</td>
 				<td class="no-padding"><a href="{{ group.name }}/publish" class="button button-table button-primary">publish</a></td>
 			</tr>
 		</tbody>
@@ -50,14 +50,14 @@
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td class="wrap">
 				{% for pkg in pkgs %}
-					<a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
+					<a href="/package/{{ pkg }}" class="no-wrap">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
 				{% endfor %}
 				</td>
 				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
 				<td>{{ bug_ticket(group.bug_ticket) }}</td>
-				<td class="no-padding"><a href="{{ group.name }}/schedule" class="button button-table  button-primary">schedule</a></td>
+				<td class="no-padding"><a href="{{ group.name }}" class="button button-table  button-primary">schedule</a></td>
 			</tr>
 		</tbody>
 		{% endfor %}
