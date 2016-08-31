@@ -21,6 +21,11 @@ def forbidden(e='403: Forbidden'):
     return handle_error(e, 403)
 
 
+@app.errorhandler(405)
+def method_not_allowed(e='405: Method Not Allowed'):
+    return handle_error(e, 405)
+
+
 @app.errorhandler(410)
 def gone(e='410: Gone'):
     return handle_error(e, 410)
