@@ -1,8 +1,8 @@
+from config import basedir
 from pycman.config import init_with_config
 from pyalpm import vercmp
 from app.util import cmp_to_key
 from operator import attrgetter
-from os.path import dirname
 from os import chdir, getcwd
 
 archs = ['i686', 'x86_64']
@@ -14,7 +14,7 @@ handles = {}
 syncdbs = {}
 
 cwd = getcwd()
-chdir(dirname(dirname(__file__)))
+chdir(basedir)
 for arch in archs:
     handle = init_with_config(configpath.format(arch))
     handles[arch] = handle
