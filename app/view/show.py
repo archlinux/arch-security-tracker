@@ -72,9 +72,6 @@ def show_group(avg):
         if advisory:
             advisories.add(advisory)
 
-    advisories_published = filter(lambda a: a.published == Publication.published, advisories)
-    advisories_scheduled = filter(lambda a: a.published == Publication.scheduled, advisories)
-
     cve_types = list(cve_types)
     cves = sorted(cves, key=lambda item: item.id, reverse=True)
     pkgs = sorted(pkgs, key=lambda item: item.pkgname)
