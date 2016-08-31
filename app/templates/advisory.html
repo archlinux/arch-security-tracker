@@ -12,7 +12,7 @@
 				<th>Group</th>
 				<th>Package</th>
 				<th>Severity</th>
-				<th class="full_size">Description</th>
+				<th class="full_size">Type</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -22,7 +22,7 @@
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
 				<td>{{ colorize_severity(group.severity) }}</td>
-				<td></td>
+				<td>{{ advisory.advisory_type }}</td>
 			</tr>
 		</tbody>
 		{% endfor %}
@@ -38,7 +38,7 @@
 				<th>Group</th>
 				<th>Package</th>
 				<th>Severity</th>
-				<th class="full_size">Description</th>
+				<th class="full_size">Type</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -48,7 +48,7 @@
 				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 				<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
 				<td>{{ colorize_severity(group.severity) }}</td>
-				<td></td>
+				<td>{{ advisory.advisory_type }}</td>
 			</tr>
 		</tbody>
 		{% endfor %}
