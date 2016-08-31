@@ -63,9 +63,11 @@ def show_group(avg):
     cves = set()
     pkgs = set()
     advisories = set()
+    cve_types = set()
     for group_entry, cve, pkg, advisory in entries:
         group = group_entry
         cves.add(cve)
+        cve_types.add(cve.issue_type)
         pkgs.add(pkg)
         if advisory:
             advisories.add(advisory)
@@ -73,11 +75,15 @@ def show_group(avg):
     advisories_published = filter(lambda a: a.published == Publication.published, advisories)
     advisories_scheduled = filter(lambda a: a.published == Publication.scheduled, advisories)
 
+    cve_types = list(cve_types)
     cves = sorted(cves, key=lambda item: item.id, reverse=True)
     pkgs = sorted(pkgs, key=lambda item: item.pkgname)
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     versions = get_pkg(pkgs[0].pkgname, filter_arch=True)
     advisory_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
+    advisory_form = AdvisoryForm()
+    if 1 == len(cve_types):
+        advisory_form.advisory_type.data = cve_types[0]
 
     out = {
         'detail': group,
@@ -90,7 +96,7 @@ def show_group(avg):
                            title='{}'.format(group.name),
                            group=out,
                            advisory_pending=advisory_pending,
-                           form=AdvisoryForm())
+                           form=advisory_form)
 
 
 @app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
