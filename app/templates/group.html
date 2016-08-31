@@ -41,6 +41,18 @@
 				<td>Ticket</td>
 				<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
 			</tr>
+			{% if advisory_pending %}
+			<tr>
+				<td>Action</td>
+				<td>
+					<form action="/AVG-{{ group.detail.id }}/scheudle" method="post" name="add" class="form_add">
+						{{ form.hidden_tag() }}
+						{{ form.advisory_type()|safe }}
+						{{ form.submit(class_='button button-table button-primary')|safe }}
+					</form>
+				</td>
+			</tr>
+			{% endif %}
 		</tbody>
 	</table>
 	<table class="styled_table full_size">

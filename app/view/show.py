@@ -2,9 +2,10 @@ from flask import render_template, flash, redirect
 from sqlalchemy import and_
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
-from app.model.enum import Publication
+from app.model.enum import Publication, Status
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex, pkgname_regex
+from app.form.advisory import AdvisoryForm
 from app.view.error import not_found
 from app.pacman import get_pkg
 from collections import defaultdict
@@ -53,8 +54,7 @@ def show_group(avg):
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
                .filter(CVEGroup.id == avg_id)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
-               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.publication == Publication.published))
+               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id))
                ).all()
     if not entries:
         return not_found()
@@ -70,10 +70,14 @@ def show_group(avg):
         if advisory:
             advisories.add(advisory)
 
+    advisories_published = filter(lambda a: a.published == Publication.published, advisories)
+    advisories_scheduled = filter(lambda a: a.published == Publication.scheduled, advisories)
+
     cves = sorted(cves, key=lambda item: item.id, reverse=True)
     pkgs = sorted(pkgs, key=lambda item: item.pkgname)
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     versions = get_pkg(pkgs[0].pkgname, filter_arch=True)
+    advisory_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
 
     out = {
         'detail': group,
@@ -84,7 +88,9 @@ def show_group(avg):
     }
     return render_template('group.html',
                            title='{}'.format(group.name),
-                           group=out)
+                           group=out,
+                           advisory_pending=advisory_pending,
+                           form=AdvisoryForm())
 
 
 @app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
