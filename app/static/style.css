@@ -230,6 +230,10 @@ dd div.errors {
   margin: 10px 0;
 }
 
+form {
+  margin: 0;
+}
+
 form label {
   width: 100%;
   float: right;
