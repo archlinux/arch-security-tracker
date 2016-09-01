@@ -4,6 +4,7 @@ from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
 from app.model.enum import Publication
+from app.form.advisory import AdvisoryPublishForm
 from app.view.error import not_found
 from app.form.advisory import AdvisoryForm
 from collections import OrderedDict
@@ -93,3 +94,25 @@ def schedule_advisory(avg):
     db.session.commit()
 
     return redirect('/{}'.format(avg))
+
+
+@app.route('/advisory/<regex("{}"):avg>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST'])
+@app.route('/<regex("{}"):asa>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST'])
+def publish_advisory(asa):
+    form = AdvisoryPublishForm()
+    if not form.validate_on_submit():
+        flash('Form validation failed', 'error')
+        return redirect('/{}'.format(asa))
+
+    advisory = (db.session.query(Advisory)
+               .filter(Advisory.id == asa)
+               ).first()
+    if not advisory:
+        return not_found()
+
+    if advisory.publication == Publication.published:
+        return redirect('/{}'.format(asa))
+
+    advisory.publication = Publication.published
+    db.session.commit()
+    return redirect('/{}'.format(asa))

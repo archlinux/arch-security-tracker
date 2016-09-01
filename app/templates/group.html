@@ -45,7 +45,7 @@
 			<tr>
 				<td>Advisory</td>
 				<td>
-					<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="add" class="form_add">
+					<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="schedule" class="form_add">
 						{{ form.hidden_tag() }}
 						{{ form.advisory_type()|safe }}
 						{{ form.submit(class_='button button-table button-primary')|safe }}
