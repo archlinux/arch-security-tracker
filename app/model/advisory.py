@@ -4,7 +4,7 @@ from app.model.enum import Publication
 from datetime import datetime
 
 
-advisory_regex = r'^(ASA\-\d{6}\-\d+)$'
+advisory_regex = r'^(ASA\-(\d{6})\-(\d+))$'
 advisory_types = list(filter(lambda e: e is not 'unknown', issue_types))
 advisory_types.insert(0, 'multiple issues')
 
