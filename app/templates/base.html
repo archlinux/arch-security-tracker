@@ -27,10 +27,10 @@
 			</ul>
 		</div>
 		<hr />
-		{% with messages = get_flashed_messages() %}
+		{% with messages = get_flashed_messages(with_categories=true) %}
 		{% if messages %}
-		{% for message in messages %}
-			<div class="box">{{ message }}</div>
+		{% for category, message in messages %}
+		<div class="box {{ category }}">{{ message }}</div>
 		{% endfor %}
 		{% endif %}
 		{% endwith %}
