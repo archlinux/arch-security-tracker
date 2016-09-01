@@ -24,7 +24,12 @@
 				<td><a href="/package/{{ package.pkgname }}" class="no-wrap">{{ package.pkgname }}</a></td>
 				<td>{{ colorize_severity(group.severity) }}</td>
 				<td>{{ advisory.advisory_type }}</td>
-				<td class="no-padding"><a href="{{ group.name }}/publish" class="button button-table button-primary">publish</a></td>
+				<td class="no-padding">
+					<form action="/{{ advisory.id }}/publish" method="post" name="publish" class="form_add">
+						{{ publish_form.hidden_tag() }}
+						{{ publish_form.submit(class_='button button-table button-primary')|safe }}
+					</form>
+				</td>
 			</tr>
 		</tbody>
 		{% endfor %}
@@ -57,7 +62,9 @@
 				<td>{{ group.affected }}</td>
 				<td>{{ group.fixed }}</td>
 				<td>{{ bug_ticket(group.bug_ticket) }}</td>
-				<td class="no-padding"><a href="{{ group.name }}" class="button button-table  button-primary">schedule</a></td>
+				<td class="no-padding">
+					<a href="{{ group.name }}" class="button button-table button-primary">schedule</a>
+				</td>
 			</tr>
 		</tbody>
 		{% endfor %}

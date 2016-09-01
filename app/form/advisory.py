@@ -7,3 +7,7 @@ from app.model.advisory import advisory_types
 class AdvisoryForm(BaseForm):
     advisory_type = SelectField(u'Type', choices=[(item, item.capitalize()) for item in advisory_types], validators=[DataRequired()])
     submit = SubmitField(u'schedule')
+
+
+class AdvisoryPublishForm(BaseForm):
+    submit = SubmitField(u'publish')

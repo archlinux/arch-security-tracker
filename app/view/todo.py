@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupPackage, Advisory
+from app.form.advisory import AdvisoryPublishForm
 from app.model.enum import Status, Remote, Severity, Publication
 from sqlalchemy import func, or_
 
@@ -40,4 +41,5 @@ def todo():
     }
     return render_template('todo.html',
                            title='Todo Lists',
-                           entries=entries)
+                           entries=entries,
+                           publish_form=AdvisoryPublishForm())
