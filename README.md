@@ -23,7 +23,6 @@ advisories.
 
 ## Install
 
-* ./db_create
 * make
 
 you can run it via:  
