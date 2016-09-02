@@ -3,6 +3,7 @@ all: update
 setup:
 	mkdir -p ./pacman/{cache,log}
 	mkdir -p ./pacman/arch/{i686,x86_64}/db
+	./db_create
 
 update: setup
 	./update
