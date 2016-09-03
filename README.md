@@ -1,17 +1,17 @@
-# Arch-Security-Tracker
+# Arch Linux Security Tracker
 
-The **Arch-Security-Tracker** is a lightweight flask-based panel for
-tracing vulnerabilities in Arch Linux packages and generating security
-advisories.
+The **Arch Linux Security Tracker** is a lightweight flask based panel
+for tracking vulnerabilities in Arch Linux packages, displaying
+vulnerability details and generating security advisories.
 
 ## Features
 
-* Issue-Tracking
-* Grouping CVEs
+* Issue tracking
+* Issue grouping
 * libalpm support
 * Todo lists
-* Vulnerability Scheduling
-* Advisory generating
+* Advisory scheduling
+* Advisory generation
 
 ## Dependencies
 
@@ -20,15 +20,21 @@ advisories.
 * python-flask-sqlalchemy
 * python-flask-wtf
 * pyalpm
+* sqlite
 
-## Install
+## Setup
 
-* make
+```
+make
+```
 
-you can run it via:
+run debug mode:
 
-* ./run.py
+```
+./run.py
+```
+
+For production run it through ```uwsgi```
 
 ## License
-
 
