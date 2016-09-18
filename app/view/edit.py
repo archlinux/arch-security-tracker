@@ -99,7 +99,7 @@ def edit_group(avg):
     group.notes = form.notes.data
     group.advisory_qualified = 'true' == form.advisory_qualified.data
 
-    cve_ids = [form.cve.data] if '\r\n' not in form.cve.data else form.cve.data.split('\r\n')
+    cve_ids = multiline_to_list(form.cve.data)
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
     issues_removed = set(filter(lambda issue: issue not in cve_ids, issue_ids))
     issues_added = set(filter(lambda issue: issue not in issue_ids, cve_ids))
