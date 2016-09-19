@@ -41,6 +41,10 @@
 				<td>Ticket</td>
 				<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
 			</tr>
+			<tr>
+				<td>Created</td>
+				<td>{{ group.detail.created.strftime('%Y-%m-%d %H:%m:%S') }}</td>
+			</tr>
 			{% if advisory_pending %}
 			<tr>
 				<td>Advisory</td>
