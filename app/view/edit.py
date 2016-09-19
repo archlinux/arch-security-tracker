@@ -49,8 +49,8 @@ def edit_cve(cve):
                   .join(CVEGroupEntry).join(CVE)
                   .group_by(CVEGroup.id).group_by(CVE.id)).all()
         group_severity = defaultdict(list)
-        for group, cve in issues:
-            group_severity[group].append(cve.severity)
+        for group, issue in issues:
+            group_severity[group].append(issue.severity)
         for group, severities in group_severity.items():
             group.severity = highest_severity(severities)
 
