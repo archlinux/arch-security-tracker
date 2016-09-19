@@ -66,7 +66,7 @@
 			<tr>
 				<td>Link</td>
 				<td class="full_size">
-					<a href="https://www.archlinux.org/packages/?name={{ package.pkgname }}">package</a> |
+					<a href="https://www.archlinux.org/packages/?name={{ package.pkgname|urlencode }}">package</a> |
 					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname }}">bugs open</a> |
 					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname }}">bugs closed</a> |
 					<a href="https://wiki.archlinux.org/index.php/Special:Search?search=%22{{ package.pkgname }}%22">Wiki</a> |
