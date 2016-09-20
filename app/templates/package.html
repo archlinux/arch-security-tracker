@@ -51,7 +51,7 @@
 				<td>{{ colorize_severity(issue.cve.severity) }}</td>
 				<td>{{ colorize_remote(issue.cve.remote) }}</td>
 				<td>{{ colorize_unknown(issue.cve.issue_type|capitalize) }}</td>
-				<td><pre>{{ nullable_value(issue.cve.description)|wordwrap(70, wrapstring=' ')|truncate(160) }}<pre></td>
+				<td><pre>{% if issue.cve.description %}{{ issue.cve.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}<pre></td>
 			</tr>
 		{% endfor %}
 		</tbody>
