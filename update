@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
     if args.pacman_db:
         print("[+] Update pacman db...")
-        update_pacman_db()
+        update_pacman_db(force=True)
 
     if args.group_status:
         print("[+] Update group status...")
