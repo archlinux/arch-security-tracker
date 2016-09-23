@@ -3,29 +3,23 @@ from pycman.config import init_with_config
 from pyalpm import vercmp
 from app.util import cmp_to_key
 from operator import attrgetter
-from os import chdir, getcwd
+from os import chdir
 
 archs = ['i686', 'x86_64']
 repos = {'i686': ['core', 'extra', 'community', 'testing', 'community-testing'],
          'x86_64': ['core', 'extra', 'community', 'multilib', 'testing', 'community-testing', 'multilib-testing']}
 configpath = './pacman/arch/{}/pacman.conf'
-
-handles = {}
-syncdbs = {}
-
-cwd = getcwd()
 chdir(basedir)
-for arch in archs:
-    handle = init_with_config(configpath.format(arch))
-    handles[arch] = handle
-    syncdbs[arch] = handle.get_syncdbs()
-chdir(cwd)
+
+
+def get_handle(arch):
+    return init_with_config(configpath.format(arch))
 
 
 def update(arch=None, force=False):
     update_archs = [arch] if arch else archs
     for arch in update_archs:
-        for syncdb in syncdbs[arch]:
+        for syncdb in get_handle(arch).get_syncdbs():
             syncdb.update(force)
 
 
@@ -33,7 +27,7 @@ def get_pkg(pkgname, arch=None, testing=True, filter_arch=False):
     get_archs = [arch] if arch else archs
     results = set()
     for arch in get_archs:
-        for syncdb in syncdbs[arch]:
+        for syncdb in get_handle(arch).get_syncdbs():
             if not testing and 'testing' in syncdb.name:
                 continue
             result = syncdb.get_pkg(pkgname)
@@ -48,7 +42,7 @@ def search(pkgname, arch=None, testing=True, filter_arch=False):
     search_archs = [arch] if arch else archs
     results = []
     for arch in search_archs:
-        for syncdb in syncdbs[arch]:
+        for syncdb in get_handle(arch).get_syncdbs():
             if not testing and 'testing' in syncdb.name:
                 continue
             result = syncdb.search(pkgname)
