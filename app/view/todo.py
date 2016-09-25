@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect
+from flask import render_template
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupPackage, Advisory
 from app.form.advisory import AdvisoryPublishForm
