@@ -435,3 +435,12 @@ input[type="button"].button-primary:focus {
   font-size: calc(2vw + 2vh + 2vmin);
   line-height: calc(2vw + 4vh + 2vmin);
 }
+
+.advisory {
+  font-family: monospace;
+  font-size: 1rem;
+  line-height: 1.2rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}

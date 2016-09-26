@@ -1,0 +1,79 @@
+Subject: [{{ advisory.id }}] {{ package.pkgname }}: {{ advisory.advisory_type }}
+
+{% set asa_title = 'Arch Linux Security Advisory ' + advisory.id %}
+{{- asa_title }}
+{% set asa_title_separator = '=' * asa_title|length %}
+{{- asa_title_separator }}
+
+Severity: {{ group.severity }}
+Date    : {{ advisory.created.strftime('%Y-%m-%d') }}
+CVE-ID  : {{ issues_listing_formatted }}
+Package : {{ package.pkgname }}
+Type    : {{ advisory.advisory_type }}
+Remote  : {%if not remote %}No{% else %}Yes{% endif %}
+Link    : {{ link }}
+
+Summary
+=======
+
+{% macro summary() -%}
+The package {{ package.pkgname }} before version {{ group.fixed }} is vulnerable to {{ advisory.advisory_type}}
+{%- if unique_issue_types|length > 1 %} including{%- raw %} {% endraw %}
+	{%- for issue_type in unique_issue_types %}
+		{{- issue_type }}
+		{%- if not loop.last %}
+			{%- if loop.revindex > 2 %}, {% else %} and {% endif %}
+		{%- endif %}
+	{%- endfor %}
+{%- endif %}.
+{%- endmacro %}
+{{- summary()|wordwrap(71) }}
+
+Resolution
+==========
+
+Upgrade to {{ group.fixed }}.
+
+# pacman -Syu "{{ package.pkgname }}>={{ group.fixed }}"
+
+The problem{% if issues|length > 1 %}s have{% else %} has{% endif %} been fixed upstream
+{%- if upstream_released %} in version {{ upstream_version }}
+{%- else %} but no release is available yet
+{%- endif %}.
+
+Workaround
+==========
+
+None.
+
+Description
+===========
+
+{% for issue in issues %}
+{%- if issues|length > 1 %}- {{issue.id}} ({{ issue.issue_type }})
+
+{% endif %}
+{%- set splitted = issue.description.split('\n') %}
+{%- for line in splitted %}
+	{{- line|wordwrap(71) }}
+	{%- if not loop.last %}
+{% endif %}
+{%- endfor %}
+{%- if not loop.last %}
+
+{% endif %}
+{%- endfor %}
+
+Impact
+======
+
+{{ impact }}
+
+References
+==========
+
+{% for reference in references %}
+{{- references }}
+{% endfor %}
+{%- for issue in issues %}https://access.redhat.com/security/cve/{{ issue.id }}
+{% endfor %}
