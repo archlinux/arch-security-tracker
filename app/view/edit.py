@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect
 from app import app, db
 from app.form import CVEForm, GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
-from app.model.enum import Remote, Severity, Affected, status_to_affected, affected_to_status, highest_severity
+from app.model.enum import Remote, Severity, Affected, Status, status_to_affected, affected_to_status, highest_severity
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
 from app.view.error import not_found
@@ -82,7 +82,7 @@ def edit_group(avg):
         form.status.data = status_to_affected(group.status).name
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
-        form.advisory_qualified.data = 'true' if group.advisory_qualified else 'false'
+        form.advisory_qualified.data = 'true' if group.advisory_qualified and group.status is not Status.not_affected else 'false'
 
         form.cve.data = "\n".join(issue_ids)
     if not form.validate_on_submit():
@@ -97,7 +97,7 @@ def edit_group(avg):
     group.status = affected_to_status(Affected.fromstring(form.status.data), pkgnames_edited[0], group.fixed)
     group.bug_ticket = form.bug_ticket.data
     group.notes = form.notes.data
-    group.advisory_qualified = 'true' == form.advisory_qualified.data
+    group.advisory_qualified = 'true' == form.advisory_qualified.data and group.status is not Status.not_affected
 
     cve_ids = multiline_to_list(form.cve.data)
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
