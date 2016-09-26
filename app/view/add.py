@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect
 from app import app, db
 from app.form import CVEForm, GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
-from app.model.enum import Remote, Severity, Affected, affected_to_status, highest_severity
+from app.model.enum import Remote, Status, Severity, Affected, affected_to_status, highest_severity
 from app.util import multiline_to_list
 
 
@@ -54,6 +54,7 @@ def add_group():
     affected = Affected.fromstring(form.status.data)
     status = affected_to_status(affected, pkgnames[0], fixed)
     severity = highest_severity([issue.severity for issue in issues])
+    advisory_qualified = 'true' == form.advisory_qualified and status is not Status.not_affected
 
     group = db.create(CVEGroup,
                       affected=form.affected.data,
@@ -61,7 +62,8 @@ def add_group():
                       fixed=fixed,
                       bug_ticket=form.bug_ticket.data,
                       notes=form.notes.data,
-                      severity=severity)
+                      severity=severity,
+                      advisory_qualified=advisory_qualified)
     db.session.commit()
 
     for cve in issues:
