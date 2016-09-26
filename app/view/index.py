@@ -1,22 +1,39 @@
 from flask import render_template
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
-from app.model.enum import Publication
+from app.model.enum import Publication, Status
 from collections import defaultdict
 from sqlalchemy import func, and_
+
+
+@app.route('/vulnerable', methods=['GET'])
+@app.route('/open', methods=['GET'])
+@app.route('/index/vulnerable', methods=['GET'])
+@app.route('/index/open', methods=['GET'])
+@app.route('/issue/vulnerable', methods=['GET'])
+@app.route('/issue/open', methods=['GET'])
+@app.route('/issues/vulnerable', methods=['GET'])
+@app.route('/issues/open', methods=['GET'])
+def index_vulnerable():
+    return index(only_vulnerable=True)
 
 
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
 @app.route('/issue', methods=['GET'])
 @app.route('/issues', methods=['GET'])
-def index():
-    entries = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '), func.group_concat(Advisory.id, ' '))
-               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
-               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.publication == Publication.published))
-               .group_by(CVEGroup.id).group_by(CVE.id)
-               .order_by(CVEGroup.status.desc()).order_by(CVEGroup.created.desc())).all()
+def index(only_vulnerable=False):
+    select = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '),
+                               func.group_concat(Advisory.id, ' '))
+                        .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                        .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
+                                                  Advisory.publication == Publication.published)))
+    if only_vulnerable:
+        select = select.filter(CVEGroup.status.in_([Status.unknown, Status.vulnerable, Status.testing]))
+
+    entries = (select.group_by(CVEGroup.id).group_by(CVE.id)
+                     .order_by(CVEGroup.status.desc())
+                     .order_by(CVEGroup.created.desc())).all()
 
     groups = defaultdict(defaultdict)
     for group, cve, pkgs, advisories in entries:
@@ -35,5 +52,6 @@ def index():
     groups = sorted(groups, key=lambda item: item['group'].status)
 
     return render_template('index.html',
-                           title='Index',
-                           entries=groups)
+                           title='Issues' if not only_vulnerable else 'Vulnerable issues',
+                           entries=groups,
+                           only_vulnerable=only_vulnerable)

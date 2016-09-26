@@ -3,6 +3,12 @@
 
 {% block content %}
 	<h1>Issues</h1>
+	<div class="navbar">
+		<ul>
+			<li>{%- if only_vulnerable %}<a href="/">all</a>{%- else %}<b>all</b>{%- endif %}</li>
+			<li>{%- if not only_vulnerable %}<a href="/vulnerable">vulnerable</a>{%- else %}<b>vulnerable</b>{%- endif %}</li>
+		</ul>
+	</div>
 	<table class="styled_table full_size">
 		<thead>
 			<tr>

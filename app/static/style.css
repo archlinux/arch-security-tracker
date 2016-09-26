@@ -32,24 +32,20 @@ select {
   padding: 10px 15px !important;
 }
 
-#archdev-navbar {
+.navbar {
   margin: 1.5em 0;
 }
 
-#archdev-navbar ul {
+.navbar ul {
   list-style: outside none none;
   margin: -0.5em 0;
   padding: 0;
 }
 
-#archdev-navbar li {
+.navbar li {
   display: inline;
   font-size: 1.0em;
   margin: 0;
-  padding: 0;
-}
-
-#archdev-navbar li a {
   padding: 0 0.5em;
 }
 
