@@ -70,6 +70,41 @@
 		{% endfor %}
 	</table>
 	{% endif %}
+	{% if entries.bumped_groups  %}
+	<h2>Maybe fixed packages</h2>
+	<table class="styled_table medium_size">
+		<thead>
+			<tr>
+				<th>Group</th>
+				<th>Packages</th>
+				<th>Severity</th>
+				<th>Affected</th>
+				<th>Current</th>
+				<th>Ticket</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for group, pkgs, versions in entries.bumped_groups %}
+			<tr>
+				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+				<td class="wrap">
+				{% for pkg in pkgs %}
+					<a href="/package/{{ pkg }}" class="no-wrap">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
+				{% endfor %}
+				</td>
+				<td>{{ colorize_severity(group.severity) }}</td>
+				<td>{{ group.affected }}</td>
+				<td>
+					{% for version in versions %}
+						{{ version.version }} [{{ version.db.name }}]<br />
+					{% endfor %}
+				</td>
+				<td>{{ bug_ticket(group.bug_ticket) }}</td>
+			</tr>
+		</tbody>
+		{% endfor %}
+	</table>
+	{% endif %}
 	{% if entries.unknown_issues %}
 	<h2>Issues missing details</h2>
 	<table class="styled_table medium_size">
