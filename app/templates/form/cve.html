@@ -1,17 +1,16 @@
-{% extends "base.html" %}
-
+{%- extends "base.html" -%}
 {% block content %}
-	<h1>{{ title }}</h1>
-    <form action="" method="post" name="add" class="form_add">
-        {{ form.hidden_tag() }}
-        <dl>
-            {{ render_field(form.cve) }}
-            {{ render_field(form.issue_type) }}
-            {{ render_field(form.severity) }}
-            {{ render_field(form.remote) }}
-            {{ render_field(form.description, maxlength=CVE.DESCRIPTION_LENGTH) }}
-            {{ render_field(form.notes, maxlength=CVE.NOTES_LENGTH) }}
-            {{ render_field_unlabeled(form.submit, class_='button-primary') }}
-        </dl>
-    </form>
-{% endblock %}
+			<h1>{{ title }}</h1>
+			<form action="" method="post" name="add" class="form_add">
+				{{ form.hidden_tag() }}
+				<dl>
+					{{ render_field(form.cve) }}
+					{{ render_field(form.issue_type) }}
+					{{ render_field(form.severity) }}
+					{{ render_field(form.remote) }}
+					{{ render_field(form.description, maxlength=CVE.DESCRIPTION_LENGTH) }}
+					{{ render_field(form.notes, maxlength=CVE.NOTES_LENGTH) }}
+					{{ render_field_unlabeled(form.submit, class_='button-primary') }}
+				</dl>
+			</form>
+{%- endblock %}

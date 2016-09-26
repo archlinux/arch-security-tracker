@@ -1,16 +1,18 @@
-{% extends "base.html" %}
+{%- extends "base.html" -%}
 {% block content %}
-<h1>{{ advisory.id }} <a href="/{{  advisory.id }}/raw">raw</a></h1>
-	<table class="styled_table full_size">
-		<thead>
-			<tr>
-				<th>[{{ advisory.id }}] {{package.pkgname}}: {{advisory.advisory_type}}</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td><div class='advisory'>{{ raw_asa|safe|urlize }}</div></td>
-			</tr>
-		</tbody>
-	</table>
-{% endblock %}
+			<h1>{{ advisory.id }} <a href="/{{  advisory.id }}/raw">raw</a></h1>
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>[{{ advisory.id }}] {{package.pkgname}}: {{advisory.advisory_type}}</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>
+							<div class='advisory'>{{ raw_asa|safe|urlize }}</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+{%- endblock %}
