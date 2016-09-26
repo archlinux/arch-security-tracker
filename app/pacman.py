@@ -1,19 +1,27 @@
-from config import basedir
+from config import basedir, PACMAN_HANDLE_CACHE_TIME
 from pycman.config import init_with_config
 from pyalpm import vercmp
 from app.util import cmp_to_key
 from operator import attrgetter
 from os import chdir
+from time import time
 
 archs = ['i686', 'x86_64']
 repos = {'i686': ['core', 'extra', 'community', 'testing', 'community-testing'],
          'x86_64': ['core', 'extra', 'community', 'multilib', 'testing', 'community-testing', 'multilib-testing']}
 configpath = './pacman/arch/{}/pacman.conf'
+handles = {}
 chdir(basedir)
 
 
-def get_handle(arch):
-    return init_with_config(configpath.format(arch))
+def get_handle(arch, force_fresh_handle=False):
+    if not force_fresh_handle and arch in handles:
+        handle, creation_time = handles[arch]
+        if creation_time > time() - PACMAN_HANDLE_CACHE_TIME:
+            return handle
+    handle = init_with_config(configpath.format(arch))
+    handles[arch] = (handle, time())
+    return handle
 
 
 def update(arch=None, force=False):
@@ -23,11 +31,11 @@ def update(arch=None, force=False):
             syncdb.update(force)
 
 
-def get_pkg(pkgname, arch=None, testing=True, filter_arch=False):
+def get_pkg(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_handle=False):
     get_archs = [arch] if arch else archs
     results = set()
     for arch in get_archs:
-        for syncdb in get_handle(arch).get_syncdbs():
+        for syncdb in get_handle(arch, force_fresh_handle=force_fresh_handle).get_syncdbs():
             if not testing and 'testing' in syncdb.name:
                 continue
             result = syncdb.get_pkg(pkgname)
@@ -38,11 +46,11 @@ def get_pkg(pkgname, arch=None, testing=True, filter_arch=False):
     return results
 
 
-def search(pkgname, arch=None, testing=True, filter_arch=False):
+def search(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_handle=False):
     search_archs = [arch] if arch else archs
     results = []
     for arch in search_archs:
-        for syncdb in get_handle(arch).get_syncdbs():
+        for syncdb in get_handle(arch, force_fresh_handle=force_fresh_handle).get_syncdbs():
             if not testing and 'testing' in syncdb.name:
                 continue
             result = syncdb.search(pkgname)
