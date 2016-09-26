@@ -330,6 +330,7 @@ input[type="reset"].button-primary,
 input[type="button"].button-primary {
   background-color: rgb(217, 230, 236);
   border-color: #bcd;
+  color: #07b;
 }
 
 .button.button-primary:hover,
