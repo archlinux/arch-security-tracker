@@ -7,3 +7,5 @@ SQLALCHEMY_ECHO = True
 
 CSRF_ENABLED = True
 SECRET_KEY = 'changeme_iddqd'
+
+PACMAN_HANDLE_CACHE_TIME = 2 * 60
