@@ -35,3 +35,9 @@ def cmp_to_key(cmp_func, getter=None):
         def __ne__(self, other):
             return cmp_func(self.extract(self.obj), self.extract(other.obj)) != 0
     return K
+
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i + n]
