@@ -114,7 +114,7 @@
 		{% for advisory in package.advisories %}
 			<tr>
 				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
-				<td></td>
+				<td>{{ advisory.advisory_type }}</td>
 			</tr>
 		</tbody>
 		{% endfor %}
