@@ -1,4 +1,4 @@
-from wtforms.validators import ValidationError
+from wtforms.validators import ValidationError, URL as URLValidator
 from app.pacman import get_pkg
 from app.util import multiline_to_list
 from app.model.cvegroup import pkgname_regex
@@ -76,3 +76,18 @@ class ValidIssues(object):
         for issue in issues:
             if not match(cve_id_regex, issue):
                 self.fail(issue)
+
+
+class ValidURLs(object):
+    def __init__(self):
+        self.message = u'Invalid URL {}.'
+        self.regex = URLValidator().regex
+
+    def fail(self, url):
+        raise ValidationError(self.message.format(url))
+
+    def __call__(self, form, field):
+        urls = multiline_to_list(field.data)
+        for url in urls:
+            if not self.regex.match(url):
+                self.fail(url)

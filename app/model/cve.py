@@ -40,8 +40,9 @@ issue_types = [
 
 class CVE(db.Model):
 
-    NOTES_LENGTH = 4096
     DESCRIPTION_LENGTH = 4096
+    REFERENCES_LENGTH = 4096
+    NOTES_LENGTH = 4096
 
     __tablename__ = 'cve'
     id = db.Column(db.String(15), index=True, unique=True, primary_key=True)
@@ -49,6 +50,7 @@ class CVE(db.Model):
     description = db.Column(db.String(DESCRIPTION_LENGTH))
     severity = db.Column(Severity.as_type(), nullable=False, default=Severity.unknown)
     remote = db.Column(Remote.as_type(), nullable=False, default=Remote.unknown)
+    reference = db.Column(db.String(REFERENCES_LENGTH))
     notes = db.Column(db.String(NOTES_LENGTH))
 
     def __repr__(self):

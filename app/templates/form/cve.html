@@ -9,6 +9,7 @@
 					{{ render_field(form.severity) }}
 					{{ render_field(form.remote) }}
 					{{ render_field(form.description, maxlength=CVE.DESCRIPTION_LENGTH) }}
+					{{ render_field(form.reference, maxlength=CVE.REFERENCES_LENGTH) }}
 					{{ render_field(form.notes, maxlength=CVE.NOTES_LENGTH) }}
 					{{ render_field_unlabeled(form.submit, class_='button-primary') }}
 				</dl>
