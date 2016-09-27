@@ -485,47 +485,53 @@ form .errors {
 .one.columns {
   width: 4.66666666667%;
 }
+
 .two.columns {
   width: 13.3333333333%;
 }
-.three.columns {
+
+.three.columns,
+.one-quarter.column {
   width: 22%;
 }
-.four.columns {
-  width: 30.6666666667%;
-}
-.five.columns {
-  width: 39.3333333333%;
-}
-.six.columns {
-  width: 48%;
-}
-.seven.columns {
-  width: 56.6666666667%;
-}
-.eight.columns {
-  width: 65.3333333333%;
-}
-.nine.columns {
-  width: 74.0%;
-}
-.ten.columns {
-  width: 82.6666666667%;
-}
-.eleven.columns {
-  width: 91.3333333333%;
-}
-.twelve.columns {
-  width: 100%; margin-left: 0;
-}
 
+.four.columns,
 .one-third.column {
   width: 30.6666666667%;
 }
+
+.five.columns {
+  width: 39.3333333333%;
+}
+
+.six.columns,
+.one-half.column {
+  width: 48%;
+}
+
+.seven.columns {
+  width: 56.6666666667%;
+}
+
+.eight.columns,
 .two-thirds.column {
   width: 65.3333333333%;
 }
 
-.one-half.column {
-  width: 48%;
+.nine.columns {
+  width: 74.0%;
+}
+
+.ten.columns {
+  width: 82.6666666667%;
+}
+
+.eleven.columns {
+  width: 91.3333333333%;
+}
+
+.twelve.columns,
+.single.column {
+  width: 100%;
+  margin-left: 0;
 }

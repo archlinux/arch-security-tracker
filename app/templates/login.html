@@ -18,12 +18,12 @@
 				<form action="" method="post" name="login">
 					{{ form.hidden_tag() }}
 					<div class="row">
-						<div class="twelve columns">
+						<div class="single columns">
 							{{ render_field(form.username, class='full_size', placeholder='Username')|smartindent(7)|safe }}
 						</div>
 					</div>
 					<div class="row">
-						<div class="twelve columns">
+						<div class="single columns">
 							{{ render_field(form.password, class='full_size', placeholder='Password')|smartindent(7)|safe }}
 						</div>
 					</div>
