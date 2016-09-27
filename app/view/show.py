@@ -179,8 +179,7 @@ def show_advisory(advisory_id, raw=False):
         if issue.issue_type not in unique_issue_types:
             unique_issue_types.append(issue.issue_type)
 
-    raw_asa = render_template('asa.txt',
-                              title='{}'.format(advisory_id),
+    raw_asa = render_template('advisory.txt',
                               advisory=advisory,
                               group=group,
                               package=package,
@@ -199,7 +198,7 @@ def show_advisory(advisory_id, raw=False):
         raw_asa = raw_asa.replace(' {}'.format(issue.id), ' <a href="/{0}">{0}</a>'.format(issue.id))
     raw_asa = raw_asa.replace(package.pkgname, '<a href="/package/{0}">{0}</a>'.format(package.pkgname))
 
-    return render_template('asa.html',
+    return render_template('advisory.html',
                            title='{}'.format(advisory_id),
                            advisory=advisory,
                            package=package,

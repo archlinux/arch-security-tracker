@@ -39,7 +39,7 @@ def advisory():
         'scheduled': scheduled,
         'published': monthly_published
     }
-    return render_template('advisory.html',
+    return render_template('advisories.html',
                            title='Advisories',
                            entries=entries)
 

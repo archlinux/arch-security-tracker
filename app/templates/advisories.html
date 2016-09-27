@@ -1,0 +1,60 @@
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, bug_ticket -%}
+{% block content %}
+			<h1>Advisories</h1>
+			{%- if entries.scheduled %}
+			<h2>Scheduled</h2>
+			<table class="styled_table medium_size">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Advisory</th>
+						<th>Group</th>
+						<th>Package</th>
+						<th>Severity</th>
+						<th class="full_size">Type</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for advisory, pkg, group in entries.scheduled %}
+					<tr>
+						<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
+						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+						<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
+						<td>{{ colorize_severity(group.severity) }}</td>
+						<td>{{ advisory.advisory_type }}</td>
+					</tr>
+				</tbody>
+				{%- endfor %}
+			</table>
+			{%- endif %}
+			<h2>Published</h2>
+			{%- for month, advisories in entries.published.items() %}
+			<h3>{{ month }}</h3>
+			<table class="styled_table medium_size">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Advisory</th>
+						<th>Group</th>
+						<th>Package</th>
+						<th>Severity</th>
+						<th class="full_size">Type</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for advisory, pkg, group in advisories %}
+					<tr>
+						<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
+						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+						<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
+						<td>{{ colorize_severity(group.severity) }}</td>
+						<td>{{ advisory.advisory_type }}</td>
+					</tr>
+				</tbody>
+				{%- endfor %}
+			</table>
+			{%- endfor %}
+{%- endblock %}
