@@ -87,7 +87,7 @@
 					<tr>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 						<td><a href="/package/{{ advisory.group_package.pkgname }}">{{ advisory.group_package.pkgname }}</a></td>
-						<td></td>
+						<td>{{ advisory.advisory_type }}</td>
 					</tr>
 				</tbody>
 				{%- endfor %}
