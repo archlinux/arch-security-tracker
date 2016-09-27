@@ -70,7 +70,7 @@
 			</table>
 			{%- endif %}
 			{%- if entries.bumped_groups  %}
-			<h2>Maybe fixed packages</h2>
+			<h2>Maybe fixed</h2>
 			<table class="styled_table medium_size">
 				<thead>
 					<tr>
@@ -80,6 +80,7 @@
 						<th>Affected</th>
 						<th>Current</th>
 						<th>Ticket</th>
+						<th class="center size-collapse">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -99,6 +100,9 @@
 							{%- endfor %}
 						</td>
 						<td>{{ bug_ticket(group.bug_ticket) }}</td>
+						<td class="no-padding">
+							<a href="{{ group.name }}/edit" class="button button-table button-primary">edit</a>
+						</td>
 					</tr>
 				</tbody>
 				{%- endfor %}
