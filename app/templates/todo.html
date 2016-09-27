@@ -24,7 +24,7 @@
 						<td>{{ colorize_severity(group.severity) }}</td>
 						<td>{{ advisory.advisory_type }}</td>
 						<td class="no-padding">
-							<form action="/{{ advisory.id }}/publish" method="post" name="publish" class="form_add">
+							<form action="/{{ advisory.id }}/publish" method="post" name="publish">
 								{{ publish_form.hidden_tag() }}
 								{{ publish_form.submit(class_='button button-table button-primary', id='submit_' + advisory.id)|safe }}
 							</form>

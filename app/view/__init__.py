@@ -7,3 +7,4 @@ from .login import *
 from .advisory import *
 from .todo import *
 from .error import *
+from .blueprint import *

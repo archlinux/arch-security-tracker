@@ -48,10 +48,10 @@
 					<tr>
 						<td>Advisory</td>
 						<td>
-							<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="schedule" class="form_add">
+							<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="schedule">
 								{{ form.hidden_tag() }}
-								{{ form.advisory_type()|safe }}
-								{{ form.submit(class_='button button-table button-primary')|safe }}
+								{{ form.advisory_type(class='no-margin input-compact') }}
+								{{ form.submit(class='button button-table button-primary') }}
 							</form>
 						</td>
 					</tr>

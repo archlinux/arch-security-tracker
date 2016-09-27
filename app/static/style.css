@@ -203,6 +203,16 @@ table.column_major tr td:first-child {
   max-width: 70em;
 }
 
+.small_size {
+  width: 100%;
+  max-width: 30em;
+}
+
+.tiny_size {
+  width: 100%;
+  max-width: 20em;
+}
+
 dt {
   float: left;
   clear: left;
@@ -252,7 +262,7 @@ input[type="url"],
 input[type="password"],
 textarea,
 select {
-  height: 2.3rem;
+  height: 2.9em;
   padding: 6px 10px;
   background-color: #fff;
   border: 1px solid #d1d1d1;
@@ -277,6 +287,12 @@ textarea:focus,
 select:focus {
   border: 1px solid rgb(155, 187, 224);
   outline: 0;
+}
+
+.input-compact {
+  padding-top: 0;
+  padding-bottom: 0;
+  height: 2.4em;
 }
 
 .button,
@@ -368,33 +384,6 @@ input[type="button"].button-primary:focus {
   list-style: none;
 }
 
-.form_field_inline input {
-  width: auto;
-}
-
-.form_add dt {
-  width: 150px;
-}
-
-.form_login dt {
-  float: none;
-}
-
-.form_login dd {
-  clear: none;
-  float: left;
-}
-
-.form_login dd,
-.form_login dt {
-  margin: 2px 0;
-}
-
-.form_login dd label {
-  float: none;
-  margin: 0 0 0 5px;
-}
-
 .red {
   color: rgb(221, 0, 0);
 }
@@ -437,6 +426,10 @@ input[type="button"].button-primary:focus {
   line-height: 1.2rem;
   white-space: pre-wrap;
   word-break: break-word;
+  margin: 0;
+}
+
+.no-margin {
   margin: 0;
 }
 
