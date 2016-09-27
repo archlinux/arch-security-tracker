@@ -105,8 +105,8 @@ def publish_advisory(asa):
         return redirect('/{}'.format(asa))
 
     advisory = (db.session.query(Advisory)
-               .filter(Advisory.id == asa)
-               ).first()
+                .filter(Advisory.id == asa)
+                ).first()
     if not advisory:
         return not_found()
 
