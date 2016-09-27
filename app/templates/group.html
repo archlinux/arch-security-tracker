@@ -36,10 +36,12 @@
 						{%- endfor %}
 						</td>
 					</tr>
+					{%- if group.detail.bug_ticket %}
 					<tr>
 						<td>Ticket</td>
 						<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
 					</tr>
+					{%- endif %}
 					<tr>
 						<td>Created</td>
 						<td>{{ group.detail.created.strftime('%c') }}</td>
