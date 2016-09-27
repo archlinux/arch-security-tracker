@@ -1,26 +1,28 @@
-{%- macro render_field(field, show_label=True) -%}
+{%- macro render_field(field, show_label=True, indent=1) -%}
+	{%- set indention = '\t' * indent -%}
 	{%- if show_label %}{{ field.label }}{% endif %}
-{{ field(**kwargs) }}
+{{ indention }}{{ field(**kwargs) }}
 	{%- if field.errors %}
-<div class="errors">
-	<ul>
+{{ indention }}<div class="errors">
+{{ indention }}	<ul>
 	{%- for error in field.errors %}
-		<li>{{ error }}</li>
+{{ indention }}		<li>{{ error }}</li>
 	{%- endfor %}
-	</ul>
-</div>
+{{ indention }}	</ul>
+{{ indention }}</div>
 	{%- endif %}
 {%- endmacro -%}
 
-{%- macro render_field_unlabeled(field) -%}
-	{{- render_field(field, show_label=False, **kwargs)|safe }}
+{%- macro render_field_unlabeled(field, indent=1) -%}
+	{{- render_field(field, show_label=False, indent=indent, **kwargs)|safe }}
 {%- endmacro -%}
 
-{%- macro render_checkbox(field) -%}
+{%- macro render_checkbox(field, indent=1) -%}
+	{%- set indention = '\t' * indent -%}
 <label>
-	{{ field() }}
-	<span class="label-body">{{ field.label.text }}</span>
-</label>
+{{ indention }}	{{ field(**kwargs) }}
+{{ indention }}	<span class="label-body">{{ field.label.text }}</span>
+{{ indention }}</label>
 {%- endmacro -%}
 
 {%- macro nullable_value(value, default='') -%}
