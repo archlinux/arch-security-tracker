@@ -1,0 +1,3 @@
+[submodule ".external/normalize.css"]
+	path = .external/normalize.css
+	url = https://github.com/necolas/normalize.css
