@@ -10,6 +10,7 @@ vulnerability_group_regex = r'^AVG-\d+$'
 
 class CVEGroup(db.Model):
 
+    REFERENCES_LENGTH = 4096
     NOTES_LENGTH = 4096
     __tablename__ = 'cve_group'
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
@@ -18,6 +19,7 @@ class CVEGroup(db.Model):
     affected = db.Column(db.String(32), nullable=False)
     fixed = db.Column(db.String(32))
     bug_ticket = db.Column(db.String(9))
+    reference = db.Column(db.String(REFERENCES_LENGTH))
     notes = db.Column(db.String(NOTES_LENGTH))
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     advisory_qualified = db.Column(db.Boolean(), default=True, nullable=False)

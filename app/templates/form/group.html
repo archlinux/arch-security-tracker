@@ -11,6 +11,7 @@
 					{{ render_field(form.fixed) }}
 					{{ render_field(form.bug_ticket) }}
 					{{ render_field(form.advisory_qualified) }}
+					{{ render_field(form.reference, maxlength=CVEGroup.REFERENCES_LENGTH) }}
 					{{ render_field(form.notes, maxlength=CVEGroup.NOTES_LENGTH) }}
 					{{ render_field_unlabeled(form.submit, class_='button-primary') }}
 				</dl>

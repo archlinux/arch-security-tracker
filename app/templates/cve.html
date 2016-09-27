@@ -93,6 +93,20 @@
 				{%- endfor %}
 			</table>
 			{%- endif %}
+			{%- if issue.reference %}
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>References</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><pre>{{ issue.reference|urlize }}</pre></td>
+					</tr>
+				</tbody>
+			</table>
+			{%- endif %}
 			{%- if issue.notes %}
 			<table class="styled_table full_size">
 				<thead>
@@ -106,5 +120,5 @@
 					</tr>
 				</tbody>
 			</table>
-	{%- endif %}
+			{%- endif %}
 {%- endblock %}

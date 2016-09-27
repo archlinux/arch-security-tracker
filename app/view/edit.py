@@ -24,6 +24,7 @@ def edit_cve(cve):
         form.description.data = cve.description
         form.severity.data = cve.severity.name
         form.remote.data = cve.remote.name
+        form.reference.data = cve.reference
         form.notes.data = cve.notes
     if not form.validate_on_submit():
         return render_template('form/cve.html',
@@ -38,6 +39,7 @@ def edit_cve(cve):
     cve.description = form.description.data
     cve.severity = severity
     cve.remote = Remote.fromstring(form.remote.data)
+    cve.reference = form.reference.data
     cve.notes = form.notes.data
 
     if severity_changed or True:
@@ -80,6 +82,7 @@ def edit_group(avg):
         form.fixed.data = group.fixed
         form.pkgnames.data = "\n".join(sorted(pkgnames))
         form.status.data = status_to_affected(group.status).name
+        form.reference.data = group.reference
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
         form.advisory_qualified.data = 'true' if group.advisory_qualified and group.status is not Status.not_affected else 'false'
@@ -96,6 +99,7 @@ def edit_group(avg):
     group.fixed = form.fixed.data
     group.status = affected_to_status(Affected.fromstring(form.status.data), pkgnames_edited[0], group.fixed)
     group.bug_ticket = form.bug_ticket.data
+    group.reference = form.reference.data
     group.notes = form.notes.data
     group.advisory_qualified = 'true' == form.advisory_qualified.data and group.status is not Status.not_affected
 

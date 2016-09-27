@@ -102,6 +102,20 @@
 				{% endfor %}
 			</table>
 			{%- endif %}
+			{%- if group.detail.reference %}
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>References</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><pre>{{ group.detail.reference|urlize }}</pre></td>
+					</tr>
+				</tbody>
+			</table>
+			{%- endif %}
 			{%- if group.detail.notes %}
 			<table class="styled_table full_size">
 				<thead>
@@ -115,5 +129,5 @@
 					</tr>
 				</tbody>
 			</table>
-	{%- endif %}
+			{%- endif %}
 {%- endblock %}

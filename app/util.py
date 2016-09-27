@@ -1,4 +1,6 @@
 def multiline_to_list(data, whitespace_separator=True, unique_only=True):
+    if not data:
+        return []
     if whitespace_separator:
         data = data.replace(' ', '\n')
     data_list = data.replace('\r', '').split('\n')

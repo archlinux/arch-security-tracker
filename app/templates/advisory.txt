@@ -73,7 +73,7 @@ References
 ==========
 
 {% for reference in references %}
-{{- references }}
+{{- reference|urlize }}
 {% endfor %}
 {%- for issue in issues %}https://access.redhat.com/security/cve/{{ issue.id }}
 {% endfor %}

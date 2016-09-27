@@ -9,7 +9,7 @@ from app.model.advisory import advisory_regex
 from app.form.advisory import AdvisoryForm
 from app.view.error import not_found
 from app.pacman import get_pkg
-from app.util import chunks
+from app.util import chunks, multiline_to_list
 from collections import defaultdict
 
 
@@ -163,8 +163,8 @@ def show_advisory(advisory_id, raw=False):
     group = entries[0][1]
     package = entries[0][2]
     issues = [issue for (advisory, group, package, issue) in entries]
-    issues = sorted(issues, key=lambda issue: issue.issue_type)
-    issues = sorted(issues, key=lambda issue: issue.severity)
+    severity_sorted_issues = sorted(issues, key=lambda issue: issue.issue_type)
+    severity_sorted_issues = sorted(severity_sorted_issues, key=lambda issue: issue.severity)
 
     remote = any([issue.remote is Remote.remote for issue in issues])
     issues_listing_formatted = (('\n{}'.format(' ' * len('CVE-ID  : ')))
@@ -175,9 +175,17 @@ def show_advisory(advisory_id, raw=False):
     if ':' in upstream_version:
         upstream_version = upstream_version[upstream_version.index(':') + 1:]
     unique_issue_types = []
-    for issue in issues:
+    for issue in severity_sorted_issues:
         if issue.issue_type not in unique_issue_types:
             unique_issue_types.append(issue.issue_type)
+    references = []
+    for reference in multiline_to_list(group.reference):
+        if reference not in references:
+            references.append(reference)
+    for issue in issues:
+        for reference in multiline_to_list(issue.reference):
+            if reference not in references:
+                references.append(reference)
 
     raw_asa = render_template('advisory.txt',
                               advisory=advisory,
@@ -189,14 +197,16 @@ def show_advisory(advisory_id, raw=False):
                               link=link,
                               upstream_released=upstream_released,
                               upstream_version=upstream_version,
-                              unique_issue_types=unique_issue_types)
+                              unique_issue_types=unique_issue_types,
+                              references=references)
     if raw:
         return raw_asa
 
     raw_asa = '\n'.join(raw_asa.split('\n')[2:])
     for issue in issues:
         raw_asa = raw_asa.replace(' {}'.format(issue.id), ' <a href="/{0}">{0}</a>'.format(issue.id))
-    raw_asa = raw_asa.replace(package.pkgname, '<a href="/package/{0}">{0}</a>'.format(package.pkgname))
+    raw_asa = raw_asa.replace(' {}'.format(package.pkgname), ' <a href="/package/{0}">{0}</a>'.format(package.pkgname))
+    raw_asa = raw_asa.replace('"{}'.format(package.pkgname), '"<a href="/package/{0}">{0}</a>'.format(package.pkgname))
 
     return render_template('advisory.html',
                            title='{}'.format(advisory_id),

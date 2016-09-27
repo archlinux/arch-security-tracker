@@ -25,6 +25,7 @@ def add_cve():
     cve.description = form.description.data
     cve.severity = Severity.fromstring(form.severity.data)
     cve.remote = Remote.fromstring(form.remote.data)
+    cve.reference = form.reference.data
     cve.notes = form.notes.data
     db.session.commit()
     flash('Added {}'.format(cve.id))
@@ -61,6 +62,7 @@ def add_group():
                       status=status,
                       fixed=fixed,
                       bug_ticket=form.bug_ticket.data,
+                      reference=form.reference.data,
                       notes=form.notes.data,
                       severity=severity,
                       advisory_qualified=advisory_qualified)
