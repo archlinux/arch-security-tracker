@@ -1,125 +1,123 @@
-{% extends "base.html" %}
-{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket %}
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket -%}
+{%- macro render_groups(groups) -%}
+	{%- if groups %}
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>Group</th>
+						<th>Affected</th>
+						<th>Fixed</th>
+						<th>Severity</th>
+						<th>Status</th>
+						<th class="full_size">Ticket</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for group in groups %}
+					<tr>
+						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+						<td>{{ group.affected }}</td>
+						<td>{{ group.fixed }}</td>
+						<td>{{ colorize_severity(group.severity) }}</td>
+						<td>{{ colorize_status(group.status) }}</td>
+						<td>{{ bug_ticket(group.bug_ticket) }}</td>
+					</tr>
+				{%- endfor %}
+				</tbody>
+			</table>
+	{%- endif %}
+{%- endmacro -%}
 
-{% macro render_groups(groups) %}
-	{% if groups %}
-	<table class="styled_table full_size">
-		<thead>
-			<tr>
-				<th>Group</th>
-				<th>Affected</th>
-				<th>Fixed</th>
-				<th>Severity</th>
-				<th>Status</th>
-				<th class="full_size">Ticket</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for group in groups %}
-			<tr>
-				<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-				<td>{{ group.affected }}</td>
-				<td>{{ group.fixed }}</td>
-				<td>{{ colorize_severity(group.severity) }}</td>
-				<td>{{ colorize_status(group.status) }}</td>
-				<td>{{ bug_ticket(group.bug_ticket) }}</td>
-			</tr>
-		{% endfor %}
-		</tbody>
-	</table>
-	{% endif %}
-{% endmacro %}
-
-{% macro render_issues(issues) %}
-	{% if issues %}
-	<table class="styled_table full_size">
-		<thead>
-			<tr>
-				<th>Issue</th>
-				<th>Group</th>
-				<th>Severity</th>
-				<th>Remote</th>
-				<th>Type</th>
-				<th class="full_size">Description</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for issue in issues %}
-			<tr>
-				<td><a href="/{{ issue.cve.id }}">{{ issue.cve.id }}</a></td>
-				<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
-				<td>{{ colorize_severity(issue.cve.severity) }}</td>
-				<td>{{ colorize_remote(issue.cve.remote) }}</td>
-				<td>{{ colorize_unknown(issue.cve.issue_type|capitalize) }}</td>
-				<td><pre>{% if issue.cve.description %}{{ issue.cve.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}<pre></td>
-			</tr>
-		{% endfor %}
-		</tbody>
-	</table>
-	{% endif %}
-{% endmacro %}
-
-{% block content %}
-	<h1>{{ package.pkgname }}</h1>
-	<table class="styled_table column_major full_size">
-		<tbody>
-			<tr>
-				<td>Link</td>
-				<td class="full_size">
-					<a href="https://www.archlinux.org/packages/?name={{ package.pkgname|urlencode }}">package</a> |
-					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname|urlencode }}">bugs open</a> |
-					<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname|urlencode }}">bugs closed</a> |
-					<a href="https://wiki.archlinux.org/index.php/Special:Search?search=%22{{ package.pkgname|urlencode }}%22">Wiki</a> |
-					<a href="https://github.com/search?type=Repositories&q=%22{{ package.pkgname|urlencode }}%22">GitHub</a> |
-					<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ package.pkgname|urlencode }}%22">web search</a>
-				</td>
-			</tr>
-			<tr>
-				<td>Description</td>
-				<td>{{ package.versions[0].desc }}</td>
-			</tr>
-			<tr>
-				<td>Version</td>
-				<td>
-				{% for version in package.versions %}
-					{{ version.version }} [{{ version.db.name }}]<br />
-				{% endfor %}
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	{% if not package.groups.open and not package.issues.open and not package.groups.resolved and not package.issues.resolved %}
-	<h2>No issues</h2>
-	{% endif %}
-	{% if package.groups.open or package.issues.open %}
-	<h2>Open</h2>
-	{{ render_groups(package.groups.open) }}
-	{{ render_issues(package.issues.open) }}
-	{% endif %}
-	{% if package.groups.resolved or package.issues.resolved %}
-	<h2>Resolved</h2>
-	{{ render_groups(package.groups.resolved) }}
-	{{ render_issues(package.issues.resolved) }}
-	{% endif %}
-	{% if package.advisories  %}
-	<h2>Advisories</h2>
-	<table class="styled_table full_size">
-		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Advisory</th>
-				<th class="full_size">Description</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for advisory in package.advisories %}
-			<tr>
-				<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
-				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
-				<td>{{ advisory.advisory_type }}</td>
-			</tr>
-		</tbody>
-		{% endfor %}
-	</table>
-	{% endif %}
-{% endblock %}
+{%- macro render_issues(issues) -%}
+	{%- if issues %}
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>Issue</th>
+						<th>Group</th>
+						<th>Severity</th>
+						<th>Remote</th>
+						<th>Type</th>
+						<th class="full_size">Description</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for issue in issues %}
+					<tr>
+						<td><a href="/{{ issue.cve.id }}">{{ issue.cve.id }}</a></td>
+						<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
+						<td>{{ colorize_severity(issue.cve.severity) }}</td>
+						<td>{{ colorize_remote(issue.cve.remote) }}</td>
+						<td>{{ colorize_unknown(issue.cve.issue_type|capitalize) }}</td>
+						<td><pre>{% if issue.cve.description %}{{ issue.cve.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}<pre></td>
+					</tr>
+				{%- endfor %}
+				</tbody>
+			</table>
+	{%- endif %}
+{%- endmacro -%}
+		{% block content %}
+			<h1>{{ package.pkgname }}</h1>
+			<table class="styled_table column_major full_size">
+				<tbody>
+					<tr>
+						<td>Link</td>
+						<td class="full_size">
+							<a href="https://www.archlinux.org/packages/?name={{ package.pkgname|urlencode }}">package</a> |
+							<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname|urlencode }}">bugs open</a> |
+							<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname|urlencode }}">bugs closed</a> |
+							<a href="https://wiki.archlinux.org/index.php/Special:Search?search=%22{{ package.pkgname|urlencode }}%22">Wiki</a> |
+							<a href="https://github.com/search?type=Repositories&q=%22{{ package.pkgname|urlencode }}%22">GitHub</a> |
+							<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ package.pkgname|urlencode }}%22">web search</a>
+						</td>
+					</tr>
+					<tr>
+						<td>Description</td>
+						<td>{{ package.versions[0].desc }}</td>
+					</tr>
+					<tr>
+						<td>Version</td>
+						<td>
+						{%- for version in package.versions %}
+							{{ version.version }} [{{ version.db.name }}]<br />
+						{%- endfor %}
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			{%- if not package.groups.open and not package.issues.open and not package.groups.resolved and not package.issues.resolved %}
+			<h2>No issues</h2>
+			{%- endif %}
+			{%- if package.groups.open or package.issues.open %}
+			<h2>Open</h2>
+			{{- render_groups(package.groups.open) }}
+			{{- render_issues(package.issues.open) }}
+			{%- endif %}
+			{%- if package.groups.resolved or package.issues.resolved %}
+			<h2>Resolved</h2>
+			{{- render_groups(package.groups.resolved) }}
+			{{- render_issues(package.issues.resolved) }}
+			{%- endif %}
+			{%- if package.advisories  %}
+			<h2>Advisories</h2>
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Advisory</th>
+						<th class="full_size">Description</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for advisory in package.advisories %}
+					<tr>
+						<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
+						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+						<td>{{ advisory.advisory_type }}</td>
+					</tr>
+				</tbody>
+				{%- endfor %}
+			</table>
+			{%- endif %}
+{%- endblock %}

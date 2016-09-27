@@ -1,120 +1,119 @@
-{% extends "base.html" %}
-{% from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket %}
-
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket -%}
 {% block content %}
-	<h1>{{ group.detail.name }} <a href="/{{  group.detail.name }}/edit">edit</a></h1>
-	<table class="styled_table column_major full_size">
-		<tbody>
-			<tr>
-				<td>Package</td>
-				<td class="full_size wrap">
-				{% for pkg in group.pkgs %}
-					<span class="no-wrap"><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
+			<h1>{{ group.detail.name }} <a href="/{{  group.detail.name }}/edit">edit</a></h1>
+			<table class="styled_table column_major full_size">
+				<tbody>
+					<tr>
+						<td>Package</td>
+						<td class="full_size wrap">
+						{%- for pkg in group.pkgs %}
+							<span class="no-wrap"><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
+						{%- endfor %}
+						</td>
+					</tr>
+					<tr>
+						<td>Status</td>
+						<td>{{ colorize_status(group.detail.status) }}</td>
+					</tr>
+					<tr>
+						<td>Severity</td>
+						<td>{{ colorize_severity(group.detail.severity) }}</td>
+					</tr>
+					<tr>
+						<td>Affected</td>
+						<td>{{ group.detail.affected }}</td>
+					</tr>
+					<tr>
+						<td>Fixed</td>
+						<td>{{ group.detail.fixed }}</td>
+					</tr>
+					<tr>
+						<td>Current</td>
+						<td>
+						{%- for version in group.versions %}
+							{{ version.version }} [{{ version.db.name }}]<br />
+						{%- endfor %}
+						</td>
+					</tr>
+					<tr>
+						<td>Ticket</td>
+						<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
+					</tr>
+					<tr>
+						<td>Created</td>
+						<td>{{ group.detail.created.strftime('%Y-%m-%d %H:%m:%S') }}</td>
+					</tr>
+					{%- if advisory_pending %}
+					<tr>
+						<td>Advisory</td>
+						<td>
+							<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="schedule" class="form_add">
+								{{ form.hidden_tag() }}
+								{{ form.advisory_type()|safe }}
+								{{ form.submit(class_='button button-table button-primary')|safe }}
+							</form>
+						</td>
+					</tr>
+					{%- endif %}
+				</tbody>
+			</table>
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>Issue</th>
+						<th>Severity</th>
+						<th>Remote</th>
+						<th>Type</th>
+						<th class="full_size">Description</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for cve in group.cves %}
+					<tr>
+						<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
+						<td>{{ colorize_severity(cve.severity) }}</td>
+						<td>{{ colorize_remote(cve.remote) }}</td>
+						<td>{{ colorize_unknown(cve.issue_type|capitalize) }}</td>
+						<td><pre>{% if cve.description %}{{ cve.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}<pre></td>
+					</tr>
+				</tbody>
+				{%- endfor %}
+			</table>
+			{%- if group.advisories %}
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>Date</th>
+						<th>Advisory</th>
+						<th>Package</th>
+						<th class="full_size">Description</th>
+					</tr>
+				</thead>
+				<tbody>
+				{% for advisory in group.advisories %}
+					<tr>
+						<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
+						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+						<td><a href="/package/{{ advisory.group_package.pkgname }}">{{ advisory.group_package.pkgname }}</a></td>
+						<td>{{ advisory.advisory_type }}</td>
+					</tr>
+				</tbody>
 				{% endfor %}
-				</td>
-			</tr>
-			<tr>
-				<td>Status</td>
-				<td>{{ colorize_status(group.detail.status) }}</td>
-			</tr>
-			<tr>
-				<td>Severity</td>
-				<td>{{ colorize_severity(group.detail.severity) }}</td>
-			</tr>
-			<tr>
-				<td>Affected</td>
-				<td>{{ group.detail.affected }}</td>
-			</tr>
-			<tr>
-				<td>Fixed</td>
-				<td>{{ group.detail.fixed }}</td>
-			</tr>
-			<tr>
-				<td>Current</td>
-				<td>
-				{% for version in group.versions %}
-					{{ version.version }} [{{ version.db.name }}]<br />
-				{% endfor %}
-				</td>
-			</tr>
-			<tr>
-				<td>Ticket</td>
-				<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
-			</tr>
-			<tr>
-				<td>Created</td>
-				<td>{{ group.detail.created.strftime('%Y-%m-%d %H:%m:%S') }}</td>
-			</tr>
-			{% if advisory_pending %}
-			<tr>
-				<td>Advisory</td>
-				<td>
-					<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="schedule" class="form_add">
-						{{ form.hidden_tag() }}
-						{{ form.advisory_type()|safe }}
-						{{ form.submit(class_='button button-table button-primary')|safe }}
-					</form>
-				</td>
-			</tr>
-			{% endif %}
-		</tbody>
-	</table>
-	<table class="styled_table full_size">
-		<thead>
-			<tr>
-				<th>Issue</th>
-				<th>Severity</th>
-				<th>Remote</th>
-				<th>Type</th>
-				<th class="full_size">Description</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for cve in group.cves %}
-			<tr>
-				<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
-				<td>{{ colorize_severity(cve.severity) }}</td>
-				<td>{{ colorize_remote(cve.remote) }}</td>
-				<td>{{ colorize_unknown(cve.issue_type|capitalize) }}</td>
-				<td><pre>{% if cve.description %}{{ cve.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}<pre></td>
-			</tr>
-		</tbody>
-		{% endfor %}
-	</table>
-	{% if group.advisories %}
-	<table class="styled_table full_size">
-		<thead>
-			<tr>
-				<th>Date</th>
-				<th>Advisory</th>
-				<th>Package</th>
-				<th class="full_size">Description</th>
-			</tr>
-		</thead>
-		<tbody>
-		{% for advisory in group.advisories %}
-			<tr>
-				<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
-				<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
-				<td><a href="/package/{{ advisory.group_package.pkgname }}">{{ advisory.group_package.pkgname }}</a></td>
-				<td>{{ advisory.advisory_type }}</td>
-			</tr>
-		</tbody>
-		{% endfor %}
-	</table>
-	{% endif %}
-	{% if group.detail.notes %}
-	<table class="styled_table full_size">
-		<thead>
-			<tr>
-				<th>Notes</th>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td><pre>{{ group.detail.notes|urlize }}</pre></td>
-			</tr>
-		</tbody>
-	</table>
-	{% endif %}
-{% endblock %}
+			</table>
+			{%- endif %}
+			{%- if group.detail.notes %}
+			<table class="styled_table full_size">
+				<thead>
+					<tr>
+						<th>Notes</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><pre>{{ group.detail.notes|urlize }}</pre></td>
+					</tr>
+				</tbody>
+			</table>
+	{%- endif %}
+{%- endblock %}

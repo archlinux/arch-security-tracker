@@ -1,40 +1,40 @@
-{% from "_formhelpers.html" import render_field, render_field_inline, render_field_unlabeled %}
+{%- from "_formhelpers.html" import render_field, render_field_inline, render_field_unlabeled -%}
 <html>
 	<head>
-		{% if title %}
+		{%- if title %}
 		<title>{{ title }} - Arch Linux Security Tracker</title>
-		{% else %}
+		{%- else %}
 		<title>Arch Linux Security Tracker</title>
-		{% endif %}
+		{%- endif %}
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 		<link rel='icon' href='/static/favicon.ico' />
 		<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet" />
 		<link rel='stylesheet' href='/static/style.css' type='text/css' media='all' />
 	</head>
 	<body>
-	<div id="archnavbar">
-		<div id="logo"><a href="/">overview</a></div>
-	</div>
-	<div class="content">
-		<div class="navbar">
-			<ul>
-				<li><a href="/">issues</a></li>
-				<li><a href="/advisory">advisories</a></li>
-				<li><a href="/todo">todo</a></li>
-				<li><a href="/CVE/add">add CVE</a></li>
-				<li><a href="/AVG/add">add AVG</a></li>
-				<li><a href="/login">login</a></li>
-			</ul>
+		<div id="archnavbar">
+			<div id="logo"><a href="/">overview</a></div>
 		</div>
-		<hr />
-		{% with messages = get_flashed_messages(with_categories=true) %}
-		{% if messages %}
-		{% for category, message in messages %}
-		<div class="box {{ category }}">{{ message }}</div>
-		{% endfor %}
-		{% endif %}
-		{% endwith %}
-		{% block content %}{% endblock %}
-	</div>
+		<div class="content">
+			<div class="navbar">
+				<ul>
+					<li><a href="/">issues</a></li>
+					<li><a href="/advisory">advisories</a></li>
+					<li><a href="/todo">todo</a></li>
+					<li><a href="/CVE/add">add CVE</a></li>
+					<li><a href="/AVG/add">add AVG</a></li>
+					<li><a href="/login">login</a></li>
+				</ul>
+			</div>
+			<hr />
+			{%- with messages = get_flashed_messages(with_categories=true) -%}
+			{% if messages %}
+			{%- for category, message in messages %}
+			<div class="box {{ category }}">{{ message }}</div>
+			{%- endfor -%}
+			{%- endif -%}
+			{%- endwith -%}
+			{%- block content -%}{%- endblock %}
+		</div>
 	</body>
 </html>

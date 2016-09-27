@@ -1,113 +1,117 @@
-{% macro render_field(field, show_label=True, class_=None) %}
-  <dt>{% if show_label %}{{ field.label }}{% else %}&nbsp;{% endif %}</dt>
-  <dd>{% if class_ %}{{ field(class_=class_, **kwargs)|safe }}{% else %}{{ field(**kwargs)|safe }}{% endif %}
-  {% if field.errors %}
-  <div class="errors">
-    <ul>
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-  </dd>
-{% endmacro %}
+{%- macro render_field(field, show_label=True, class_=None) -%}
+					<dt>
+						{% if show_label %}{{ field.label }}{% else %}&nbsp;{% endif %}
+					</dt>
+					<dd>
+						{% if class_ %}{{ field(class_=class_, **kwargs)|safe }}{% else %}{{ field(**kwargs)|safe }}{% endif %}
+					{%- if field.errors %}
+						<div class="errors">
+							<ul>
+							{%- for error in field.errors %}
+								<li>{{ error }}</li>
+							{%- endfor %}
+							</ul>
+						</div>
+					{%- endif %}
+					</dd>
+{%- endmacro -%}
 
-{% macro render_field_unlabeled(field, class_=None) %}
+{%- macro render_field_unlabeled(field, class_=None) -%}
 	{% if class_ %}{{ render_field(field, show_label=False, class_=class_) }}{% else %}{{ render_field(field, show_label=False, **kwargs)|safe }}{% endif %}
-{% endmacro %}
+{%- endmacro -%}
 
-{% macro render_field_inline(field, class_=None) %}
-  <dt />
-  <dd class="form_field_inline">{% if class_ %}{{ field(class_=class_, **kwargs)|safe }}{% else %}{{ field(**kwargs)|safe }}{% endif %} {{ field.label }}
-  {% if field.errors %}
-  <div class="errors">
-    <ul>
-    {% for error in field.errors %}
-      <li>{{ error }}</li>
-    {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-  </dd>
-{% endmacro %}
+{%- macro render_field_inline(field, class_=None) -%}
+					<dt />
+					<dd class="form_field_inline">
+						{% if class_ %}{{ field(class_=class_, **kwargs)|safe }}{% else %}{{ field(**kwargs)|safe }}{% endif %} {{ field.label }}
+					{%- if field.errors %}
+						<div class="errors">
+							<ul>
+							{%- for error in field.errors %}
+								<li>{{ error }}</li>
+							{%- endfor %}
+							</ul>
+						</div>
+					{%- endif %}
+					</dd>
+{%- endmacro -%}
 
-{% macro nullable_value(value, default='') %}
-{% if value %}{{ value }}{% else %}{{ default }}{% endif %}
-{% endmacro %}
+{%- macro nullable_value(value, default='') -%}
+{%- if value -%}{{ value }}{%- else -%}{{ default }}{%- endif -%}
+{%- endmacro -%}
 
-{% macro colorize_severity(severity) %}
-	{% if not severity or severity == "Unknown" %}
+{%- macro colorize_severity(severity) -%}
+	{%- if not severity or severity == "Unknown" -%}
 		<span class="purple">Unknown</span>
-	{% elif severity == "Low" %}
+	{%- elif severity == "Low" -%}
 		<span class="green">Low</span>
-	{% elif severity == "Medium" %}
+	{%- elif severity == "Medium" -%}
 		<span class="light_orange">Medium</span>
-	{% elif severity == "High" %}
+	{%- elif severity == "High" -%}
 		<span class="orange">High</span>
-	{% elif severity == "Critical" %}
+	{%- elif severity == "Critical" -%}
 		<span class="red">Critical</span>
-	{% else %}
+	{%- else -%}
 		<span>{{ severity }}</span>
-	{% endif %}
-{% endmacro %}
+	{%- endif -%}
+{%- endmacro -%}
 
-{% macro colorize_status(status) %}
-	{% if not status or status == "Unknown" %}
+{%- macro colorize_status(status) -%}
+	{%- if not status or status == "Unknown" -%}
 		<span class="purple">Unknown</span>
-	{% elif status == "Testing" %}
+	{%- elif status == "Testing" -%}
 		<span class="orange">Testing</span>
-	{% elif status == "Vulnerable" %}
+	{%- elif status == "Vulnerable" -%}
 		<span class="red">Vulnerable</span>
-	{% elif status == "Fixed" %}
+	{%- elif status == "Fixed" -%}
 		<span class="green">Fixed</span>
-	{% elif status == "Not affected" %}
+	{%- elif status == "Not affected" -%}
 		<span>Not affected</span>
-	{% else %}
+	{%- else -%}
 		<span>{{ status }}</span>
-	{% endif %}
-{% endmacro %}
+	{%- endif -%}
+{%- endmacro -%}
 
 {% macro colorize_remote(value) %}
-	{% if value == None or value == "Unknown" %}
+	{%- if value == None or value == "Unknown" -%}
 		<span class="purple">Unknown</span>
-	{% elif value == "Remote" %}
+	{%- elif value == "Remote" -%}
 		<span class="red">Yes</span>
-	{% else %}
+	{%- else -%}
 		<span class="green">No</span>
-	{% endif %}
-{% endmacro %}
+	{%- endif -%}
+{%- endmacro -%}
 
-{% macro colorize_unknown(value) %}
-	{% if value == None or value == "Unknown" %}
+{%- macro colorize_unknown(value) -%}
+	{%- if value == None or value == "Unknown" -%}
 		<span class="purple">Unknown</span>
-	{% else %}
+	{%- else -%}
 		{{ value }}
-	{% endif %}
-{% endmacro %}
+	{%- endif -%}
+{%- endmacro -%}
 
-{% macro colorize_boolean(value) %}
-	{% if value == None or value == "Unknown" %}
+{%- macro colorize_boolean(value) -%}
+	{%- if value == None or value == "Unknown" -%}
 		<span class="purple">Unknown</span>
-	{% elif value %}
+	{%- elif value -%}
 		<span class="red">Yes</span>
-	{% else %}
+	{%- else -%}
 		<span class="green">No</span>
-	{% endif %}
-{% endmacro %}
+	{%- endif -%}
+{%- endmacro -%}
 
-{% macro boolean_value(value, default='Unknown') %}
-	{% if value == None %}
+{%- macro boolean_value(value, default='Unknown') -%}
+	{%- if value == None -%}
 		{{ default }}
-	{% elif value %}
+	{%- elif value -%}
 		Yes
-	{% else %}
+	{%- else -%}
 		No
-	{% endif %}
-{% endmacro %}
+	{%- endif -%}
+{%- endmacro -%}
 
-{% macro bug_ticket(id) %}
-	{% if id %}
+{%- macro bug_ticket(id) -%}
+	{%- if id -%}
 		<a href="https://bugs.archlinux.org/task/{{ id }}">FS#{{ id }}</a>
-	{% endif %}
-{% endmacro %}
+	{%- endif -%}
+{%- endmacro -%}
