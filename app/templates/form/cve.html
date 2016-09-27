@@ -1,28 +1,28 @@
 {%- extends "base.html" -%}
 {% block content %}
 			<h1>{{ title }}</h1>
-			<div class="wide_size">
+			<div class="wide size">
 				<form action="" method="post" name="add">
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="one-half column">
-							{{ render_field(form.cve, class='full_size', placeholder='Issue identifier')|smartindent(7)|safe }}
+							{{ render_field(form.cve, class='full size', placeholder='Issue identifier')|smartindent(7)|safe }}
 						</div>
 						<div class="one-half column">
-							{{ render_field(form.issue_type, class='full_size')|smartindent(7)|safe }}
+							{{ render_field(form.issue_type, class='full size')|smartindent(7)|safe }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="one-half column">
-							{{ render_field(form.severity, class='full_size')|smartindent(7)|safe }}
+							{{ render_field(form.severity, class='full size')|smartindent(7)|safe }}
 						</div>
 						<div class="one-half column">
-							{{ render_field(form.remote, class='full_size')|smartindent(7)|safe }}
+							{{ render_field(form.remote, class='full size')|smartindent(7)|safe }}
 						</div>
 					</div>
-					{{ render_field(form.description, class='full_size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...')|smartindent(5)|safe }}
-					{{ render_field(form.reference, class='full_size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...')|smartindent(5)|safe }}
-					{{ render_field(form.notes, class='full_size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...')|smartindent(5)|safe }}
+					{{ render_field(form.description, class='full size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...')|smartindent(5)|safe }}
+					{{ render_field(form.reference, class='full size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...')|smartindent(5)|safe }}
+					{{ render_field(form.notes, class='full size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...')|smartindent(5)|safe }}
 					{{ form.submit(class='button-primary') }}
 				</form>
 			</div>

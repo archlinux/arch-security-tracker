@@ -1,33 +1,33 @@
 {%- extends "base.html" -%}
 {% block content %}
 			<h1>{{ title }}</h1>
-			<div class="wide_size">
+			<div class="wide size">
 				<form action="" method="post" name="add">
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="one-half column">
-							{{ render_field(form.pkgnames, class='full_size', placeholder='Package names...')|smartindent(7)|safe }}
+							{{ render_field(form.pkgnames, class='full size', placeholder='Package names...')|smartindent(7)|safe }}
 						</div>
 						<div class="one-half column">
-							{{ render_field(form.cve, class='full_size', placeholder='Issue identifiers...')|smartindent(7)|safe }}
+							{{ render_field(form.cve, class='full size', placeholder='Issue identifiers...')|smartindent(7)|safe }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="one-quarter column">
-							{{ render_field(form.status, class='full_size')|smartindent(7)|safe }}
+							{{ render_field(form.status, class='full size')|smartindent(7)|safe }}
 						</div>
 						<div class="one-quarter column">
-							{{ render_field(form.bug_ticket, class='full_size', placeholder='ID')|smartindent(7)|safe }}
+							{{ render_field(form.bug_ticket, class='full size', placeholder='ID')|smartindent(7)|safe }}
 						</div>
 						<div class="one-quarter column">
-							{{ render_field(form.affected, class='full_size', placeholder='Package version')|smartindent(7)|safe }}
+							{{ render_field(form.affected, class='full size', placeholder='Package version')|smartindent(7)|safe }}
 						</div>
 						<div class="one-quarter column">
-							{{ render_field(form.fixed, class='full_size', placeholder='Package version')|smartindent(7)|safe }}
+							{{ render_field(form.fixed, class='full size', placeholder='Package version')|smartindent(7)|safe }}
 						</div>
 					</div>
-					{{ render_field(form.reference, class='full_size', maxlength=CVEGroup.REFERENCES_LENGTH, placeholder='Relevant external group references...')|smartindent(5)|safe }}
-					{{ render_field(form.notes, class='full_size', maxlength=CVEGroup.NOTES_LENGTH, placeholder='Internal group side notes...')|smartindent(5)|safe }}
+					{{ render_field(form.reference, class='full size', maxlength=CVEGroup.REFERENCES_LENGTH, placeholder='Relevant external group references...')|smartindent(5)|safe }}
+					{{ render_field(form.notes, class='full size', maxlength=CVEGroup.NOTES_LENGTH, placeholder='Internal group side notes...')|smartindent(5)|safe }}
 					{{ render_checkbox(form.advisory_qualified)|smartindent(5)|safe }}
 					{{ form.submit(class='button-primary') }}
 				</form>

@@ -4,7 +4,7 @@
 			<h1>Advisories</h1>
 			{%- if entries.scheduled %}
 			<h2>Scheduled</h2>
-			<table class="styled_table medium_size">
+			<table class="styled-table medium size">
 				<thead>
 					<tr>
 						<th>Date</th>
@@ -12,7 +12,7 @@
 						<th>Group</th>
 						<th>Package</th>
 						<th>Severity</th>
-						<th class="full_size">Type</th>
+						<th class="full size">Type</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -32,7 +32,7 @@
 			<h2>Published</h2>
 			{%- for month, advisories in entries.published.items() %}
 			<h3>{{ month }}</h3>
-			<table class="styled_table medium_size">
+			<table class="styled-table medium size">
 				<thead>
 					<tr>
 						<th>Date</th>
@@ -40,7 +40,7 @@
 						<th>Group</th>
 						<th>Package</th>
 						<th>Severity</th>
-						<th class="full_size">Type</th>
+						<th class="full size">Type</th>
 					</tr>
 				</thead>
 				<tbody>

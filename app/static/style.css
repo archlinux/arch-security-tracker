@@ -168,16 +168,16 @@ table tr:hover {
   background-color: rgb(228, 237, 241)
 }
 
-table.styled_table {
+table.styled-table {
   background: #ecf2f5 none repeat scroll 0 0;
   border: 1px solid #bcd;
 }
 
-table.styled_table tr td {
+table.styled-table tr td {
   border-top: 1px dotted #bcd;
 }
 
-table.column_major tr td:first-child {
+table.column-major tr td:first-child {
   font-weight: bold;
 }
 
@@ -185,31 +185,28 @@ table.column_major tr td:first-child {
   text-align: center;
 }
 
-.size-collapse {
+.size,
+.full.size {
+  width: 100%;
+}
+
+.collapse.size {
   width: 1%;
 }
 
-.full_size {
-  width: 100%;
-}
-
-.wide_size {
-  width: 100%;
+.wide.size {
   max-width: 85em;
 }
 
-.medium_size {
-  width: 100%;
+.medium.size {
   max-width: 70em;
 }
 
-.small_size {
-  width: 100%;
+.small.size {
   max-width: 30em;
 }
 
-.tiny_size {
-  width: 100%;
+.tiny.size {
   max-width: 20em;
 }
 

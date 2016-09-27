@@ -1,7 +1,7 @@
 {%- extends "base.html" -%}
 {% block content %}
 			<h1>{{ advisory.id }} <a href="/{{  advisory.id }}/raw">raw</a></h1>
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>[{{ advisory.id }}] {{package.pkgname}}: {{advisory.advisory_type}}</th>

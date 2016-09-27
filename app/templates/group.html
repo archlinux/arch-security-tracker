@@ -2,11 +2,11 @@
 {%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket -%}
 {% block content %}
 			<h1>{{ group.detail.name }} <a href="/{{  group.detail.name }}/edit">edit</a></h1>
-			<table class="styled_table column_major full_size">
+			<table class="styled-table column-major full size">
 				<tbody>
 					<tr>
 						<td>Package</td>
-						<td class="full_size wrap">
+						<td class="full size wrap">
 						{%- for pkg in group.pkgs %}
 							<span class="no-wrap"><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
 						{%- endfor %}
@@ -58,14 +58,14 @@
 					{%- endif %}
 				</tbody>
 			</table>
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Issue</th>
 						<th>Severity</th>
 						<th>Remote</th>
 						<th>Type</th>
-						<th class="full_size">Description</th>
+						<th class="full size">Description</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -81,13 +81,13 @@
 				{%- endfor %}
 			</table>
 			{%- if group.advisories %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Date</th>
 						<th>Advisory</th>
 						<th>Package</th>
-						<th class="full_size">Description</th>
+						<th class="full size">Description</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -103,7 +103,7 @@
 			</table>
 			{%- endif %}
 			{%- if group.detail.reference %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>References</th>
@@ -117,7 +117,7 @@
 			</table>
 			{%- endif %}
 			{%- if group.detail.notes %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Notes</th>
