@@ -252,8 +252,8 @@ input[type="url"],
 input[type="password"],
 textarea,
 select {
-  height: 2.3em;
-  padding: 1px 7px;
+  height: 2.3rem;
+  padding: 6px 10px;
   background-color: #fff;
   border: 1px solid #d1d1d1;
   border-radius: 4px;
@@ -263,9 +263,7 @@ select {
 }
 
 textarea {
-  min-height: 65px;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  min-height: 85px;
 }
 
 input[type="email"]:focus,
@@ -278,6 +276,7 @@ input[type="password"]:focus,
 textarea:focus,
 select:focus {
   border: 1px solid rgb(155, 187, 224);
+  outline: 0;
 }
 
 .button,
@@ -362,7 +361,7 @@ input[type="button"].button-primary:focus {
 
 .errors ul {
   padding: 0;
-  margin: 0 0 0 15px;
+  margin: 0;
 }
 
 .errors li {
@@ -439,4 +438,101 @@ input[type="button"].button-primary:focus {
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
+}
+
+label > .label-body {
+  display: inline-block;
+  margin-left: .5rem;
+  font-weight: normal;
+}
+
+label,
+legend {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600;
+}
+
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 1.3em;
+}
+
+form .errors {
+  position: relative;
+  top: -0.7em;
+  margin-bottom: 0.3em;
+}
+
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.column,
+.columns {
+  margin-left: 4%;
+}
+
+.column:first-child,
+.columns:first-child {
+  margin-left: 0;
+}
+
+.column, .columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box;
+}
+
+.one.column,
+.one.columns {
+  width: 4.66666666667%;
+}
+.two.columns {
+  width: 13.3333333333%;
+}
+.three.columns {
+  width: 22%;
+}
+.four.columns {
+  width: 30.6666666667%;
+}
+.five.columns {
+  width: 39.3333333333%;
+}
+.six.columns {
+  width: 48%;
+}
+.seven.columns {
+  width: 56.6666666667%;
+}
+.eight.columns {
+  width: 65.3333333333%;
+}
+.nine.columns {
+  width: 74.0%;
+}
+.ten.columns {
+  width: 82.6666666667%;
+}
+.eleven.columns {
+  width: 91.3333333333%;
+}
+.twelve.columns {
+  width: 100%; margin-left: 0;
+}
+
+.one-third.column {
+  width: 30.6666666667%;
+}
+.two-thirds.column {
+  width: 65.3333333333%;
+}
+
+.one-half.column {
+  width: 48%;
 }
