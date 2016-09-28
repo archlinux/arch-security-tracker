@@ -112,7 +112,7 @@
 				<tbody>
 				{%- for advisory in package.advisories %}
 					<tr>
-						<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
+						<td>{{ advisory.created.strftime('%d %b %Y') }}</td>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 						<td>{{ advisory.advisory_type }}</td>
 					</tr>

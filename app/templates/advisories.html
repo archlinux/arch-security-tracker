@@ -18,7 +18,7 @@
 				<tbody>
 				{%- for advisory, pkg, group in entries.scheduled %}
 					<tr>
-						<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
+						<td>{{ advisory.created.strftime('%d %b %Y') }}</td>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 						<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
@@ -46,7 +46,7 @@
 				<tbody>
 				{%- for advisory, pkg, group in advisories %}
 					<tr>
-						<td>{{ advisory.created.strftime('%Y-%m-%d') }}</td>
+						<td>{{ advisory.created.strftime('%d %b %Y') }}</td>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 						<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
