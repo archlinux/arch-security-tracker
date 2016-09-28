@@ -14,13 +14,20 @@
 			}
 			</script>
 			<h1>Login</h1>
-			<form action="" method="post" name="login" class="form_login">
-				{{ form.hidden_tag() }}
-				<dl>
-					{{ render_field(form.username) }}
-					{{ render_field(form.password) }}
-					{{ render_field_inline(form.remember_me) }}
-					{{ render_field_unlabeled(form.login, class_='button-primary') }}
-				</dl>
-			</form>
+		<div class="tiny_size">
+				<form action="" method="post" name="login">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<div class="twelve columns">
+							{{ render_field(form.username, class='full_size', placeholder='Username')|smartindent(7)|safe }}
+						</div>
+					</div>
+					<div class="row">
+						<div class="twelve columns">
+							{{ render_field(form.password, class='full_size', placeholder='Password')|smartindent(7)|safe }}
+						</div>
+					</div>
+					{{ render_checkbox(form.remember_me)|smartindent(5)|safe }}
+					{{ form.login(class='button-primary') }}
+				</form>
 {%- endblock %}

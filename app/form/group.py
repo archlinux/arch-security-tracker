@@ -1,5 +1,5 @@
 from .base import BaseForm
-from wtforms import StringField, SelectField, TextAreaField, SubmitField
+from wtforms import StringField, SelectField, TextAreaField, SubmitField, BooleanField
 from wtforms.validators import DataRequired, Optional, Regexp, Length
 from app.model.cvegroup import pkgver_regex, CVEGroup
 from app.model.enum import Affected
@@ -12,13 +12,13 @@ class GroupForm(BaseForm):
     # TODO: check if the pkgnames are all belonging to the same pkgbase instead of checking for the versions
     pkgnames = TextAreaField(u'Package', validators=[DataRequired(), ValidPackageNames(), SamePackageVersions()])
     description = TextAreaField(u'Description', validators=[Optional()])
-    affected = StringField(u'Affected version', validators=[DataRequired(), Regexp(pkgver_regex)])
-    fixed = StringField(u'Fixed Version', validators=[Optional(), Regexp(pkgver_regex)])
+    affected = StringField(u'Affected', validators=[DataRequired(), Regexp(pkgver_regex)])
+    fixed = StringField(u'Fixed', validators=[Optional(), Regexp(pkgver_regex)])
     status = SelectField(u'Status', choices=[(e.name, e.label) for e in [*Affected]], validators=[DataRequired()])
     bug_ticket = StringField('Bug ticket', validators=[Optional(), Regexp(r'^\d+$')])
     reference = TextAreaField(u'References', validators=[Optional(), Length(max=CVEGroup.REFERENCES_LENGTH), ValidURLs()])
     notes = TextAreaField(u'Notes', validators=[Optional(), Length(max=CVEGroup.NOTES_LENGTH)])
-    advisory_qualified = SelectField(u'Advisory qualified', choices=[('true', 'Yes'), ('false', 'No')], validators=[DataRequired()])
+    advisory_qualified = BooleanField(u'Advisory qualified', default=True, validators=[Optional()])
     submit = SubmitField(u'submit')
 
     def validate(self):

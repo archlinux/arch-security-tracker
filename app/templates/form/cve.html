@@ -2,97 +2,27 @@
 {% block content %}
 			<h1>{{ title }}</h1>
 			<div class="wide_size">
-				<form action="" method="post" name="add" class="form_add">
+				<form action="" method="post" name="add">
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="six columns">
-							{{ form.cve.label }}
-							{{ form.cve(class='full_size', placeholder='Issue identifier...') }}
-							{%- if form.cve.errors %}
-							<div class="errors">
-								<ul>
-								{%- for error in form.cve.errors %}
-									<li>{{ error }}</li>
-								{%- endfor %}
-								</ul>
-							</div>
-							{%- endif %}
+							{{ render_field(form.cve, class='full_size', placeholder='Issue identifier')|smartindent(7)|safe }}
 						</div>
 						<div class="six columns">
-							{{ form.issue_type.label }}
-							{{ form.issue_type(class='full_size') }}
-							{%- if form.issue_type.errors %}
-							<div class="errors">
-								<ul>
-								{%- for error in form.issue_type.errors %}
-									<li>{{ error }}</li>
-								{%- endfor %}
-								</ul>
-							</div>
-							{%- endif %}
+							{{ render_field(form.issue_type, class='full_size')|smartindent(7)|safe }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="six columns">
-							{{ form.severity.label }}
-							{{ form.severity(class='full_size') }}
-							{%- if form.severity.errors %}
-							<div class="errors">
-								<ul>
-								{%- for error in form.severity.errors %}
-									<li>{{ error }}</li>
-								{%- endfor %}
-								</ul>
-							</div>
-							{%- endif %}
+							{{ render_field(form.severity, class='full_size')|smartindent(7)|safe }}
 						</div>
 						<div class="six columns">
-							{{ form.remote.label }}
-							{{ form.remote(class='full_size') }}
-							{%- if form.remote.errors %}
-							<div class="errors">
-								<ul>
-								{%- for error in form.remote.errors %}
-									<li>{{ error }}</li>
-								{%- endfor %}
-								</ul>
-							</div>
-							{%- endif %}
+							{{ render_field(form.remote, class='full_size')|smartindent(7)|safe }}
 						</div>
 					</div>
-					{{ form.description.label }}
-					{{ form.description(class='full_size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...') }}
-					{%- if form.description.errors %}
-					<div class="errors">
-						<ul>
-						{%- for error in form.description.errors %}
-							<li>{{ error }}</li>
-						{%- endfor %}
-						</ul>
-					</div>
-					{%- endif %}
-					{{ form.reference.label }}
-					{{ form.reference(class='full_size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...') }}
-					{%- if form.reference.errors %}
-					<div class="errors">
-						<ul>
-						{%- for error in form.reference.errors %}
-							<li>{{ error }}</li>
-						{%- endfor %}
-						</ul>
-					</div>
-					{%- endif %}
-					{{ form.notes.label }}
-					{{ form.notes(class='full_size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...') }}
-					{%- if form.notes.errors %}
-					<div class="errors">
-						<ul>
-						{%- for error in form.notes.errors %}
-							<li>{{ error }}</li>
-						{%- endfor %}
-						</ul>
-					</div>
-					{%- endif %}
+					{{ render_field(form.description, class='full_size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...')|smartindent(5)|safe }}
+					{{ render_field(form.reference, class='full_size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...')|smartindent(5)|safe }}
+					{{ render_field(form.notes, class='full_size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...')|smartindent(5)|safe }}
 					{{ form.submit(class='button-primary') }}
 				</form>
 			</div>
