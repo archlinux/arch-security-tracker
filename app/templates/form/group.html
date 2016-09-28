@@ -5,24 +5,24 @@
 				<form action="" method="post" name="add">
 					{{ form.hidden_tag() }}
 					<div class="row">
-						<div class="six columns">
+						<div class="one-half column">
 							{{ render_field(form.pkgnames, class='full_size', placeholder='Package names...')|smartindent(7)|safe }}
 						</div>
-						<div class="six columns">
+						<div class="one-half column">
 							{{ render_field(form.cve, class='full_size', placeholder='Issue identifiers...')|smartindent(7)|safe }}
 						</div>
 					</div>
 					<div class="row">
-						<div class="three columns">
+						<div class="one-quarter column">
 							{{ render_field(form.status, class='full_size')|smartindent(7)|safe }}
 						</div>
-						<div class="three columns">
+						<div class="one-quarter column">
 							{{ render_field(form.bug_ticket, class='full_size', placeholder='ID')|smartindent(7)|safe }}
 						</div>
-						<div class="three columns">
+						<div class="one-quarter column">
 							{{ render_field(form.affected, class='full_size', placeholder='Package version')|smartindent(7)|safe }}
 						</div>
-						<div class="three columns">
+						<div class="one-quarter column">
 							{{ render_field(form.fixed, class='full_size', placeholder='Package version')|smartindent(7)|safe }}
 						</div>
 					</div>
