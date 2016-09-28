@@ -26,7 +26,7 @@
 					</tr>
 					<tr>
 						<td>Fixed</td>
-						<td>{{ group.detail.fixed }}</td>
+						<td>{% if group.detail.fixed %}{{ group.detail.fixed }}{% else %}{{ colorize_unknown('Unknown') }}{% endif %}</td>
 					</tr>
 					<tr>
 						<td>Current</td>
