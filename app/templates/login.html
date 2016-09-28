@@ -19,15 +19,15 @@
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="single columns">
-							{{ render_field(form.username, class='full size', placeholder='Username')|smartindent(7)|safe }}
+							{{ render_field(form.username, class='full size', placeholder='Username', indent=7) }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="single columns">
-							{{ render_field(form.password, class='full size', placeholder='Password')|smartindent(7)|safe }}
+							{{ render_field(form.password, class='full size', placeholder='Password', indent=7) }}
 						</div>
 					</div>
-					{{ render_checkbox(form.remember_me)|smartindent(5)|safe }}
+					{{ render_checkbox(form.remember_me, indent=5) }}
 					{{ form.login(class='button-primary') }}
 				</form>
 {%- endblock %}

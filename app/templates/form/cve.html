@@ -6,23 +6,23 @@
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="one-half column">
-							{{ render_field(form.cve, class='full size', placeholder='Issue identifier')|smartindent(7)|safe }}
+							{{ render_field(form.cve, class='full size', placeholder='Issue identifier', indent=7) }}
 						</div>
 						<div class="one-half column">
-							{{ render_field(form.issue_type, class='full size')|smartindent(7)|safe }}
+							{{ render_field(form.issue_type, class='full size', indent=7) }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="one-half column">
-							{{ render_field(form.severity, class='full size')|smartindent(7)|safe }}
+							{{ render_field(form.severity, class='full size', indent=7) }}
 						</div>
 						<div class="one-half column">
-							{{ render_field(form.remote, class='full size')|smartindent(7)|safe }}
+							{{ render_field(form.remote, class='full size', indent=7) }}
 						</div>
 					</div>
-					{{ render_field(form.description, class='full size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...')|smartindent(5)|safe }}
-					{{ render_field(form.reference, class='full size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...')|smartindent(5)|safe }}
-					{{ render_field(form.notes, class='full size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...')|smartindent(5)|safe }}
+					{{ render_field(form.description, class='full size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...', indent=5) }}
+					{{ render_field(form.reference, class='full size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...', indent=5) }}
+					{{ render_field(form.notes, class='full size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...', indent=5) }}
 					{{ form.submit(class='button-primary') }}
 				</form>
 			</div>
