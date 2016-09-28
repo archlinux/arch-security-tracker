@@ -4,8 +4,10 @@ from app.model import CVE, CVEGroup, CVEGroupPackage, Advisory
 from app.form.advisory import AdvisoryPublishForm
 from app.model.enum import Status, Remote, Severity, Publication
 from app.pacman import get_pkg
+from app.symbol import smileys_happy
 from sqlalchemy import func, or_
 from pyalpm import vercmp
+from random import randint
 
 
 @app.route('/todo', methods=['GET'])
@@ -61,4 +63,5 @@ def todo():
     return render_template('todo.html',
                            title='Todo Lists',
                            entries=entries,
-                           publish_form=AdvisoryPublishForm())
+                           publish_form=AdvisoryPublishForm(),
+                           smiley=smileys_happy[randint(0, len(smileys_happy) - 1)])
