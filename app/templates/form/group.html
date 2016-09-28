@@ -6,10 +6,10 @@
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="one-half column">
-							{{ render_field(form.pkgnames, class='full size', placeholder='Package names...', autofocus='', indent=7) }}
+							{{ render_field(form.pkgnames, class='full size', placeholder='Package names...', autofocus='', required='', indent=7) }}
 						</div>
 						<div class="one-half column">
-							{{ render_field(form.cve, class='full size', placeholder='Issue identifiers...', indent=7) }}
+							{{ render_field(form.cve, class='full size', placeholder='Issue identifiers...', required='', indent=7) }}
 						</div>
 					</div>
 					<div class="row">
@@ -20,7 +20,7 @@
 							{{ render_field(form.bug_ticket, class='full size', placeholder='ID', indent=7) }}
 						</div>
 						<div class="one-quarter column">
-							{{ render_field(form.affected, class='full size', placeholder='Package version', indent=7) }}
+							{{ render_field(form.affected, class='full size', placeholder='Package version', required='', indent=7) }}
 						</div>
 						<div class="one-quarter column">
 							{{ render_field(form.fixed, class='full size', placeholder='Package version', indent=7) }}
