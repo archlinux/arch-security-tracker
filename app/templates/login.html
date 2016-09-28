@@ -14,17 +14,17 @@
 			}
 			</script>
 			<h1>Login</h1>
-		<div class="tiny_size">
+		<div class="tiny size">
 				<form action="" method="post" name="login">
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="single columns">
-							{{ render_field(form.username, class='full_size', placeholder='Username')|smartindent(7)|safe }}
+							{{ render_field(form.username, class='full size', placeholder='Username')|smartindent(7)|safe }}
 						</div>
 					</div>
 					<div class="row">
 						<div class="single columns">
-							{{ render_field(form.password, class='full_size', placeholder='Password')|smartindent(7)|safe }}
+							{{ render_field(form.password, class='full size', placeholder='Password')|smartindent(7)|safe }}
 						</div>
 					</div>
 					{{ render_checkbox(form.remember_me)|smartindent(5)|safe }}

@@ -2,7 +2,7 @@
 {%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket -%}
 {%- macro render_groups(groups) -%}
 	{%- if groups %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Group</th>
@@ -10,7 +10,7 @@
 						<th>Fixed</th>
 						<th>Severity</th>
 						<th>Status</th>
-						<th class="full_size">Ticket</th>
+						<th class="full size">Ticket</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -31,7 +31,7 @@
 
 {%- macro render_issues(issues) -%}
 	{%- if issues %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Issue</th>
@@ -39,7 +39,7 @@
 						<th>Severity</th>
 						<th>Remote</th>
 						<th>Type</th>
-						<th class="full_size">Description</th>
+						<th class="full size">Description</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -59,11 +59,11 @@
 {%- endmacro -%}
 		{% block content %}
 			<h1>{{ package.pkgname }}</h1>
-			<table class="styled_table column_major full_size">
+			<table class="styled-table column-major full size">
 				<tbody>
 					<tr>
 						<td>Link</td>
-						<td class="full_size">
+						<td class="full size">
 							<a href="https://www.archlinux.org/packages/?name={{ package.pkgname|urlencode }}">package</a> |
 							<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&string={{ package.pkgname|urlencode }}">bugs open</a> |
 							<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname|urlencode }}">bugs closed</a> |
@@ -101,12 +101,12 @@
 			{%- endif %}
 			{%- if package.advisories  %}
 			<h2>Advisories</h2>
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Date</th>
 						<th>Advisory</th>
-						<th class="full_size">Description</th>
+						<th class="full size">Description</th>
 					</tr>
 				</thead>
 				<tbody>

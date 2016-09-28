@@ -4,15 +4,15 @@
 			<h1>Todo Lists</h1>
 			{%- if entries.scheduled_advisories %}
 			<h2>Scheduled advisories</h2>
-			<table class="styled_table medium_size">
+			<table class="styled-table medium size">
 				<thead>
 					<tr>
 						<th>Advisory</th>
 						<th>Group</th>
 						<th>Package</th>
 						<th>Severity</th>
-						<th class="full_size">Type</th>
-						<th class="center size-collapse">Action</th>
+						<th class="full size">Type</th>
+						<th class="center collapse size">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -36,7 +36,7 @@
 			{%- endif %}
 			{%- if entries.unhandled_advisories %}
 			<h2>Pending advisories</h2>
-			<table class="styled_table medium_size">
+			<table class="styled-table medium size">
 				<thead>
 					<tr>
 						<th>Group</th>
@@ -45,7 +45,7 @@
 						<th>Affected</th>
 						<th>Fixed</th>
 						<th>Ticket</th>
-						<th class="center size-collapse">Action</th>
+						<th class="center collapse size">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -71,7 +71,7 @@
 			{%- endif %}
 			{%- if entries.bumped_groups  %}
 			<h2>Maybe fixed</h2>
-			<table class="styled_table medium_size">
+			<table class="styled-table medium size">
 				<thead>
 					<tr>
 						<th>Group</th>
@@ -80,7 +80,7 @@
 						<th>Affected</th>
 						<th>Current</th>
 						<th>Ticket</th>
-						<th class="center size-collapse">Action</th>
+						<th class="center collapse size">Action</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -110,14 +110,14 @@
 			{%- endif %}
 			{%- if entries.unknown_issues %}
 			<h2>Issues missing details</h2>
-			<table class="styled_table medium_size">
+			<table class="styled-table medium size">
 				<thead>
 					<tr>
 						<th>Issue</th>
 						<th>Severity</th>
 						<th>Remote</th>
 						<th>Type</th>
-						<th class="full_size">Description</th>
+						<th class="full size">Description</th>
 					</tr>
 				</thead>
 				<tbody>

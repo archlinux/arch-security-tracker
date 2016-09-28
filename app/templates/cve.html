@@ -2,7 +2,7 @@
 {%- from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, colorize_unknown, nullable_value, bug_ticket -%}
 {% block content %}
 			<h1>{{ issue.id }} <a href="/{{  issue.id }}/edit">edit</a></h1>
-			<table class="styled_table column_major full_size">
+			<table class="styled-table column-major full size">
 				<tbody>
 					<tr>
 						<td>Source</td>
@@ -42,7 +42,7 @@
 				</tbody>
 			</table>
 			{%- if groups %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Group</th>
@@ -51,7 +51,7 @@
 						<th>Fixed</th>
 						<th>Severity</th>
 						<th>Status</th>
-						<th class="full_size">Ticket</th>
+						<th class="full size">Ticket</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -74,12 +74,12 @@
 			</table>
 			{%- endif %}
 			{%- if advisories %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Advisory</th>
 						<th>Package</th>
-						<th class="full_size">Description</th>
+						<th class="full size">Description</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -94,7 +94,7 @@
 			</table>
 			{%- endif %}
 			{%- if issue.reference %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>References</th>
@@ -108,7 +108,7 @@
 			</table>
 			{%- endif %}
 			{%- if issue.notes %}
-			<table class="styled_table full_size">
+			<table class="styled-table full size">
 				<thead>
 					<tr>
 						<th>Notes</th>
