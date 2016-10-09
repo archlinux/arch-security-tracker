@@ -11,7 +11,32 @@ from app.form.advisory import AdvisoryForm
 from app.view.error import not_found
 from app.util import chunks, multiline_to_list
 from collections import defaultdict
+from urllib.parse import urlencode
 
+
+def link_encode(url, query):
+    query = {k: v for k, v in query.items()}
+    data = urlencode(query)
+    return "%s?%s" % (url, data)
+
+
+def add_bug_link(cves, pkgs):
+    bug_url = "https://bugs.archlinux.org/newtask"
+
+    summary_desc = '<give a short summary about all CVEs>'
+    guidance = '<give a short guidance for the maintainer.. what shall he/she do? include a patch? Just upgrade?>'
+    references = '\n'.join((cve.reference for cve in cves))
+    bug_desc = "Summary\n=======\n%s\nGuidance\n========\n%s\nReferences\n==========\n%s" % (summary_desc, guidance, references)
+    summary = '[%s][Security] <Short description>' % ' '.join((pkg.pkgname for pkg in pkgs))
+
+    bug_data = {
+            'project': 1,  # all packages
+            'product_category':  13,  # security
+            'item_summary': summary,
+            'detailed_desc': bug_desc
+    }
+
+    return link_encode(bug_url, bug_data)
 
 @app.route('/issue/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
 @app.route('/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
@@ -96,6 +121,7 @@ def show_group(avg):
     }
     return render_template('group.html',
                            title='{}'.format(group.name),
+                           bug_link=add_bug_link(cves, pkgs),
                            group=out,
                            advisory_pending=advisory_pending,
                            form=advisory_form)
