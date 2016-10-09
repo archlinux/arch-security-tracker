@@ -1,0 +1,13 @@
+Summary
+=======
+<give a short summary about all CVEs>
+
+Guidance
+========
+<give a short guidance for the maintainer.. what shall he/she do? include a patch? Just upgrade?>
+
+References
+==========
+{% for cve in cves -%}
+{{ cve.reference }}
+{% endfor -%}
