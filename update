@@ -42,6 +42,10 @@ def recalc_group_severity():
     db.session.commit()
 
 
+def db_vacuum():
+    db.session.execute('VACUUM')
+
+
 if __name__ == "__main__":
     no_args = 1 >= len(argv)
     parser = ArgumentParser(prog='update')
@@ -49,6 +53,7 @@ if __name__ == "__main__":
     parser.add_argument('--group-status', action='store_true', default=no_args)
     parser.add_argument('--recalc-group-status', action='store_true')
     parser.add_argument('--recalc-group-severity', action='store_true')
+    parser.add_argument('--db-vacuum', action='store_true')
     args = parser.parse_args()
 
     if args.pacman_db:
@@ -66,3 +71,7 @@ if __name__ == "__main__":
     if args.recalc_group_severity:
         print("[+] Recalc group severity...")
         recalc_group_severity()
+
+    if args.db_vacuum:
+        print("[+] Compact database...")
+        db_vacuum()
