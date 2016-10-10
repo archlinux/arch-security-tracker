@@ -3,6 +3,16 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql.expression import ClauseElement
 from werkzeug.routing import BaseConverter
 from types import MethodType
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
+
+
+@event.listens_for(Engine, 'connect')
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute('PRAGMA temp_store = MEMORY')
+    cursor.execute('PRAGMA journal_mode = WAL')
+    cursor.close()
 
 app = Flask(__name__)
 app.config.from_object('config')
