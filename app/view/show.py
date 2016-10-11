@@ -14,29 +14,31 @@ from collections import defaultdict
 from urllib.parse import urlencode
 
 
-def link_encode(url, query):
-    query = {k: v for k, v in query.items()}
-    data = urlencode(query)
-    return "%s?%s" % (url, data)
-
-
-def add_bug_link(cves, pkgs):
-    bug_url = "https://bugs.archlinux.org/newtask"
-
-    summary_desc = '<give a short summary about all CVEs>'
-    guidance = '<give a short guidance for the maintainer.. what shall he/she do? include a patch? Just upgrade?>'
+def add_bug_link(cves, pkgs, severity):
     references = '\n'.join((cve.reference for cve in cves))
-    bug_desc = "Summary\n=======\n%s\nGuidance\n========\n%s\nReferences\n==========\n%s" % (summary_desc, guidance, references)
-    summary = '[%s][Security] <Short description>' % ' '.join((pkg.pkgname for pkg in pkgs))
+    bug_desc = render_template('bug.txt', references=references)
+    pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
+    summary = '[{}][Security] <Short description>'.format(pkg_str)
 
-    bug_data = {
+    # 5: critical, 4: high, 3: medium, 2: low, 1: very low.
+    severitiy_mapping = {
+            'unknown': 3,
+            'critical': 5,
+            'high': 4,
+            'medium': 3,
+            'low': 2,
+    }
+
+    task_severity = severitiy_mapping.get(severity.name)
+
+    return {
             'project': 1,  # all packages
             'product_category':  13,  # security
             'item_summary': summary,
+            'task_severity': task_severity,
             'detailed_desc': bug_desc
     }
 
-    return link_encode(bug_url, bug_data)
 
 @app.route('/issue/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
 @app.route('/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
@@ -119,9 +121,10 @@ def show_group(avg):
         'cves': cves,
         'advisories': advisories
     }
+
     return render_template('group.html',
                            title='{}'.format(group.name),
-                           bug_link=add_bug_link(cves, pkgs),
+                           bug_data=add_bug_link(cves, pkgs, group.severity),
                            group=out,
                            advisory_pending=advisory_pending,
                            form=advisory_form)
