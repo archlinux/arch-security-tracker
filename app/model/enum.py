@@ -1,7 +1,8 @@
+from .package import Package
+from app import db
 from enum import Enum
 from sqlalchemy.types import SchemaType, TypeDecorator
 from sqlalchemy.types import Enum as SQLAlchemyEnum
-from app.pacman import get_pkg
 from pyalpm import vercmp
 
 
@@ -127,7 +128,8 @@ def affected_to_status(affected, pkgname, fixed_version):
         return Status.not_affected
     if Affected.unknown == affected:
         return Status.unknown
-    versions = get_pkg(pkgname, filter_arch=True)
+    versions = db.session.query(Package).filter_by(name=pkgname) \
+        .group_by(Package.name, Package.version).all()
     # unknown if no version was found
     if not versions:
         return Status.unknown
@@ -136,7 +138,7 @@ def affected_to_status(affected, pkgname, fixed_version):
     if not fixed_version or 0 > vercmp(version.version, fixed_version):
         return Status.vulnerable
     # check if any non-testing versions are fixed
-    non_testing = list(filter(lambda e: 'testing' not in e.db.name, versions))
+    non_testing = list(filter(lambda e: 'testing' not in e.database, versions))
     latest_non_testing = non_testing[0]
     if 0 <= vercmp(latest_non_testing.version, fixed_version):
         return Status.fixed

@@ -1,9 +1,9 @@
 from wtforms.validators import ValidationError, URL as URLValidator
-from app.pacman import get_pkg
 from app.util import multiline_to_list
 from app.model.cvegroup import pkgname_regex
 from app.model.cve import cve_id_regex
-from pyalpm import vercmp
+from app.model import Package
+from app import db
 from re import match
 
 
@@ -14,7 +14,7 @@ class ValidPackageName(object):
     def __call__(self, form, field):
         if not match(pkgname_regex, field.data):
             self.fail(field.data)
-        versions = get_pkg(field.data)
+        versions = Package.query.filter(name=field.data).first()
         if not versions:
             raise ValidationError(self.message)
 
@@ -27,32 +27,34 @@ class ValidPackageNames(object):
         raise ValidationError(self.message.format(pkgname))
 
     def __call__(self, form, field):
-        pkgnames = multiline_to_list(field.data)
+        pkgnames = set(multiline_to_list(field.data))
         for pkgname in pkgnames:
             if not match(pkgname_regex, pkgname):
                 self.fail(pkgname)
-            versions = get_pkg(pkgname)
-            if not versions:
-                self.fail(pkgname)
+        db_packages = db.session.query(Package) \
+            .filter(Package.name.in_(pkgnames)) \
+            .group_by(Package.name).all()
+        db_packages = set([pkg.name for pkg in db_packages])
+        diff = [pkg for pkg in pkgnames if pkg not in db_packages]
+        for pkgname in diff:
+            self.fail(pkgname)
 
 
-class SamePackageVersions(object):
+class SamePackageBase(object):
     def __init__(self):
-        self.message = u'Mismatching version {}.'
+        self.message = u'Mismatching pkgbases ({}).'
 
     def fail(self, pkgname):
         raise ValidationError(self.message.format(pkgname))
 
     def __call__(self, form, field):
-        pkgnames = multiline_to_list(field.data)
-        ref_version = None
-        for pkgname in pkgnames:
-            versions = get_pkg(pkgname)
-            if not versions:
-                self.fail(pkgname)
-            ref_version = ref_version if ref_version else versions[0]
-            if 0 != vercmp(ref_version.version, versions[0].version):
-                self.fail(pkgname)
+        pkgnames = set(multiline_to_list(field.data))
+        pkgbases = db.session.query(Package) \
+            .filter(Package.name.in_(pkgnames)) \
+            .group_by(Package.base).all()
+        pkgbases = [pkg.base for pkg in pkgbases]
+        if len(pkgbases) > 1:
+            self.fail(', '.join(pkgbases))
 
 
 class ValidIssue(object):

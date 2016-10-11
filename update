@@ -1,12 +1,13 @@
 #!/usr/bin/env python
-from app.pacman import update as update_pacman_db
+from app.pacman import update as update_pacman_db, search, get_configpath, archs, primary_arch
 from app import db
-from app.model import CVEGroup, CVEGroupPackage, CVE, CVEGroupEntry
+from app.model import CVEGroup, CVEGroupPackage, CVE, CVEGroupEntry, Package
 from app.model.enum import Status, Affected, affected_to_status, highest_severity
 from sqlalchemy import func
 from collections import defaultdict
 from argparse import ArgumentParser
 from sys import argv
+from subprocess import check_output
 
 
 def update_group_status():
@@ -42,6 +43,48 @@ def recalc_group_severity():
     db.session.commit()
 
 
+def update_package_cache():
+    packages = search('', filter_duplicate_packages=False, sort_results=False)
+
+    print('    --> Collecting pkgbase...')
+    pkgbases = {}
+    arch_packages = defaultdict(list)
+
+    # assign packages per arch list (unify any into 64bit)
+    for package in packages:
+        arch = package.arch if package.arch != 'any' else primary_arch
+        if package.name not in arch_packages[arch]:
+            arch_packages[arch].append(package.name)
+
+    # query all pkgbases per arch
+    for arch in archs:
+        cmd = ['expac', '-S', '--config', get_configpath(arch), '%n %e']
+        cmd.extend(arch_packages[arch])
+        bases = check_output(cmd).decode().split('\n')[:-1]
+        for base in bases:
+            data = base.split(' ')
+            pkgbases[data[0]] = data[1] if data[1] != '(null)' else data[0]
+
+    print('    --> Deleting old entries...')
+    Package.query.delete()
+    print('    --> Inserting new entries...')
+    for package in packages:
+        db_package = Package()
+        db_package.name = package.name
+        db_package.base = pkgbases[package.name]
+        db_package.version = package.version
+        db_package.description = package.desc
+        db_package.url = package.url
+        db_package.arch = package.arch
+        db_package.database = package.db.name
+        db_package.filename = package.filename
+        db_package.md5sum = package.md5sum
+        db_package.sha256sum = package.sha256sum
+        db_package.builddate = package.builddate
+        db.session.add(db_package)
+    db.session.commit()
+
+
 def db_vacuum():
     db.session.execute('VACUUM')
 
@@ -53,6 +96,7 @@ if __name__ == "__main__":
     parser.add_argument('--group-status', action='store_true', default=no_args)
     parser.add_argument('--recalc-group-status', action='store_true')
     parser.add_argument('--recalc-group-severity', action='store_true')
+    parser.add_argument('--package-cache', action='store_true', default=no_args)
     parser.add_argument('--db-vacuum', action='store_true')
     args = parser.parse_args()
 
@@ -71,6 +115,10 @@ if __name__ == "__main__":
     if args.recalc_group_severity:
         print("[+] Recalc group severity...")
         recalc_group_severity()
+
+    if args.package_cache:
+        print("[+] Update package cache...")
+        update_package_cache()
 
     if args.db_vacuum:
         print("[+] Compact database...")

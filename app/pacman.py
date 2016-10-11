@@ -7,6 +7,7 @@ from os import chdir
 from time import time
 
 archs = ['i686', 'x86_64']
+primary_arch = 'x86_64'
 repos = {'i686': ['core', 'extra', 'community', 'testing', 'community-testing'],
          'x86_64': ['core', 'extra', 'community', 'multilib', 'testing', 'community-testing', 'multilib-testing']}
 configpath = './pacman/arch/{}/pacman.conf'
@@ -14,12 +15,16 @@ handles = {}
 chdir(basedir)
 
 
+def get_configpath(arch):
+    return configpath.format(arch)
+
+
 def get_handle(arch, force_fresh_handle=False):
     if not force_fresh_handle and arch in handles:
         handle, creation_time = handles[arch]
         if creation_time > time() - PACMAN_HANDLE_CACHE_TIME:
             return handle
-    handle = init_with_config(configpath.format(arch))
+    handle = init_with_config(get_configpath(arch))
     handles[arch] = (handle, time())
     return handle
 
@@ -31,7 +36,7 @@ def update(arch=None, force=False):
             syncdb.update(force)
 
 
-def get_pkg(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_handle=False):
+def get_pkg(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_handle=False, sort_results=True, filter_duplicate_packages=True):
     get_archs = [arch] if arch else archs
     results = set()
     for arch in get_archs:
@@ -41,12 +46,14 @@ def get_pkg(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_han
             result = syncdb.get_pkg(pkgname)
             if result:
                 results.add(result)
-    results = sort_packages(results)
-    results = filter_duplicates(results, filter_arch)
+    if sort_results:
+        results = sort_packages(results)
+    if filter_duplicate_packages:
+        results = filter_duplicates(results, filter_arch)
     return results
 
 
-def search(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_handle=False):
+def search(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_handle=False, sort_results=True, filter_duplicate_packages=True):
     search_archs = [arch] if arch else archs
     results = []
     for arch in search_archs:
@@ -55,9 +62,11 @@ def search(pkgname, arch=None, testing=True, filter_arch=False, force_fresh_hand
                 continue
             result = syncdb.search(pkgname)
             if result:
-                results.append(result)
-    results = sort_packages(results)
-    results = filter_duplicates(results, filter_arch)
+                results.extend(result)
+    if sort_results:
+        results = sort_packages(results)
+    if filter_duplicate_packages:
+        results = filter_duplicates(results, filter_arch)
     return results
 
 

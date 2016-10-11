@@ -3,14 +3,13 @@ from wtforms import StringField, SelectField, TextAreaField, SubmitField, Boolea
 from wtforms.validators import DataRequired, Optional, Regexp, Length
 from app.model.cvegroup import pkgver_regex, CVEGroup
 from app.model.enum import Affected
-from app.form.validators import ValidPackageNames, SamePackageVersions, ValidIssues, ValidURLs
+from app.form.validators import ValidPackageNames, SamePackageBase, ValidIssues, ValidURLs
 from pyalpm import vercmp
 
 
 class GroupForm(BaseForm):
     cve = TextAreaField(u'CVE', validators=[DataRequired(), ValidIssues()])
-    # TODO: check if the pkgnames are all belonging to the same pkgbase instead of checking for the versions
-    pkgnames = TextAreaField(u'Package', validators=[DataRequired(), ValidPackageNames(), SamePackageVersions()])
+    pkgnames = TextAreaField(u'Package', validators=[DataRequired(), ValidPackageNames(), SamePackageBase()])
     description = TextAreaField(u'Description', validators=[Optional()])
     affected = StringField(u'Affected', validators=[DataRequired(), Regexp(pkgver_regex)])
     fixed = StringField(u'Fixed', validators=[Optional(), Regexp(pkgver_regex)])

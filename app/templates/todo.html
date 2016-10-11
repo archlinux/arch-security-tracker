@@ -92,19 +92,19 @@ Yippie!</pre>
 					</tr>
 				</thead>
 				<tbody>
-				{%- for group, pkgs, versions in entries.bumped_groups %}
+				{%- for group, pkgnames, versions in entries.bumped_groups %}
 					<tr>
 						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 						<td class="wrap">
-							{%- for pkg in pkgs %}
+							{%- for pkg in pkgnames %}
 							<a href="/package/{{ pkg }}" class="no-wrap">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
 							{%- endfor %}
 						</td>
 						<td>{{ colorize_severity(group.severity) }}</td>
 						<td>{{ group.affected }}</td>
 						<td>
-							{%- for version in versions %}
-							{{ version.version }} [{{ version.db.name }}]<br />
+							{%- for package in versions %}
+							{{ package.version }} [{{ package.database }}]<br />
 							{%- endfor %}
 						</td>
 						<td>{{ bug_ticket(group.bug_ticket) }}</td>
