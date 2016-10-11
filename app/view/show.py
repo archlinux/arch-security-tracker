@@ -11,7 +11,6 @@ from app.form.advisory import AdvisoryForm
 from app.view.error import not_found
 from app.util import chunks, multiline_to_list
 from collections import defaultdict
-from urllib.parse import urlencode
 
 
 def add_bug_link(cves, pkgs, severity):
