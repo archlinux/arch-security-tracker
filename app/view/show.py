@@ -1,14 +1,14 @@
 from flask import render_template
 from sqlalchemy import and_
 from app import app, db
-from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
+from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
 from app.model.enum import Publication, Status, Remote
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex, pkgname_regex
 from app.model.advisory import advisory_regex
+from app.model.package import filter_duplicate_packages, sort_packages
 from app.form.advisory import AdvisoryForm
 from app.view.error import not_found
-from app.pacman import get_pkg
 from app.util import chunks, multiline_to_list
 from collections import defaultdict
 
@@ -53,9 +53,10 @@ def show_cve(cve):
 @app.route('/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
 def show_group(avg):
     avg_id = avg.replace('AVG-', '')
-    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
+    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory, Package)
                .filter(CVEGroup.id == avg_id)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+               .outerjoin(Package, Package.name == CVEGroupPackage.pkgname)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id))
                ).all()
     if not entries:
@@ -66,19 +67,21 @@ def show_group(avg):
     pkgs = set()
     advisories = set()
     cve_types = set()
-    for group_entry, cve, pkg, advisory in entries:
+    versions = set()
+    for group_entry, cve, pkg, advisory, package in entries:
         group = group_entry
         cves.add(cve)
         cve_types.add(cve.issue_type)
         pkgs.add(pkg)
+        versions.add(package)
         if advisory:
             advisories.add(advisory)
 
     cve_types = list(cve_types)
     cves = sorted(cves, key=lambda item: item.id, reverse=True)
     pkgs = sorted(pkgs, key=lambda item: item.pkgname)
+    versions = sort_packages(filter_duplicate_packages(list(versions), True))
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
-    versions = get_pkg(pkgs[0].pkgname, filter_arch=True)
     advisory_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
     advisory_form = AdvisoryForm()
     if 1 == len(cve_types):
@@ -100,30 +103,35 @@ def show_group(avg):
 
 @app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
 def show_package(pkgname):
-    versions = get_pkg(pkgname, filter_arch=True)
-    if not versions:
-        return not_found()
-
-    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
+    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory, Package)
                .filter(CVEGroupPackage.pkgname == pkgname)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+               .outerjoin(Package, Package.name == pkgname)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
                                          Advisory.publication == Publication.published))
                ).all()
+
+    if not entries:
+        return not_found()
+
     groups = set()
-    issues = []
+    issues = set()
     advisories = set()
-    for group, cve, pkg, advisory in entries:
+    versions = set()
+    for group, cve, pkg, advisory, package in entries:
         groups.add(group)
-        issues.append({'cve': cve, 'group': group})
+        versions.add(package)
+        issues.add((cve, group))
         if advisory:
             advisories.add(advisory)
 
+    issues = [{'cve': e[0], 'group': e[1]} for e in issues]
     issues = sorted(issues, key=lambda item: item['cve'].id, reverse=True)
     issues = sorted(issues, key=lambda item: item['group'].status)
     groups = sorted(groups, key=lambda item: item.id, reverse=True)
     groups = sorted(groups, key=lambda item: item.status)
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
+    versions = sort_packages(filter_duplicate_packages(list(versions), True))
 
     package = {
         'pkgname': pkgname,

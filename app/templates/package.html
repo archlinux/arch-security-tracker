@@ -74,13 +74,13 @@
 					</tr>
 					<tr>
 						<td>Description</td>
-						<td>{{ package.versions[0].desc }}</td>
+						<td>{% if package.versions[0] %}{{ package.versions[0].description }}{% endif %}</td>
 					</tr>
 					<tr>
 						<td>Version</td>
 						<td>
 						{%- for version in package.versions %}
-							{{ version.version }} [{{ version.db.name }}]<br />
+							{{ version.version }} [{{ version.database }}]<br />
 						{%- endfor %}
 						</td>
 					</tr>
