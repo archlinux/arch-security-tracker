@@ -144,7 +144,7 @@ def affected_to_status(affected, pkgname, fixed_version):
     if 0 <= vercmp(latest_non_testing.version, fixed_version):
         return Status.fixed
     # check if latest version is testing
-    if 'testing' in version.db.name:
+    if 'testing' in version.database:
         return Status.testing
     # return vulnerable otherwise
     return Status.vulnerable
