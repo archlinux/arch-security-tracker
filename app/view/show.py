@@ -187,6 +187,8 @@ def show_advisory(advisory_id, raw=False):
         if issue.issue_type not in unique_issue_types:
             unique_issue_types.append(issue.issue_type)
     references = []
+    if group.bug_ticket:
+        references.append('https://bugs.archlinux.org/task/{}'.format(group.bug_ticket))
     for reference in multiline_to_list(group.reference):
         if reference not in references:
             references.append(reference)
