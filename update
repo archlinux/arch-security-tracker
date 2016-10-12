@@ -104,6 +104,10 @@ if __name__ == "__main__":
         print("[+] Update pacman db...")
         update_pacman_db(force=True)
 
+    if args.package_cache:
+        print("[+] Update package cache...")
+        update_package_cache()
+
     if args.group_status:
         print("[+] Update group status...")
         update_group_status()
@@ -115,10 +119,6 @@ if __name__ == "__main__":
     if args.recalc_group_severity:
         print("[+] Recalc group severity...")
         recalc_group_severity()
-
-    if args.package_cache:
-        print("[+] Update package cache...")
-        update_package_cache()
 
     if args.db_vacuum:
         print("[+] Compact database...")
