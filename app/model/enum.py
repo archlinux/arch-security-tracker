@@ -1,4 +1,4 @@
-from .package import Package
+from .package import Package, sort_packages
 from app import db
 from enum import Enum
 from sqlalchemy.types import SchemaType, TypeDecorator
@@ -130,6 +130,7 @@ def affected_to_status(affected, pkgname, fixed_version):
         return Status.unknown
     versions = db.session.query(Package).filter_by(name=pkgname) \
         .group_by(Package.name, Package.version).all()
+    versions = sort_packages(versions)
     # unknown if no version was found
     if not versions:
         return Status.unknown
