@@ -21,6 +21,7 @@ vulnerability details and generating security advisories.
 * python-flask-wtf
 * pyalpm
 * sqlite
+* expac
 
 ## Setup
 
