@@ -2,7 +2,7 @@
 from app.pacman import update as update_pacman_db, search, get_configpath, archs, primary_arch
 from app import db
 from app.model import CVEGroup, CVEGroupPackage, CVE, CVEGroupEntry, Package
-from app.model.enum import Status, Affected, affected_to_status, highest_severity
+from app.model.enum import Status, Affected, affected_to_status, status_to_affected, highest_severity
 from sqlalchemy import func
 from collections import defaultdict
 from argparse import ArgumentParser
@@ -17,7 +17,7 @@ def update_group_status():
               .group_by(CVEGroupPackage.group_id)).all()
     for group, pkgnames in groups:
         pkgnames = pkgnames.split(' ')
-        group.status = affected_to_status(Affected.affected, pkgnames[0], group.fixed)
+        group.status = affected_to_status(status_to_affected(group.status), pkgnames[0], group.fixed)
     db.session.commit()
 
 
@@ -27,7 +27,7 @@ def recalc_group_status():
               .group_by(CVEGroupPackage.group_id)).all()
     for group, pkgnames in groups:
         pkgnames = pkgnames.split(' ')
-        group.status = affected_to_status(Affected.affected, pkgnames[0], group.fixed)
+        group.status = affected_to_status(status_to_affected(group.status), pkgnames[0], group.fixed)
     db.session.commit()
 
 
