@@ -1,7 +1,7 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 
 
-class BaseForm(Form):
+class BaseForm(FlaskForm):
     class Meta:
         def bind_field(self, form, unbound_field, options):
             filters = unbound_field.kwargs.get('filters', [])
