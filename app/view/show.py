@@ -13,9 +13,8 @@ from app.util import chunks, multiline_to_list
 from collections import defaultdict
 
 
-def add_bug_link(cves, pkgs, severity):
-    references = '\n'.join((cve.reference for cve in cves))
-    bug_desc = render_template('bug.txt', references=references)
+def get_bug_data(cves, pkgs, group):
+    bug_desc = render_template('bug.txt', cves=cves)
     pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
     summary = '[{}][Security] <Short description>'.format(pkg_str)
 
@@ -28,7 +27,7 @@ def add_bug_link(cves, pkgs, severity):
             'low': 2,
     }
 
-    task_severity = severitiy_mapping.get(severity.name)
+    task_severity = severitiy_mapping.get(group.severity.name)
 
     return {
             'project': 1,  # all packages
@@ -123,7 +122,7 @@ def show_group(avg):
 
     return render_template('group.html',
                            title='{}'.format(group.name),
-                           bug_data=add_bug_link(cves, pkgs, group.severity),
+                           bug_data=get_bug_data(cves, pkgs, group),
                            group=out,
                            advisory_pending=advisory_pending,
                            form=advisory_form)
