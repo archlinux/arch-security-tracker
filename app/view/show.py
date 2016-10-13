@@ -13,6 +13,31 @@ from app.util import chunks, multiline_to_list
 from collections import defaultdict
 
 
+def get_bug_data(cves, pkgs, group):
+    bug_desc = render_template('bug.txt', cves=cves)
+    pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
+    summary = '[{}][Security] <Short description>'.format(pkg_str)
+
+    # 5: critical, 4: high, 3: medium, 2: low, 1: very low.
+    severitiy_mapping = {
+            'unknown': 3,
+            'critical': 5,
+            'high': 4,
+            'medium': 3,
+            'low': 2,
+    }
+
+    task_severity = severitiy_mapping.get(group.severity.name)
+
+    return {
+            'project': 1,  # all packages
+            'product_category':  13,  # security
+            'item_summary': summary,
+            'task_severity': task_severity,
+            'detailed_desc': bug_desc
+    }
+
+
 @app.route('/issue/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
 @app.route('/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
 def show_cve(cve):
@@ -94,8 +119,10 @@ def show_group(avg):
         'cves': cves,
         'advisories': advisories
     }
+
     return render_template('group.html',
                            title='{}'.format(group.name),
+                           bug_data=get_bug_data(cves, pkgs, group),
                            group=out,
                            advisory_pending=advisory_pending,
                            form=advisory_form)
