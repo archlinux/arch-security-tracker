@@ -23,25 +23,25 @@ def get_bug_data(cves, pkgs, group):
 
     bug_desc = render_template('bug.txt', cves=cves, group=group, references=references)
     pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
-    summary = '[{}][Security] <Short description>'.format(pkg_str)
+    summary = '[{}] [Security] <Short description>'.format(pkg_str)
 
     # 5: critical, 4: high, 3: medium, 2: low, 1: very low.
     severitiy_mapping = {
-            'unknown': 3,
-            'critical': 5,
-            'high': 4,
-            'medium': 3,
-            'low': 2,
+        'unknown': 3,
+        'critical': 5,
+        'high': 4,
+        'medium': 3,
+        'low': 2,
     }
 
     task_severity = severitiy_mapping.get(group.severity.name)
 
     return {
-            'project': 1,  # all packages
-            'product_category':  13,  # security
-            'item_summary': summary,
-            'task_severity': task_severity,
-            'detailed_desc': bug_desc
+        'project': 1,  # all packages
+        'product_category': 13,  # security
+        'item_summary': summary,
+        'task_severity': task_severity,
+        'detailed_desc': bug_desc
     }
 
 
