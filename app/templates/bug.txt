@@ -8,6 +8,6 @@ Guidance
 
 References
 ==========
-{% for cve in cves -%}
-{{ cve.reference }}
-{% endfor -%}
+{%- for reference in references %}
+{{ reference -}}
+{%- endfor -%}

@@ -14,7 +14,14 @@ from collections import defaultdict
 
 
 def get_bug_data(cves, pkgs, group):
-    bug_desc = render_template('bug.txt', cves=cves)
+    references = []
+    # TODO: add backreference to AVG tracker page
+    references = [ref for ref in multiline_to_list(group.reference)
+                  if ref not in references]
+    map(lambda issue: references.extend(
+        [ref for ref in multiline_to_list(issue.reference) if ref not in references]), cves)
+
+    bug_desc = render_template('bug.txt', cves=cves, group=group, references=references)
     pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
     summary = '[{}][Security] <Short description>'.format(pkg_str)
 
