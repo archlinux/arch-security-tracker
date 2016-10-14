@@ -1,13 +1,42 @@
 Summary
 =======
-<give a short summary about all CVEs>
+
+{% macro summary() -%}
+The package{% if pkgs|length > 1 %}s{% endif %}{%- raw %} {% endraw %}
+{%- for pkg in pkgs %}
+	{{- pkg.pkgname -}}
+	{%- if not loop.last %}
+		{%- if loop.revindex > 2 %}, {% else %} and {% endif %}
+	{%- endif %}
+{%- endfor -%}
+{%- if pkgs|length > 1 %} are{% else %} is{% endif %} vulnerable to
+{%- if unique_issue_types|length > 1 %}
+{%- raw %} {% endraw %}multiple issues including{%- raw %} {% endraw %}
+	{%- for issue_type in unique_issue_types %}
+		{{- issue_type }}
+		{%- if not loop.last %}
+			{%- if loop.revindex > 2 %}, {% else %} and {% endif %}
+		{%- endif %}
+	{%- endfor %}
+{%- else -%}
+{%- raw %} {% endraw %}{{- unique_issue_types[0] -}}
+{%- endif %} via{%- raw %} {% endraw %}
+{%- for issue in cves %}
+	{{- issue.id -}}
+	{%- if not loop.last %}
+		{%- if loop.revindex > 2 %}, {% else %} and {% endif %}
+	{%- endif %}
+{%- endfor -%}.
+{%- endmacro %}
+{{- summary() }}
 
 Guidance
 ========
+
 <give a short guidance for the maintainer.. what shall he/she do? include a patch? Just upgrade?>
 
 References
 ==========
-{%- for reference in references %}
-{{ reference -}}
+{% for reference in references %}
+{{ reference }}
 {%- endfor -%}

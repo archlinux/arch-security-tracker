@@ -21,9 +21,18 @@ def get_bug_data(cves, pkgs, group):
     map(lambda issue: references.extend(
         [ref for ref in multiline_to_list(issue.reference) if ref not in references]), cves)
 
-    bug_desc = render_template('bug.txt', cves=cves, group=group, references=references)
+    severity_sorted_issues = sorted(cves, key=lambda issue: issue.issue_type)
+    severity_sorted_issues = sorted(severity_sorted_issues, key=lambda issue: issue.severity)
+    unique_issue_types = []
+    for issue in severity_sorted_issues:
+        if issue.issue_type not in unique_issue_types:
+            unique_issue_types.append(issue.issue_type)
+
+    bug_desc = render_template('bug.txt', cves=cves, group=group, references=references,
+                               pkgs=pkgs, unique_issue_types=unique_issue_types)
     pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
-    summary = '[{}] [Security] <Short description>'.format(pkg_str)
+    group_type = 'multiple issues' if len(unique_issue_types) > 1 else unique_issue_types[0]
+    summary = '[{}] [Security] {} ({})'.format(pkg_str, group_type, ' '.join([cve.id for cve in cves]))
 
     # 5: critical, 4: high, 3: medium, 2: low, 1: very low.
     severitiy_mapping = {
