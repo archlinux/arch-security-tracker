@@ -38,13 +38,13 @@
 					</tr>
 					<tr>
 						<td>Ticket</td>
-					        {%- if group.detail.bug_ticket %}
-                                                    <td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
-                                                {%- elif group.detail.status == "Vulnerable" %}
-						    <td><a class='button button-table button-primary' href="https://bugs.archlinux.org/newtask?{{ bug_data | urlencode }}">Create</a></td>
-					        {%- else %}
-						    <td>None</td>
-					        {%- endif %}
+							{%- if group.detail.bug_ticket %}
+						<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
+							{%- elif group.detail.status == "Vulnerable" %}
+						<td><a class='button button-table button-primary' href="https://bugs.archlinux.org/newtask?{{ bug_data | urlencode }}">Create</a></td>
+							{%- else %}
+						<td>None</td>
+							{%- endif %}
 					</tr>
 					<tr>
 						<td>Created</td>
