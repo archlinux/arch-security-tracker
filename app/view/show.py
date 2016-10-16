@@ -18,8 +18,8 @@ def get_bug_data(cves, pkgs, group):
     # TODO: add backreference to AVG tracker page
     references = [ref for ref in multiline_to_list(group.reference)
                   if ref not in references]
-    map(lambda issue: references.extend(
-        [ref for ref in multiline_to_list(issue.reference) if ref not in references]), cves)
+    list(map(lambda issue: references.extend(
+        [ref for ref in multiline_to_list(issue.reference) if ref not in references]), cves))
 
     severity_sorted_issues = sorted(cves, key=lambda issue: issue.issue_type)
     severity_sorted_issues = sorted(severity_sorted_issues, key=lambda issue: issue.severity)
@@ -235,8 +235,8 @@ def show_advisory(advisory_id, raw=False):
         references.append('https://bugs.archlinux.org/task/{}'.format(group.bug_ticket))
     references.extend([ref for ref in multiline_to_list(group.reference)
                        if ref not in references])
-    map(lambda issue: references.extend(
-        [ref for ref in multiline_to_list(issue.reference) if ref not in references]), issues)
+    list(map(lambda issue: references.extend(
+        [ref for ref in multiline_to_list(issue.reference) if ref not in references]), issues))
 
     raw_asa = render_template('advisory.txt',
                               advisory=advisory,
