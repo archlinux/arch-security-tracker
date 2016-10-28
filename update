@@ -44,32 +44,70 @@ def recalc_group_severity():
 
 
 def update_package_cache():
+    print('    --> Querying alpm database...')
     packages = search('', filter_duplicate_packages=False, sort_results=False)
 
-    print('    --> Collecting pkgbase...')
     pkgbases = {}
-    arch_packages = defaultdict(list)
+    packages_by_arch = defaultdict(list)
+    packages_by_name_db_arch = {}
+    packages_by_name = defaultdict(list)
 
     # assign packages per arch list (unify any into 64bit)
     for package in packages:
         arch = package.arch if package.arch != 'any' else primary_arch
-        if package.name not in arch_packages[arch]:
-            arch_packages[arch].append(package.name)
+        if package.name not in packages_by_arch[arch]:
+            packages_by_arch[arch].append(package.name)
+        packages_by_name_db_arch['{}_{}_{}'.format(
+            package.name, package.db.name, package.arch)] = package
+        packages_by_name[package.name].append(package)
 
+    print('    --> Collecting pkgbases...')
     # query all pkgbases per arch
     for arch in archs:
         cmd = ['expac', '-S', '--config', get_configpath(arch), '%n %e']
-        cmd.extend(arch_packages[arch])
+        cmd.extend(packages_by_arch[arch])
         bases = check_output(cmd).decode().split('\n')[:-1]
         for base in bases:
-            data = base.split(' ')
-            pkgbases[data[0]] = data[1] if data[1] != '(null)' else data[0]
+            pkgname, pkgbase = (base.split(' '))
+            pkgbases[pkgname] = pkgbase if pkgbase != '(null)' else pkgname
 
-    print('    --> Deleting old entries...')
-    Package.query.delete()
-    print('    --> Inserting new entries...')
-    for package in packages:
-        db_package = Package()
+    # build up different lookup dicts for fast fetching of incremental changes
+    db_packages = Package.query.all()
+    db.session.commit()
+    db_packages_obsolete = [pkg.name for pkg in db_packages if pkg.name not in packages_by_name]
+    db_packages = [pkg for pkg in db_packages if pkg.name not in db_packages_obsolete]
+    db_packages_by_name_db_arch = {}
+    for package in db_packages:
+        db_packages_by_name_db_arch['{}_{}_{}'.format(
+               package.name, package.database, package.arch)] = package
+
+    print('    --> Deleting obsolete packages...')
+    if len(db_packages_obsolete) > 0:
+        Package.query.filter(Package.name.in_(db_packages_obsolete)).all()
+        db.session.commit()
+
+    print('    --> Deleting obsolete variants...')
+    for key, db_package in db_packages_by_name_db_arch.items():
+        # delete if the database and arch variant does not exist anymore
+        if key not in packages_by_name_db_arch:
+            db.session.delete(db_package)
+    db.session.commit()
+
+    print('    --> Updating package variants...')
+    for key, package in packages_by_name_db_arch.items():
+        new_package = False
+        # old database and arch variant exists, use it to update the lines
+        if key in db_packages_by_name_db_arch:
+            db_package = db_packages_by_name_db_arch[key]
+            # skip entry if it has the same version as the database entry
+            if db_package.version == package.version:
+                continue
+        # database and arch variant is new, insert it as new entry
+        else:
+            db_package = Package()
+            new_package = True
+
+        # assign database properties
         db_package.name = package.name
         db_package.base = pkgbases[package.name]
         db_package.version = package.version
@@ -81,9 +119,10 @@ def update_package_cache():
         db_package.md5sum = package.md5sum
         db_package.sha256sum = package.sha256sum
         db_package.builddate = package.builddate
-        db.session.add(db_package)
-    db.session.commit()
 
+        if new_package:
+            db.session.add(db_package)
+        db.session.commit()
 
 def db_vacuum():
     db.session.execute('VACUUM')
