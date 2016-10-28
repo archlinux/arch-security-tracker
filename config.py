@@ -1,12 +1,33 @@
-from os import path
-basedir = path.abspath(path.dirname(__file__))
+from os.path import abspath, dirname
+from configparser import ConfigParser
+from glob import glob
 
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + path.join(basedir, 'app.db')
-SQLALCHEMY_MIGRATE_REPO = path.join(basedir, 'db_repository')
-SQLALCHEMY_ECHO = False
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+basedir = abspath(dirname(__file__))
 
-CSRF_ENABLED = True
-SECRET_KEY = 'changeme_iddqd'
+config = ConfigParser()
+config_files = sorted(glob('{}/config/*.conf'.format(basedir)))
+for config_file in config_files:
+    config.read(config_file)
 
-PACMAN_HANDLE_CACHE_TIME = 2 * 60
+config_tracker = config['tracker']
+TRACKER_ADVISORY_URL = config_tracker['advisory_url']
+TRACKER_BUGTRACKER_URL = config_tracker['bugtracker_url']
+
+config_sqlite = config['sqlite']
+SQLITE_JOURNAL_MODE = config_sqlite['journal_mode']
+SQLITE_TEMP_STORE = config_sqlite['temp_store']
+SQLITE_SYNCHRONOUS = config_sqlite['synchronous']
+SQLITE_MMAP_SIZE = config_sqlite.getint('mmap_size')
+
+config_sqlalchemy = config['sqlalchemy']
+SQLALCHEMY_DATABASE_URI = config_sqlalchemy['database_uri'].replace('{{BASEDIR}}', basedir)
+SQLALCHEMY_MIGRATE_REPO = config_sqlalchemy['migrate_repo'].replace('{{BASEDIR}}', basedir)
+SQLALCHEMY_ECHO = config_sqlalchemy.getboolean('echo')
+SQLALCHEMY_TRACK_MODIFICATIONS = config_sqlalchemy.getboolean('track_modifications')
+
+config_flask = config['flask']
+CSRF_ENABLED = config_flask.getboolean('csrf')
+SECRET_KEY = config_flask['secret_key']
+
+config_pacman = config['pacman']
+PACMAN_HANDLE_CACHE_TIME = config_pacman.getint('handle_cache_time')

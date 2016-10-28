@@ -5,15 +5,16 @@ from werkzeug.routing import BaseConverter
 from types import MethodType
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+from config import SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE
 
 
 @event.listens_for(Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
-    cursor.execute('PRAGMA temp_store = MEMORY')
-    cursor.execute('PRAGMA journal_mode = WAL')
-    cursor.execute('PRAGMA synchronous=NORMAL')
-    cursor.execute('PRAGMA mmap_size=268435456;')
+    cursor.execute('PRAGMA temp_store = {}'.format(SQLITE_TEMP_STORE))
+    cursor.execute('PRAGMA journal_mode = {}'.format(SQLITE_JOURNAL_MODE))
+    cursor.execute('PRAGMA synchronous = {}'.format(SQLITE_SYNCHRONOUS))
+    cursor.execute('PRAGMA mmap_size = {}'.format(SQLITE_MMAP_SIZE))
     cursor.close()
 
 app = Flask(__name__)
