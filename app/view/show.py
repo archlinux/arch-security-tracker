@@ -1,5 +1,6 @@
 from flask import render_template
 from sqlalchemy import and_
+from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
 from app.model.enum import Publication, Status, Remote
@@ -220,7 +221,7 @@ def show_advisory(advisory_id, raw=False):
     remote = any([issue.remote is Remote.remote for issue in issues])
     issues_listing_formatted = (('\n{}'.format(' ' * len('CVE-ID  : ')))
                                 .join(list(map(' '.join, chunks([issue.id for issue in issues], 4)))))
-    link = 'https://wiki.archlinux.org/index.php/CVE'
+    link = TRACKER_ADVISORY_URL.format(advisory.id, group.id)
     upstream_released = group.affected.split('-')[0] != group.fixed.split('-')[0]
     upstream_version = group.fixed.split('-')[0]
     if ':' in upstream_version:
@@ -232,7 +233,7 @@ def show_advisory(advisory_id, raw=False):
 
     references = []
     if group.bug_ticket:
-        references.append('https://bugs.archlinux.org/task/{}'.format(group.bug_ticket))
+        references.append(TRACKER_BUGTRACKER_URL.format(group.bug_ticket))
     references.extend([ref for ref in multiline_to_list(group.reference)
                        if ref not in references])
     list(map(lambda issue: references.extend(
