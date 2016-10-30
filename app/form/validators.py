@@ -3,8 +3,29 @@ from app.util import multiline_to_list
 from app.model.cvegroup import pkgname_regex
 from app.model.cve import cve_id_regex
 from app.model import Package
+from app.model.advisory import advisory_regex
+from app.advisory import advisory_fetch_from_mailman
 from app import db
-from re import match
+from re import match, search
+
+
+class ValidAdvisoryReference(object):
+    def __call__(self, form, field):
+        if not field.data:
+            return
+
+        form.advisory_content = advisory_fetch_from_mailman(field.data)
+        if not form.advisory_content:
+            raise ValidationError('Failed to fetch advisory')
+
+        print(advisory_regex[1:-1])
+        m = search(advisory_regex[1:-1], form.advisory_content)
+        if not m:
+            raise ValidationError('Failed to fetch advisory')
+
+        found = m.group(1)
+        if found != form.advisory_id:
+            raise ValidationError('Advisory mismatched: {}'.format(found))
 
 
 class ValidPackageName(object):

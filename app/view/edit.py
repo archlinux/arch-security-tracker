@@ -8,7 +8,7 @@ from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
 from app.view.error import not_found
-from app.view.advisory import get_advisory_from_mailman, extend_advisory_model_from_advisory
+from app.advisory import advisory_extend_model_from_advisory_text
 from app.util import multiline_to_list
 from sqlalchemy import func
 from itertools import chain
@@ -21,7 +21,7 @@ def edit_advisory(advisory_id):
     if not advisory:
         return not_found()
 
-    form = AdvisoryEditForm()
+    form = AdvisoryEditForm(advisory.id)
     if not form.is_submitted():
         form.workaround.data = advisory.workaround
         form.impact.data = advisory.impact
@@ -35,8 +35,8 @@ def edit_advisory(advisory_id):
     advisory.impact = form.impact.data
     advisory.workaround = form.workaround.data
     if advisory.reference != form.reference.data:
-        advisory.content = get_advisory_from_mailman(form.reference.data)
-        extend_advisory_model_from_advisory(advisory)
+        advisory.content = form.advisory_content
+        advisory_extend_model_from_advisory_text(advisory)
     advisory.reference = form.reference.data
     db.session.commit()
 
