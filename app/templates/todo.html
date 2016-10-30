@@ -32,10 +32,7 @@ Yippie!</pre>
 						<td>{{ colorize_severity(group.severity) }}</td>
 						<td>{{ advisory.advisory_type }}</td>
 						<td class="no-padding">
-							<form action="/{{ advisory.id }}/publish" method="post" name="publish">
-								{{ publish_form.hidden_tag() }}
-								{{ publish_form.submit(class_='button button-table button-primary', id='submit_' + advisory.id)|safe }}
-							</form>
+							<a href="{{ advisory.id }}/publish" class="button button-table button-primary">publish</a>
 						</td>
 					</tr>
 				</tbody>
@@ -71,6 +68,35 @@ Yippie!</pre>
 						<td>{{ bug_ticket(group.bug_ticket) }}</td>
 						<td class="no-padding">
 							<a href="{{ group.name }}" class="button button-table button-primary">schedule</a>
+						</td>
+					</tr>
+				</tbody>
+				{%- endfor %}
+			</table>
+			{%- endif %}
+			{%- if entries.incomplete_advisories %}
+			<h2>Incomplete advisories</h2>
+			<table class="styled-table medium size">
+				<thead>
+					<tr>
+						<th>Advisory</th>
+						<th>Group</th>
+						<th>Package</th>
+						<th>Severity</th>
+						<th class="full size">Type</th>
+						<th class="center collapse size">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for advisory, package, group in entries.incomplete_advisories %}
+					<tr>
+						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
+						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+						<td><a href="/package/{{ package.pkgname }}" class="no-wrap">{{ package.pkgname }}</a></td>
+						<td>{{ colorize_severity(group.severity) }}</td>
+						<td>{{ advisory.advisory_type }}</td>
+						<td class="no-padding">
+							<a href="{{ advisory.id }}/edit" class="button button-table button-primary">edit</a>
 						</td>
 					</tr>
 				</tbody>

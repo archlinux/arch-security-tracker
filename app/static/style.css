@@ -99,6 +99,10 @@ hr {
   margin: 10px 0;
 }
 
+.monospaced {
+  font-family: monospace;
+}
+
 a {
   text-decoration: none;
 }
@@ -208,6 +212,10 @@ table.column-major tr td:first-child {
 
 .tiny.size {
   max-width: 20em;
+}
+
+.extra-height {
+  min-height: 260px;
 }
 
 form {

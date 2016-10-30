@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, redirect
 from sqlalchemy import and_
 from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL
 from app import app, db
@@ -10,6 +10,7 @@ from app.model.advisory import advisory_regex
 from app.model.package import filter_duplicate_packages, sort_packages
 from app.form.advisory import AdvisoryForm
 from app.view.error import not_found
+from app.view.advisory import extend_advisory_html
 from app.util import chunks, multiline_to_list
 from collections import defaultdict
 
@@ -191,11 +192,33 @@ def show_package(pkgname):
                            package=package)
 
 
+def render_html_advisory(advisory, package, raw_asa, generated):
+    return render_template('advisory.html',
+                           title='{}'.format(advisory.id),
+                           advisory=advisory,
+                           package=package,
+                           raw_asa=raw_asa,
+                           generated=generated)
+
+
 @app.route('/advisory/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
 @app.route('/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
 def show_advisory_raw(advisory_id):
     result = show_advisory(advisory_id, raw=True)
     if isinstance(result, tuple):
+        return result
+    if not isinstance(result, str):
+        return result
+    return result, 200, {'Content-Type': 'text/plain; charset=utf-8'}
+
+
+@app.route('/advisory/<regex("{}"):advisory_id>/generate/raw'.format(advisory_regex[1:-1]), methods=['GET'])
+@app.route('/<regex("{}"):advisory_id>/generate/raw'.format(advisory_regex[1:-1]), methods=['GET'])
+def show_generated_advisory_raw(advisory_id):
+    result = show_generated_advisory(advisory_id, raw=True)
+    if isinstance(result, tuple):
+        return result
+    if not isinstance(result, str):
         return result
     return result, 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
@@ -203,6 +226,32 @@ def show_advisory_raw(advisory_id):
 @app.route('/advisory/<regex("{}"):advisory_id>'.format(advisory_regex[1:]), methods=['GET'])
 @app.route('/<regex("{}"):advisory_id>'.format(advisory_regex[1:]), methods=['GET'])
 def show_advisory(advisory_id, raw=False):
+    entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage, CVE)
+               .filter(Advisory.id == advisory_id)
+               .join(CVEGroupPackage).join(CVEGroup).join(CVEGroupEntry).join(CVE)
+               .order_by(CVE.id)
+               ).all()
+    if not entries:
+        return not_found()
+
+    advisory = entries[0][0]
+    package = entries[0][2]
+    issues = [issue for (advisory, group, package, issue) in entries]
+
+    if not advisory.content:
+        if raw:
+            return redirect('/{}/generate/raw'.format(advisory_id))
+        return redirect('/{}/generate'.format(advisory_id))
+
+    if raw:
+        return advisory.content
+    asa = extend_advisory_html(advisory.content, issues, package)
+    return render_html_advisory(advisory=advisory, package=package, raw_asa=asa, generated=False)
+
+
+@app.route('/advisory/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
+@app.route('/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
+def show_generated_advisory(advisory_id, raw=False):
     entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage, CVE)
                .filter(Advisory.id == advisory_id)
                .join(CVEGroupPackage).join(CVEGroup).join(CVEGroupEntry).join(CVE)
@@ -247,6 +296,8 @@ def show_advisory(advisory_id, raw=False):
                               remote=remote,
                               issues_listing_formatted=issues_listing_formatted,
                               link=link,
+                              workaround=advisory.workaround,
+                              impact=advisory.impact,
                               upstream_released=upstream_released,
                               upstream_version=upstream_version,
                               unique_issue_types=unique_issue_types,
@@ -255,13 +306,5 @@ def show_advisory(advisory_id, raw=False):
         return raw_asa
 
     raw_asa = '\n'.join(raw_asa.split('\n')[2:])
-    for issue in issues:
-        raw_asa = raw_asa.replace(' {}'.format(issue.id), ' <a href="/{0}">{0}</a>'.format(issue.id))
-    raw_asa = raw_asa.replace(' {}'.format(package.pkgname), ' <a href="/package/{0}">{0}</a>'.format(package.pkgname))
-    raw_asa = raw_asa.replace('"{}'.format(package.pkgname), '"<a href="/package/{0}">{0}</a>'.format(package.pkgname))
-
-    return render_template('advisory.html',
-                           title='{}'.format(advisory_id),
-                           advisory=advisory,
-                           package=package,
-                           raw_asa=raw_asa)
+    raw_asa = extend_advisory_html(raw_asa, issues, package)
+    return render_html_advisory(advisory=advisory, package=package, raw_asa=raw_asa, generated=True)

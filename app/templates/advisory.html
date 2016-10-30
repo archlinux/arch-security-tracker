@@ -1,6 +1,14 @@
 {%- extends "base.html" -%}
 {% block content %}
-			<h1>{{ advisory.id }} <a href="/{{  advisory.id }}/raw">raw</a></h1>
+			<h1>{{ advisory.id }}
+				<a href="/{{  advisory.id }}/edit">edit</a>
+				{% if not generated -%}
+					<a href="/{{  advisory.id }}/generate">generated</a>
+				{%- elif advisory.content -%}
+					<a href="/{{  advisory.id }}">original</a>
+				{%- endif %}
+				<a href="/{{  advisory.id }}/{% if generated %}generate/{% endif %}raw">raw</a>
+			</h1>
 			<table class="styled-table full size">
 				<thead>
 					<tr>

@@ -44,7 +44,16 @@ The problem{% if issues|length > 1 %}s have{% else %} has{% endif %} been fixed 
 Workaround
 ==========
 
+{% if workaround %}
+{%- set splitted = workaround.split('\n') %}
+{%- for line in splitted %}
+	{{- line|wordwrap(71) }}
+	{%- if not loop.last %}
+{% endif %}
+{%- endfor %}
+{%- else -%}
 None.
+{%- endif %}
 
 Description
 ===========
@@ -67,7 +76,7 @@ Description
 Impact
 ======
 
-{{ impact }}
+{% if impact %}{{ impact|wordwrap(71) }}{% endif %}
 
 References
 ==========

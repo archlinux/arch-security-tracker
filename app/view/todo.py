@@ -1,11 +1,11 @@
 from flask import render_template
 from app import app, db
 from app.model import CVE, CVEGroup, CVEGroupPackage, Advisory, Package
-from app.form.advisory import AdvisoryPublishForm
+from app.form.advisory import AdvisoryEditForm
 from app.model.enum import Status, Remote, Severity, Publication
 from app.model.package import filter_duplicate_packages
 from app.symbol import smileys_happy
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, and_
 from pyalpm import vercmp
 from random import randint
 from collections import defaultdict
@@ -15,6 +15,15 @@ from operator import attrgetter
 
 @app.route('/todo', methods=['GET'])
 def todo():
+    incomplete_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
+                             .join(CVEGroupPackage).join(CVEGroup)
+                             .filter(and_(
+                                 Advisory.publication == Publication.published,
+                                 or_(Advisory.content == '', Advisory.content.is_(None),
+                                     Advisory.reference == '', Advisory.reference.is_(None))))
+                             .group_by(CVEGroupPackage.id)
+                             .order_by(Advisory.created.desc())).all()
+
     scheduled_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
                             .join(CVEGroupPackage).join(CVEGroup)
                             .filter(Advisory.publication == Publication.scheduled)
@@ -67,6 +76,7 @@ def todo():
 
     entries = {
         'scheduled_advisories': scheduled_advisories,
+        'incomplete_advisories': incomplete_advisories,
         'unhandled_advisories': unhandled_advisories,
         'unknown_issues': unknown_issues,
         'bumped_groups': bumped_groups
@@ -74,5 +84,5 @@ def todo():
     return render_template('todo.html',
                            title='Todo Lists',
                            entries=entries,
-                           publish_form=AdvisoryPublishForm(),
+                           advisory_edit_form=AdvisoryEditForm(),
                            smiley=smileys_happy[randint(0, len(smileys_happy) - 1)])
