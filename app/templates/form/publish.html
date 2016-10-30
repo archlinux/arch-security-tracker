@@ -1,0 +1,15 @@
+{%- extends "base.html" -%}
+{% block content %}
+			<h1>{{ title }}</h1>
+			<div class="wide size">
+				<form action="" method="post" name="publish-advisory">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<div class="two-thirds column">
+							{{ render_field(form.reference, class='full size', maxlength=Advisory.REFERENCE_LENGTH, placeholder='External reference...', autofocus='', required='', indent=7) }}
+						</div>
+					</div>
+					{{ form.submit(class='button-primary') }}
+				</form>
+			</div>
+{%- endblock %}

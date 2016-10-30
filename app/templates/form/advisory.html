@@ -1,0 +1,25 @@
+{%- extends "base.html" -%}
+{% block content %}
+			<h1>{{ title }}</h1>
+			<div class="wide size">
+				<form action="" method="post" name="edit-advisory">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<div class="two-thirds column">
+							{{ render_field(form.reference, class='full size', maxlength=Advisory.REFERENCE_LENGTH, placeholder='External reference...', autofocus='', indent=7) }}
+						</div>
+					</div>
+					<div class="row">
+						<div class="two-thirds column">
+							{{ render_field(form.workaround, class='full size', maxlength=Advisory.WORKAROUND_LENGTH, placeholder='Optional workaround...', indent=7) }}
+						</div>
+					</div>
+					<div class="row">
+						<div class="two-thirds column">
+							{{ render_field(form.impact, class='full size', maxlength=Advisory.IMPACT_LENGTH, placeholder='Overall impact...', indent=7) }}
+						</div>
+					</div>
+					{{ form.edit(class='button-primary') }}
+				</form>
+			</div>
+{%- endblock %}

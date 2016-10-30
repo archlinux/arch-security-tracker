@@ -15,10 +15,12 @@ vulnerability details and generating security advisories.
 
 ## Dependencies
 
+* python >= 3.4
 * python-flask
 * python-sqlalchemy
 * python-flask-sqlalchemy
 * python-flask-wtf
+* python-requests
 * pyalpm
 * sqlite
 * expac
