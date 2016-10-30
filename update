@@ -46,83 +46,43 @@ def recalc_group_severity():
 def update_package_cache():
     print('    --> Querying alpm database...')
     packages = search('', filter_duplicate_packages=False, sort_results=False)
-
     pkgbases = {}
-    packages_by_arch = defaultdict(list)
-    packages_by_name_db_arch = {}
-    packages_by_name = defaultdict(list)
-
+    packages_by_arch = defaultdict(set)
     # assign packages per arch list (unify any into 64bit)
     for package in packages:
         arch = package.arch if package.arch != 'any' else primary_arch
-        if package.name not in packages_by_arch[arch]:
-            packages_by_arch[arch].append(package.name)
-        packages_by_name_db_arch['{}_{}_{}'.format(
-            package.name, package.db.name, package.arch)] = package
-        packages_by_name[package.name].append(package)
+        packages_by_arch[arch].add(package.name)
 
     print('    --> Collecting pkgbases...')
     # query all pkgbases per arch
     for arch in archs:
         cmd = ['expac', '-S', '--config', get_configpath(arch), '%n %e']
-        cmd.extend(packages_by_arch[arch])
+        cmd.extend(list(packages_by_arch[arch]))
         bases = check_output(cmd).decode().split('\n')[:-1]
         for base in bases:
             pkgname, pkgbase = (base.split(' '))
             pkgbases[pkgname] = pkgbase if pkgbase != '(null)' else pkgname
 
-    # build up different lookup dicts for fast fetching of incremental changes
-    db_packages = Package.query.all()
-    db.session.commit()
-    db_packages_obsolete = [pkg.name for pkg in db_packages if pkg.name not in packages_by_name]
-    db_packages = [pkg for pkg in db_packages if pkg.name not in db_packages_obsolete]
-    db_packages_by_name_db_arch = {}
-    for package in db_packages:
-        db_packages_by_name_db_arch['{}_{}_{}'.format(
-               package.name, package.database, package.arch)] = package
-
-    print('    --> Deleting obsolete packages...')
-    if len(db_packages_obsolete) > 0:
-        Package.query.filter(Package.name.in_(db_packages_obsolete)).all()
-        db.session.commit()
-
-    print('    --> Deleting obsolete variants...')
-    for key, db_package in db_packages_by_name_db_arch.items():
-        # delete if the database and arch variant does not exist anymore
-        if key not in packages_by_name_db_arch:
-            db.session.delete(db_package)
+    print('    --> Updating database cache...')
+    new_packages = []
+    for package in packages:
+        new_packages.append({
+            'name': package.name,
+            'base': pkgbases[package.name],
+            'version': package.version,
+            'description': package.desc,
+            'url': package.url,
+            'arch': package.arch,
+            'database': package.db.name,
+            'filename': package.filename,
+            'md5sum': package.md5sum,
+            'sha256sum': package.sha256sum,
+            'builddate': package.builddate
+        })
+    Package.query.delete()
+    db.session.bulk_insert_mappings(Package, new_packages)
     db.session.commit()
 
-    print('    --> Updating package variants...')
-    for key, package in packages_by_name_db_arch.items():
-        new_package = False
-        # old database and arch variant exists, use it to update the lines
-        if key in db_packages_by_name_db_arch:
-            db_package = db_packages_by_name_db_arch[key]
-            # skip entry if it has the same version as the database entry
-            if db_package.version == package.version:
-                continue
-        # database and arch variant is new, insert it as new entry
-        else:
-            db_package = Package()
-            new_package = True
-
-        # assign database properties
-        db_package.name = package.name
-        db_package.base = pkgbases[package.name]
-        db_package.version = package.version
-        db_package.description = package.desc
-        db_package.url = package.url
-        db_package.arch = package.arch
-        db_package.database = package.db.name
-        db_package.filename = package.filename
-        db_package.md5sum = package.md5sum
-        db_package.sha256sum = package.sha256sum
-        db_package.builddate = package.builddate
-
-        if new_package:
-            db.session.add(db_package)
-        db.session.commit()
 
 def db_vacuum():
     db.session.execute('VACUUM')
