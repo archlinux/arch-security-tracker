@@ -5,7 +5,7 @@ from werkzeug.routing import BaseConverter
 from types import MethodType
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
-from config import SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE
+from config import SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE, SQLITE_CACHE_SIZE
 
 
 @event.listens_for(Engine, 'connect')
@@ -15,6 +15,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute('PRAGMA journal_mode = {}'.format(SQLITE_JOURNAL_MODE))
     cursor.execute('PRAGMA synchronous = {}'.format(SQLITE_SYNCHRONOUS))
     cursor.execute('PRAGMA mmap_size = {}'.format(SQLITE_MMAP_SIZE))
+    cursor.execute('PRAGMA cache_size = {}'.format(SQLITE_CACHE_SIZE))
     cursor.close()
 
 app = Flask(__name__)

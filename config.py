@@ -18,6 +18,7 @@ SQLITE_JOURNAL_MODE = config_sqlite['journal_mode']
 SQLITE_TEMP_STORE = config_sqlite['temp_store']
 SQLITE_SYNCHRONOUS = config_sqlite['synchronous']
 SQLITE_MMAP_SIZE = config_sqlite.getint('mmap_size')
+SQLITE_CACHE_SIZE = config_sqlite.getint('cache_size')
 
 config_sqlalchemy = config['sqlalchemy']
 SQLALCHEMY_DATABASE_URI = config_sqlalchemy['database_uri'].replace('{{BASEDIR}}', basedir)
