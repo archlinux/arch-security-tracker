@@ -30,6 +30,9 @@ SQLALCHEMY_TRACK_MODIFICATIONS = config_sqlalchemy.getboolean('track_modificatio
 config_flask = config['flask']
 CSRF_ENABLED = config_flask.getboolean('csrf')
 SECRET_KEY = config_flask['secret_key']
+FLASK_HOST = config_flask['host']
+FLASK_PORT = config_flask.getint('port')
+FLASK_DEBUG = config_flask.getboolean('debug')
 
 config_pacman = config['pacman']
 PACMAN_HANDLE_CACHE_TIME = config_pacman.getint('handle_cache_time')
