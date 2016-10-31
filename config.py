@@ -12,6 +12,7 @@ for config_file in config_files:
 config_tracker = config['tracker']
 TRACKER_ADVISORY_URL = config_tracker['advisory_url']
 TRACKER_BUGTRACKER_URL = config_tracker['bugtracker_url']
+TRACKER_MAILMAN_URL = config_tracker['mailman_url']
 
 config_sqlite = config['sqlite']
 SQLITE_JOURNAL_MODE = config_sqlite['journal_mode']

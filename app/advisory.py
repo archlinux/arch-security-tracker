@@ -1,6 +1,8 @@
-from re import sub
+from config import TRACKER_MAILMAN_URL
+from re import sub, search
 from requests import get
 from html import unescape
+from datetime import date
 
 
 def advisory_fetch_from_mailman(url):
@@ -14,6 +16,27 @@ def advisory_fetch_from_mailman(url):
         end = '\n-------------- next part --------------'
         asa = asa[asa.index(start_marker) + len(start):asa.index(end)]
         return asa.strip()
+    except Exception:
+        return None
+
+
+def advisory_fetch_reference_url_from_mailman(advisory):
+    try:
+        year = advisory.id[4:8]
+        month = advisory.id[8:10]
+        publish_date = date(int(year), int(month), 1)
+        mailman_url = '{}{}-{}/'.format(TRACKER_MAILMAN_URL, year, publish_date.strftime('%B'))
+        response = get(mailman_url)
+        if 200 != response.status_code:
+            return None
+        for line in response.text.split('\n'):
+            if not '[{}]'.format(advisory.id) in line:
+                continue
+            match = search('HREF="(\d+.html)"', line)
+            if not match:
+                continue
+            return '{}{}'.format(mailman_url, match.group(1))
+        return None
     except Exception:
         return None
 

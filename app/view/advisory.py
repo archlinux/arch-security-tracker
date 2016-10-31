@@ -4,10 +4,9 @@ from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
 from app.model.enum import Publication
-from app.form.advisory import AdvisoryPublishForm
 from app.view.error import not_found
-from app.advisory import advisory_extend_model_from_advisory_text
-from app.form.advisory import AdvisoryForm
+from app.advisory import advisory_extend_model_from_advisory_text, advisory_fetch_reference_url_from_mailman
+from app.form.advisory import AdvisoryForm, AdvisoryPublishForm
 from collections import OrderedDict
 from sqlalchemy import and_
 from datetime import datetime
@@ -112,6 +111,8 @@ def publish_advisory(asa):
     form = AdvisoryPublishForm(advisory.id)
     if not form.is_submitted():
         form.reference.data = advisory.reference
+        if not advisory.reference:
+            form.reference.data = advisory_fetch_reference_url_from_mailman(advisory)
     if not form.validate_on_submit():
         return render_template('form/publish.html',
                                title='Publish {}'.format(advisory.id),
