@@ -192,9 +192,9 @@ def show_package(pkgname):
                            package=package)
 
 
-def render_html_advisory(advisory, package, raw_asa, generated):
+def render_html_advisory(advisory, package, group, raw_asa, generated):
     return render_template('advisory.html',
-                           title='{}'.format(advisory.id),
+                           title='[{}] {}: {}'.format(advisory.id, package.pkgname, advisory.advisory_type),
                            advisory=advisory,
                            package=package,
                            raw_asa=raw_asa,
@@ -235,6 +235,7 @@ def show_advisory(advisory_id, raw=False):
         return not_found()
 
     advisory = entries[0][0]
+    group = entries[0][1]
     package = entries[0][2]
     issues = [issue for (advisory, group, package, issue) in entries]
 
@@ -246,7 +247,7 @@ def show_advisory(advisory_id, raw=False):
     if raw:
         return advisory.content
     asa = advisory_extend_html(advisory.content, issues, package)
-    return render_html_advisory(advisory=advisory, package=package, raw_asa=asa, generated=False)
+    return render_html_advisory(advisory=advisory, package=package, group=group, raw_asa=asa, generated=False)
 
 
 @app.route('/advisory/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
@@ -307,4 +308,4 @@ def show_generated_advisory(advisory_id, raw=False):
 
     raw_asa = '\n'.join(raw_asa.split('\n')[2:])
     raw_asa = advisory_extend_html(raw_asa, issues, package)
-    return render_html_advisory(advisory=advisory, package=package, raw_asa=raw_asa, generated=True)
+    return render_html_advisory(advisory=advisory, package=package, group=group, raw_asa=raw_asa, generated=True)
