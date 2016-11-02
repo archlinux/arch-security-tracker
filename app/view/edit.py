@@ -3,12 +3,12 @@ from app import app, db
 from app.form import CVEForm, GroupForm
 from app.form.advisory import AdvisoryEditForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
-from app.model.enum import Remote, Severity, Affected, Status, status_to_affected, affected_to_status, highest_severity
+from app.model.enum import Remote, Severity, Affected, Status, Publication, status_to_affected, affected_to_status, highest_severity
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
 from app.view.error import not_found
-from app.advisory import advisory_extend_model_from_advisory_text
+from app.advisory import advisory_extend_model_from_advisory_text, advisory_fetch_reference_url_from_mailman
 from app.util import multiline_to_list
 from sqlalchemy import func
 from itertools import chain
@@ -26,6 +26,8 @@ def edit_advisory(advisory_id):
         form.workaround.data = advisory.workaround
         form.impact.data = advisory.impact
         form.reference.data = advisory.reference
+        if not advisory.reference and Publication.published == advisory.publication:
+            form.reference.data = advisory_fetch_reference_url_from_mailman(advisory)
     if not form.validate_on_submit():
         return render_template('form/advisory.html',
                                title='Edit {}'.format(advisory.id),
