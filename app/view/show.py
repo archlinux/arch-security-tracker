@@ -272,8 +272,8 @@ def show_generated_advisory(advisory_id, raw=False):
     issues_listing_formatted = (('\n{}'.format(' ' * len('CVE-ID  : ')))
                                 .join(list(map(' '.join, chunks([issue.id for issue in issues], 4)))))
     link = TRACKER_ADVISORY_URL.format(advisory.id, group.id)
-    upstream_released = group.affected.split('-')[0] != group.fixed.split('-')[0]
-    upstream_version = group.fixed.split('-')[0]
+    upstream_released = group.affected.split('-')[0].split('+')[0] != group.fixed.split('-')[0].split('+')[0]
+    upstream_version = group.fixed.split('-')[0].split('+')[0]
     if ':' in upstream_version:
         upstream_version = upstream_version[upstream_version.index(':') + 1:]
     unique_issue_types = []
