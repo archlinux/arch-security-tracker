@@ -11,5 +11,5 @@ def login():
               (form.username.data, str(form.remember_me.data)))
         return redirect('/index')
     return render_template('login.html',
-                           title='Sign In',
+                           title='Login',
                            form=form)

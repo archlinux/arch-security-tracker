@@ -1,0 +1,26 @@
+{%- extends "base.html" -%}
+{% block content %}
+			<h1>Create User</h1>
+			<div class="medium size">
+				<form action="" method="post" name="create_user">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<div class="one-half column">
+							{{ render_field(form.username, class='full size', maxlength=User.NAME_LENGTH, placeholder='Username', autofocus='', required='', indent=7) }}
+						</div>
+						<div class="one-half column">
+							{{ render_field(form.email, class='full size', maxlength=User.EMAIL_LENGTH, placeholder='E-Mail', required='', indent=7) }}
+						</div>
+					</div>
+					<div class="row">
+						<div class="one-half column">
+							{{ render_field(form.password, class='full size', placeholder='Password (optional)', indent=7) }}
+						</div>
+						<div class="one-half column">
+							{{ render_field(form.role, class='full size', required='', indent=7) }}
+						</div>
+					</div>
+					{{ form.create(class='button-primary') }}
+				</form>
+			</div>
+{%- endblock %}
