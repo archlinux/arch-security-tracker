@@ -1,5 +1,6 @@
 from .base import BaseForm
-from app.model.user import User, UserRole
+from app.model.user import User
+from app.model.enum import UserRole
 from wtforms import StringField, SelectField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Optional, Length, Email
 from wtforms.fields.html5 import EmailField

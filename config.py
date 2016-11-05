@@ -33,6 +33,7 @@ SECRET_KEY = config_flask['secret_key']
 FLASK_HOST = config_flask['host']
 FLASK_PORT = config_flask.getint('port')
 FLASK_DEBUG = config_flask.getboolean('debug')
+FLASK_SESSION_PROTECTION = None if 'none' == config_flask['session_protection'] else config_flask['session_protection']
 
 config_pacman = config['pacman']
 PACMAN_HANDLE_CACHE_TIME = config_pacman.getint('handle_cache_time')

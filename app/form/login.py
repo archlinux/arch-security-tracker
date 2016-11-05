@@ -12,6 +12,7 @@ class LoginForm(BaseForm):
     login = SubmitField(u'login')
 
     def validate(self):
+        self.user = None
         rv = BaseForm.validate(self)
         if not rv:
             return False
@@ -25,4 +26,7 @@ class LoginForm(BaseForm):
             return fail()
         if user.password != hash_password(self.password.data, user.salt):
             return fail()
+        if not user.active:
+            self.username.errors.append('Account is disabled.')
+        self.user = user
         return True

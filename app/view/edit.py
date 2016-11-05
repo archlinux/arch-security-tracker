@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
+from app.user import security_team_required, reporter_required
 from app.form import CVEForm, GroupForm
 from app.form.advisory import AdvisoryEditForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
@@ -16,6 +17,7 @@ from collections import defaultdict
 
 
 @app.route('/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
+@security_team_required
 def edit_advisory(advisory_id):
     advisory = db.get(Advisory, id=advisory_id)
     if not advisory:
@@ -47,6 +49,7 @@ def edit_advisory(advisory_id):
 
 
 @app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+@reporter_required
 def edit_cve(cve):
     cve = db.get(CVE, id=cve)
     if not cve:
@@ -96,6 +99,7 @@ def edit_cve(cve):
 
 
 @app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
+@reporter_required
 def edit_group(avg):
     group_id = avg.replace('AVG-', '')
     group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '))
