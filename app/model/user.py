@@ -1,12 +1,5 @@
-from datetime import datetime
 from app import db
-from .enum import OrderedDatabaseEnum
-
-
-class UserRole(OrderedDatabaseEnum):
-    administrator = 'Administrator', 1
-    security_team = 'Security Team', 2
-    reporter = 'Reporter', 3
+from .enum import UserRole
 
 
 class User(db.Model):
@@ -24,6 +17,17 @@ class User(db.Model):
     salt = db.Column(db.String(SALT_LENGTH), nullable=False)
     password = db.Column(db.String(SALT_LENGTH), nullable=False)
     role = db.Column(UserRole.as_type(), nullable=False, default=UserRole.reporter)
+    active = db.Column(db.Boolean(), nullable=False, default=True)
+
+    is_authenticated = False
+    is_anonymous = False
+
+    @property
+    def is_active(self):
+        return self.active
+
+    def get_id(self):
+        return "{}".format(self.id)
 
     def __str__(self):
         return self.name

@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
+from app.user import reporter_required
 from app.form import CVEForm, GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
 from app.model.enum import Remote, Status, Severity, Affected, affected_to_status, highest_severity
@@ -7,6 +8,7 @@ from app.util import multiline_to_list
 
 
 @app.route('/CVE/add', methods=['GET', 'POST'])
+@reporter_required
 def add_cve():
     form = CVEForm()
     if not form.validate_on_submit():
@@ -33,6 +35,7 @@ def add_cve():
 
 
 @app.route('/AVG/add', methods=['GET', 'POST'])
+@reporter_required
 def add_group():
     form = GroupForm()
     if not form.validate_on_submit():

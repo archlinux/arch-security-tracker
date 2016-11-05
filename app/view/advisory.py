@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
+from app.user import security_team_required
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
@@ -46,6 +47,7 @@ def advisory():
 
 @app.route('/group/<regex("{}"):avg>/schedule'.format(vulnerability_group_regex[1:-1]), methods=['PUT', 'POST'])
 @app.route('/<regex("{}"):avg>/schedule'.format(vulnerability_group_regex[1:-1]), methods=['PUT', 'POST'])
+@security_team_required
 def schedule_advisory(avg):
     avg_id = avg.replace('AVG-', '')
     form = AdvisoryForm()
@@ -98,6 +100,7 @@ def schedule_advisory(avg):
 
 @app.route('/advisory/<regex("{}"):avg>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST', 'GET'])
 @app.route('/<regex("{}"):asa>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST', 'GET'])
+@security_team_required
 def publish_advisory(asa):
     advisory = (db.session.query(Advisory)
                 .filter(Advisory.id == asa)

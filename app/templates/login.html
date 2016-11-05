@@ -6,7 +6,7 @@
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="single columns">
-							{{ render_field(form.username, class='full size', placeholder='Username', autofocus='', required='', indent=7) }}
+							{{ render_field(form.username, class='full size', maxlength=User.NAME_LENGTH, placeholder='Username', autofocus='', required='', indent=7) }}
 						</div>
 					</div>
 					<div class="row">

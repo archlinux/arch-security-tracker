@@ -22,9 +22,13 @@
 					<li><a href="/">issues</a></li>
 					<li><a href="/advisory">advisories</a></li>
 					<li><a href="/todo">todo</a></li>
+					{%- if not current_user.is_authenticated %}
+					<li><a href="/login">login</a></li>
+					{%- else %}
 					<li><a href="/CVE/add">add CVE</a></li>
 					<li><a href="/AVG/add">add AVG</a></li>
-					<li><a href="/login">login</a></li>
+					<li><a href="/logout">logout</a></li>
+					{%- endif -%}
 				</ul>
 			</div>
 			<hr />

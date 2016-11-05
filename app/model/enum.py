@@ -83,7 +83,7 @@ class Status(OrderedDatabaseEnum):
     not_affected = 'Not affected', 4
 
     def open(self):
-        return self in (Status.unknown, Status.vulnerable, Status.testing)
+        return self in [Status.unknown, Status.vulnerable, Status.testing]
 
     def resolved(self):
         return not self.open()
@@ -112,6 +112,21 @@ class Affected(OrderedDatabaseEnum):
 class Publication(OrderedDatabaseEnum):
     scheduled = 'Scheduled', 1
     published = 'Published', 2
+
+
+class UserRole(OrderedDatabaseEnum):
+    administrator = 'Administrator', 1
+    security_team = 'Security Team', 2
+    reporter = 'Reporter', 3
+
+    def is_reporter(self):
+        return self in [UserRole.reporter, UserRole.security_team, UserRole.administrator]
+
+    def is_security_team(self):
+        return self in [UserRole.security_team, UserRole.administrator]
+
+    def is_administrator(self):
+        return self in [UserRole.administrator]
 
 
 def status_to_affected(status):

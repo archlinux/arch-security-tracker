@@ -1,11 +1,12 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql.expression import ClauseElement
+from flask_login import LoginManager
 from werkzeug.routing import BaseConverter
 from types import MethodType
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
-from config import SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE, SQLITE_CACHE_SIZE
+from sqlalchemy.sql.expression import ClauseElement
+from config import SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE, SQLITE_CACHE_SIZE, FLASK_SESSION_PROTECTION
 
 
 @event.listens_for(Engine, 'connect')
@@ -21,6 +22,11 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.session_protection = FLASK_SESSION_PROTECTION
+login_manager.login_view = 'login'
 
 
 class RegexConverter(BaseConverter):

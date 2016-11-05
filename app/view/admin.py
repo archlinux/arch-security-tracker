@@ -1,11 +1,13 @@
 from flask import render_template, redirect, flash
 from app import app, db
+from app.user import administrator_required
 from app.form.admin import CreateUserForm
 from app.model.user import User
 from app.user import gen_salt, hash_password
 
 
 @app.route('/admin/user/create', methods=['GET', 'POST'])
+@administrator_required
 def create_user():
     form = CreateUserForm()
     if not form.validate_on_submit():
