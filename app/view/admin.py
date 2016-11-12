@@ -3,7 +3,7 @@ from app import app, db
 from app.user import administrator_required
 from app.form.admin import CreateUserForm
 from app.model.user import User
-from app.user import gen_salt, hash_password
+from app.user import random_string, hash_password
 
 
 @app.route('/admin/user/create', methods=['GET', 'POST'])
@@ -16,8 +16,8 @@ def create_user():
                                form=form,
                                User=User)
 
-    password = gen_salt() if not form.password.data else form.password.data
-    salt = gen_salt()
+    password = random_string() if not form.password.data else form.password.data
+    salt = random_string()
     user = db.create(User, name=form.username.data,
                      email=form.email.data, salt=salt,
                      password=hash_password(password, salt))
