@@ -8,7 +8,7 @@ from base64 import b85encode
 from os import urandom
 
 
-def gen_salt(length=16):
+def random_string(length=16):
     salt = b85encode(urandom(length))
     return salt.decode()
 
