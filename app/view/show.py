@@ -143,6 +143,7 @@ def show_group(avg):
                            title='{}'.format(group.name),
                            bug_data=get_bug_data(cves, pkgs, group),
                            group=out,
+                           Status=Status,
                            advisory_pending=advisory_pending,
                            form=advisory_form)
 
