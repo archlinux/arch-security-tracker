@@ -70,7 +70,7 @@ def advisory_extend_html(advisory, issues, package):
     for issue in issues:
         advisory = advisory.replace(' {}'.format(issue.id), ' <a href="/{0}">{0}</a>'.format(issue.id))
     advisory = advisory.replace(' {}'.format(package.pkgname), ' <a href="/package/{0}">{0}</a>'.format(package.pkgname))
-    advisory = advisory.replace('"{}'.format(package.pkgname), '"<a href="/package/{0}">{0}</a>'.format(package.pkgname))
+    advisory = advisory.replace(';{}'.format(package.pkgname), ';<a href="/package/{0}">{0}</a>'.format(package.pkgname))
     return advisory
 
 
