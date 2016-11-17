@@ -17,6 +17,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute('PRAGMA synchronous = {}'.format(SQLITE_SYNCHRONOUS))
     cursor.execute('PRAGMA mmap_size = {}'.format(SQLITE_MMAP_SIZE))
     cursor.execute('PRAGMA cache_size = {}'.format(SQLITE_CACHE_SIZE))
+    cursor.execute('PRAGMA foreign_keys = ON')
     cursor.close()
 
 app = Flask(__name__)
