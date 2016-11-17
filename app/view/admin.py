@@ -3,6 +3,7 @@ from app import app, db
 from app.user import administrator_required
 from app.form.admin import CreateUserForm
 from app.model.user import User
+from app.model.enum import UserRole
 from app.user import random_string, hash_password
 
 
@@ -18,9 +19,12 @@ def create_user():
 
     password = random_string() if not form.password.data else form.password.data
     salt = random_string()
-    user = db.create(User, name=form.username.data,
-                     email=form.email.data, salt=salt,
-                     password=hash_password(password, salt))
+    user = db.create(User,
+                     name=form.username.data,
+                     email=form.email.data,
+                     salt=salt,
+                     password=hash_password(password, salt),
+                     role=UserRole.fromstring(form.role.data))
     db.session.commit()
 
     flash('Created {} with password: {}'.format(user.name, password))
