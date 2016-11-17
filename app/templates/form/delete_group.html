@@ -1,0 +1,39 @@
+{%- extends "base.html" -%}
+{% block content %}
+			<h1>{% if heading %}{{ heading }}{% else %}Confirm{% endif %}</h1>
+			<div class="short size">
+				<form action="" method="post" name="confirm">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<div class="single column">
+							Are you sure you want to delete <a href="/{{ group }}">{{ group }}</a>?<br />
+							<br />
+							<table class="styled-table column-major full size">
+								<tbody>
+									<tr>
+										<td>Packages</td>
+										<td class="full size wrap">
+										{%- for pkg in packages %}
+											<span class="no-wrap"><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
+										{%- endfor %}
+										</td>
+									</tr>
+									<tr>
+										<td>Issues</td>
+										<td class="full size wrap">
+										{%- for issue in issues %}
+											<span class="no-wrap"><a href="/{{ issue.id }}">{{ issue.id }}</a>{% if not loop.last %}, {% endif %}</span>
+										{%- endfor %}
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<div class="row">
+						{{ form.confirm(class='button-primary') }}
+						{{ form.abort(class='button-primary') }}
+					</div>
+				</form>
+			</div>
+{%- endblock %}

@@ -3,7 +3,7 @@ from app import db
 
 class CVEGroupPackage(db.Model):
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
-    group_id = db.Column(db.Integer(), db.ForeignKey('cve_group.id'), nullable=False)
+    group_id = db.Column(db.Integer(), db.ForeignKey('cve_group.id', ondelete="CASCADE"), nullable=False)
     pkgname = db.Column(db.String(64), nullable=False)
 
     group = db.relationship("CVEGroup")

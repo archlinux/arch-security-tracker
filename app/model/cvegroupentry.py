@@ -3,8 +3,8 @@ from app import db
 
 class CVEGroupEntry(db.Model):
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
-    group_id = db.Column(db.Integer(), db.ForeignKey('cve_group.id'), nullable=False)
-    cve_id = db.Column(db.String(15), db.ForeignKey('cve.id'), nullable=False)
+    group_id = db.Column(db.Integer(), db.ForeignKey('cve_group.id', ondelete="CASCADE"), nullable=False)
+    cve_id = db.Column(db.String(15), db.ForeignKey('cve.id', ondelete="CASCADE"), nullable=False)
 
     group = db.relationship("CVEGroup")
     cve = db.relationship("CVE")

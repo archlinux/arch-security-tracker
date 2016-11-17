@@ -1,6 +1,7 @@
 from .add import *
 from .edit import *
 from .show import *
+from .delete import *
 
 from .index import *
 from .login import *

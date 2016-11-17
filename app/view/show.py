@@ -101,7 +101,7 @@ def show_group(avg):
                .filter(CVEGroup.id == avg_id)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                .outerjoin(Package, Package.name == CVEGroupPackage.pkgname)
-               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id))
+               .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                ).all()
     if not entries:
         return not_found()

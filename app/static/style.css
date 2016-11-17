@@ -206,6 +206,10 @@ table.column-major tr td:first-child {
   max-width: 70em;
 }
 
+.short.size {
+  max-width: 50em;
+}
+
 .small.size {
   max-width: 30em;
 }
