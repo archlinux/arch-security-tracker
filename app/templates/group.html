@@ -55,6 +55,7 @@
 					{%- if advisory_pending %}
 					<tr>
 						<td>Advisory</td>
+						{%- if can_handle_advisory %}
 						<td>
 							<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="schedule">
 								{{ form.hidden_tag() }}
@@ -62,6 +63,9 @@
 								{{ form.submit(class='button button-table button-primary') }}
 							</form>
 						</td>
+						{%- else %}
+						<td>Pending</td>
+						{%- endif %}
 					</tr>
 					{%- endif %}
 				</tbody>

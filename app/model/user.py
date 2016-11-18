@@ -44,3 +44,6 @@ class Guest(User):
         self.is_anonymous = True
         self.is_authenticated = False
         self.role = UserRole.guest
+
+    def get_id(self):
+        return None

@@ -8,6 +8,9 @@ from base64 import b85encode
 from os import urandom
 
 
+login_manager.anonymous_user = Guest
+
+
 def random_string(length=16):
     salt = b85encode(urandom(length))
     return salt.decode()
@@ -76,3 +79,7 @@ def user_can_edit_group(advisories):
 
 def user_can_delete_group(advisories):
     return user_can_delete_issue(advisories)
+
+
+def user_can_handle_advisory():
+    return current_user.role.is_security_team

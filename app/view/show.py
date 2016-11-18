@@ -2,7 +2,7 @@ from flask import render_template, redirect
 from sqlalchemy import and_
 from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL
 from app import app, db
-from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group
+from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group, user_can_handle_advisory
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
 from app.model.enum import Publication, Status, Remote
 from app.model.cve import cve_id_regex
@@ -151,7 +151,8 @@ def show_group(avg):
                            advisory_pending=advisory_pending,
                            form=advisory_form,
                            can_edit=user_can_edit_group(advisories),
-                           can_delete=user_can_delete_group(advisories))
+                           can_delete=user_can_delete_group(advisories),
+                           can_handle_advisory=user_can_handle_advisory())
 
 
 @app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
@@ -206,7 +207,8 @@ def render_html_advisory(advisory, package, group, raw_asa, generated):
                            advisory=advisory,
                            package=package,
                            raw_asa=raw_asa,
-                           generated=generated)
+                           generated=generated,
+                           can_handle_advisory=user_can_handle_advisory())
 
 
 @app.route('/advisory/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])

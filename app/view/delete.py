@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.user import security_team_required, user_can_delete_group, user_can_delete_issue
+from app.user import reporter_required, user_can_delete_group, user_can_delete_issue
 from app.form.confirm import ConfirmForm
 from app.model import CVEGroup, CVE, CVEGroupPackage, CVEGroupEntry, Advisory
 from app.model.cvegroup import vulnerability_group_regex
@@ -11,7 +11,7 @@ from collections import defaultdict
 
 @app.route('/group/<regex("{}"):avg>/delete'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
 @app.route('/<regex("{}"):avg>/delete'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
-@security_team_required
+@reporter_required
 def delete_group(avg):
     avg_id = avg.replace('AVG-', '')
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
@@ -61,7 +61,7 @@ def delete_group(avg):
 
 @app.route('/issue/<regex("{}"):issue>/delete'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
 @app.route('/<regex("{}"):issue>/delete'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
-@security_team_required
+@reporter_required
 def delete_issue(issue):
     entries = (db.session.query(CVE, CVEGroup, CVEGroupPackage, Advisory)
                .filter(CVE.id == issue)

@@ -1,5 +1,6 @@
 from flask import render_template
 from app import app, db
+from app.user import user_can_handle_advisory
 from app.model import CVE, CVEGroup, CVEGroupPackage, Advisory, Package
 from app.model.enum import Status, Remote, Severity, Publication
 from app.model.package import filter_duplicate_packages
@@ -83,4 +84,5 @@ def todo():
     return render_template('todo.html',
                            title='Todo Lists',
                            entries=entries,
-                           smiley=smileys_happy[randint(0, len(smileys_happy) - 1)])
+                           smiley=smileys_happy[randint(0, len(smileys_happy) - 1)],
+                           can_handle_advisory=user_can_handle_advisory())
