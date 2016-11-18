@@ -62,7 +62,7 @@ Description
 {%- if issues|length > 1 %}- {{issue.id}} ({{ issue.issue_type }})
 
 {% endif %}
-{%- set splitted = issue.description.split('\n') %}
+{%- set splitted = '' if not issue.description else issue.description.split('\n') %}
 {%- for line in splitted %}
 	{{- line|wordwrap(71) }}
 	{%- if not loop.last %}

@@ -1,7 +1,9 @@
 {%- extends "base.html" -%}
 {% block content %}
 			<h1>{{ advisory.id }}
+				{%- if can_handle_advisory %}
 				<a href="/{{  advisory.id }}/edit">edit</a>
+				{%- endif %}
 				{% if not generated -%}
 					<a href="/{{  advisory.id }}/generate">generated</a>
 				{%- elif advisory.content -%}

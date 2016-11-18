@@ -20,7 +20,9 @@ Yippie!</pre>
 						<th>Package</th>
 						<th>Severity</th>
 						<th class="full size">Type</th>
+						{%- if can_handle_advisory %}
 						<th class="center collapse size">Action</th>
+						{%- endif %}
 					</tr>
 				</thead>
 				<tbody>
@@ -31,9 +33,9 @@ Yippie!</pre>
 						<td><a href="/package/{{ package.pkgname }}" class="no-wrap">{{ package.pkgname }}</a></td>
 						<td>{{ colorize_severity(group.severity) }}</td>
 						<td>{{ advisory.advisory_type }}</td>
-						<td class="no-padding">
-							<a href="{{ advisory.id }}/publish" class="button button-table button-primary">publish</a>
-						</td>
+						{%- if can_handle_advisory %}
+						<td class="no-padding"><a href="{{ advisory.id }}/publish" class="button button-table button-primary">publish</a></td>
+						{%- endif %}
 					</tr>
 				</tbody>
 				{%- endfor %}
@@ -50,7 +52,9 @@ Yippie!</pre>
 						<th>Affected</th>
 						<th>Fixed</th>
 						<th>Ticket</th>
+						{%- if can_handle_advisory %}
 						<th class="center collapse size">Action</th>
+						{%- endif %}
 					</tr>
 				</thead>
 				<tbody>
@@ -66,9 +70,9 @@ Yippie!</pre>
 						<td>{{ group.affected }}</td>
 						<td>{{ group.fixed }}</td>
 						<td>{{ bug_ticket(group.bug_ticket) }}</td>
-						<td class="no-padding">
-							<a href="{{ group.name }}" class="button button-table button-primary">schedule</a>
-						</td>
+						{%- if can_handle_advisory %}
+						<td class="no-padding"><a href="{{ group.name }}" class="button button-table button-primary">schedule</a></td>
+						{%- endif %}
 					</tr>
 				</tbody>
 				{%- endfor %}
@@ -84,7 +88,9 @@ Yippie!</pre>
 						<th>Package</th>
 						<th>Severity</th>
 						<th class="full size">Type</th>
+						{%- if can_handle_advisory %}
 						<th class="center collapse size">Action</th>
+						{%- endif %}
 					</tr>
 				</thead>
 				<tbody>
@@ -95,9 +101,9 @@ Yippie!</pre>
 						<td><a href="/package/{{ package.pkgname }}" class="no-wrap">{{ package.pkgname }}</a></td>
 						<td>{{ colorize_severity(group.severity) }}</td>
 						<td>{{ advisory.advisory_type }}</td>
-						<td class="no-padding">
-							<a href="{{ advisory.id }}/edit" class="button button-table button-primary">edit</a>
-						</td>
+						{%- if can_handle_advisory %}
+						<td class="no-padding"><a href="{{ advisory.id }}/edit" class="button button-table button-primary">edit</a></td>
+						{%- endif %}
 					</tr>
 				</tbody>
 				{%- endfor %}
