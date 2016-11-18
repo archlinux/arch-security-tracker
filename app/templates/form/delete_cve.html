@@ -1,0 +1,53 @@
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import colorize_severity, colorize_status, bug_ticket -%}
+{% block content %}
+			<h1>{% if heading %}{{ heading }}{% else %}Confirm{% endif %}</h1>
+			<div class="medium size">
+				<form action="" method="post" name="confirm">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						{%- if groups %}
+						<h2>References</h2>
+						<table class="styled-table full size">
+							<thead>
+								<tr>
+									<th>Group</th>
+									<th>Package</th>
+									<th>Severity</th>
+									<th>Status</th>
+									<th>Ticket</th>
+									<th class="full size">Issue</th>
+								</tr>
+							</thead>
+							<tbody>
+							{%- for group in groups %}
+								<tr>
+									<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
+									<td class="wrap">
+									{%- for pkgname in group_packages[group] %}
+										<span class="no-wrap"><a href="/package/{{ pkgname }}">{{ pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
+									{%- endfor %}
+									</td>
+									<td>{{ colorize_severity(group.severity) }}</td>
+									<td>{{ colorize_status(group.status) }}</td>
+									<td>{{ bug_ticket(group.bug_ticket) }}</td>
+									<td class="wrap">
+									{%- for group_issue in group_issues[group] %}
+										<span class="no-wrap"><a href="/{{ group_issue }}">{{ group_issue }}</a>{% if not loop.last %}, {% endif %}</span>
+									{%- endfor %}
+									</td>
+								</tr>
+							{%- endfor %}
+							</tbody>
+						</table>
+						{%- endif %}
+					</div>
+					<div class="row">
+						Are you sure you want to delete <a href="/{{ issue }}">{{ issue }}</a>?<br />
+						<br />
+						{{ form.confirm(class='button-primary') }}
+						{{ form.abort(class='button-primary') }}
+					</div>
+				</form>
+			</div>
+{%- endblock %}
