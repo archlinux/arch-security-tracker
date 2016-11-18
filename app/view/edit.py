@@ -16,6 +16,7 @@ from itertools import chain
 from collections import defaultdict
 
 
+@app.route('/advisory/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
 @app.route('/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
 @security_team_required
 def edit_advisory(advisory_id):
@@ -48,6 +49,8 @@ def edit_advisory(advisory_id):
     return redirect('/{}'.format(advisory.id))
 
 
+@app.route('/issue/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+@app.route('/cve/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
 @app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
 @reporter_required
 def edit_cve(cve):
@@ -98,6 +101,8 @@ def edit_cve(cve):
     return redirect('/{}'.format(cve.id))
 
 
+@app.route('/group/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
+@app.route('/avg/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
 @app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
 @reporter_required
 def edit_group(avg):

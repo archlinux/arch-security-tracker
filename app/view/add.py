@@ -7,7 +7,7 @@ from app.model.enum import Remote, Status, Severity, Affected, affected_to_statu
 from app.util import multiline_to_list
 
 
-@app.route('/CVE/add', methods=['GET', 'POST'])
+@app.route('/cve/add', methods=['GET', 'POST'])
 @reporter_required
 def add_cve():
     form = CVEForm()
@@ -34,7 +34,7 @@ def add_cve():
     return redirect('/{}'.format(cve.id))
 
 
-@app.route('/AVG/add', methods=['GET', 'POST'])
+@app.route('/avg/add', methods=['GET', 'POST'])
 @reporter_required
 def add_group():
     form = GroupForm()

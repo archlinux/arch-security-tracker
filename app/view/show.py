@@ -58,6 +58,7 @@ def get_bug_data(cves, pkgs, group):
 
 
 @app.route('/issue/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
+@app.route('/cve/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
 @app.route('/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
 def show_cve(cve):
     cve_model = CVE.query.get(cve)
@@ -94,6 +95,7 @@ def show_cve(cve):
 
 
 @app.route('/group/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
+@app.route('/avg/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
 @app.route('/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
 def show_group(avg):
     avg_id = avg.replace('AVG-', '')
