@@ -118,13 +118,21 @@ class UserRole(OrderedDatabaseEnum):
     administrator = 'Administrator', 1
     security_team = 'Security Team', 2
     reporter = 'Reporter', 3
+    guest = 'Guest', 4
 
+    @property
+    def is_guest(self):
+        return self == UserRole.guest
+
+    @property
     def is_reporter(self):
         return self in [UserRole.reporter, UserRole.security_team, UserRole.administrator]
 
+    @property
     def is_security_team(self):
         return self in [UserRole.security_team, UserRole.administrator]
 
+    @property
     def is_administrator(self):
         return self in [UserRole.administrator]
 

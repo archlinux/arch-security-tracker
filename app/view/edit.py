@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.user import security_team_required, reporter_required
+from app.user import security_team_required, reporter_required, user_can_edit_group, user_can_edit_issue
 from app.form import CVEForm, GroupForm
 from app.form.advisory import AdvisoryEditForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
@@ -8,7 +8,7 @@ from app.model.enum import Remote, Severity, Affected, Status, Publication, stat
 from app.model.cve import cve_id_regex
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
-from app.view.error import not_found
+from app.view.error import not_found, forbidden
 from app.advisory import advisory_extend_model_from_advisory_text, advisory_fetch_reference_url_from_mailman
 from app.util import multiline_to_list
 from sqlalchemy import func
@@ -54,9 +54,20 @@ def edit_advisory(advisory_id):
 @app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
 @reporter_required
 def edit_cve(cve):
-    cve = db.get(CVE, id=cve)
-    if not cve:
+    entries = (db.session.query(CVE, CVEGroup, Advisory)
+               .filter(CVE.id == cve)
+               .outerjoin(CVEGroupEntry).outerjoin(CVEGroup).outerjoin(CVEGroupPackage)
+               .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)).all()
+    if not entries:
         return not_found()
+
+    cve = entries[0][0]
+    groups = set(group for (cve, group, advisory) in entries if group)
+    advisories = set(advisory for (cve, group, advisory) in entries if advisory)
+
+    if not user_can_edit_issue(advisories):
+        return forbidden()
+
     form = CVEForm()
     if not form.is_submitted():
         form.cve.data = cve.id
@@ -82,12 +93,10 @@ def edit_cve(cve):
     cve.reference = form.reference.data
     cve.notes = form.notes.data
 
-    if severity_changed or True:
+    if severity_changed:
         # update cached group severity for all goups containing this issue
-        groups = (db.session.query(CVEGroupEntry, CVEGroup)
-                  .filter_by(cve=cve).join(CVEGroup)).all()
         issues = (db.session.query(CVEGroup, CVE)
-                  .filter(CVEGroup.id.in_([group.id for (entry, group) in groups]))
+                  .filter(CVEGroup.id.in_([group.id for group in groups]))
                   .join(CVEGroupEntry).join(CVE)
                   .group_by(CVEGroup.id).group_by(CVE.id)).all()
         group_severity = defaultdict(list)
@@ -107,17 +116,23 @@ def edit_cve(cve):
 @reporter_required
 def edit_group(avg):
     group_id = avg.replace('AVG-', '')
-    group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '))
+    group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '), Advisory)
                   .filter(CVEGroup.id == group_id)
                   .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                  .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                   .group_by(CVEGroup.id).group_by(CVE.id)
                   .order_by(CVE.id)).all()
     if not group_data:
         return not_found()
+
     group = group_data[0][0]
-    issues = [cve for (group, cve, pkg) in group_data]
+    issues = [cve for (group, cve, pkg, advisory) in group_data]
     issue_ids = [cve.id for cve in issues]
-    pkgnames = set(chain.from_iterable([pkg.split(' ') for (group, cve, pkg) in group_data]))
+    pkgnames = set(chain.from_iterable([pkg.split(' ') for (group, cve, pkg, advisory) in group_data]))
+    advisories = set(advisory for (group, cve, pkg, advisory) in group_data if advisory)
+
+    if not user_can_edit_group(advisories):
+        return forbidden()
 
     form = GroupForm()
     if not form.is_submitted():

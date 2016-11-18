@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.user import security_team_required
+from app.user import security_team_required, user_can_delete_group, user_can_delete_issue
 from app.form.confirm import ConfirmForm
 from app.model import CVEGroup, CVE, CVEGroupPackage, CVEGroupEntry, Advisory
 from app.model.cvegroup import vulnerability_group_regex
@@ -32,7 +32,7 @@ def delete_group(avg):
         if advisory:
             advisories.add(advisory)
 
-    if advisories:
+    if not user_can_delete_group(advisories):
         return forbidden()
 
     issues = sorted(issues, key=lambda item: item.id)
@@ -82,7 +82,7 @@ def delete_issue(issue):
         if advisory:
             advisories.add(advisory)
 
-    if advisories:
+    if not user_can_delete_issue(advisories):
         return forbidden()
 
     group_entries = (db.session.query(CVEGroup, CVE)
