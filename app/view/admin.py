@@ -7,12 +7,13 @@ from app.model.enum import UserRole
 from app.user import random_string, hash_password
 
 
+@app.route('/admin/user/new', methods=['GET', 'POST'])
 @app.route('/admin/user/create', methods=['GET', 'POST'])
 @administrator_required
 def create_user():
     form = CreateUserForm()
     if not form.validate_on_submit():
-        return render_template('form/create_user.html',
+        return render_template('admin/form/create_user.html',
                                title='Create User',
                                form=form,
                                User=User)
