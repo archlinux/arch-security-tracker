@@ -2,6 +2,7 @@ from flask import render_template, redirect
 from sqlalchemy import and_
 from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL
 from app import app, db
+from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
 from app.model.enum import Publication, Status, Remote
 from app.model.cve import cve_id_regex
@@ -68,8 +69,7 @@ def show_cve(cve):
     entries = (db.session.query(CVEGroupEntry, CVEGroup, CVEGroupPackage, Advisory)
                .filter_by(cve=cve_model)
                .join(CVEGroup).join(CVEGroupPackage)
-               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.publication == Publication.published))
+               .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
 
     group_packages = defaultdict(set)
@@ -91,7 +91,9 @@ def show_cve(cve):
                            issue=cve_model,
                            groups=groups,
                            group_packages=group_packages,
-                           advisories=advisories)
+                           advisories=advisories,
+                           can_edit=user_can_edit_issue(advisories),
+                           can_delete=user_can_delete_issue(advisories))
 
 
 @app.route('/group/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
@@ -147,7 +149,9 @@ def show_group(avg):
                            group=out,
                            Status=Status,
                            advisory_pending=advisory_pending,
-                           form=advisory_form)
+                           form=advisory_form,
+                           can_edit=user_can_edit_group(advisories),
+                           can_delete=user_can_delete_group(advisories))
 
 
 @app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])

@@ -34,3 +34,13 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User %r>' % (self.name)
+
+
+class Guest(User):
+    def __init__(self):
+        super().__init__()
+        self.name = 'Guest'
+        self.active = False
+        self.is_anonymous = True
+        self.is_authenticated = False
+        self.role = UserRole.guest
