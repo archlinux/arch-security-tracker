@@ -13,6 +13,7 @@ config_tracker = config['tracker']
 TRACKER_ADVISORY_URL = config_tracker['advisory_url']
 TRACKER_BUGTRACKER_URL = config_tracker['bugtracker_url']
 TRACKER_MAILMAN_URL = config_tracker['mailman_url']
+TRACKER_PASSWORD_LENGTH_MIN = config_tracker.getint('password_length_min')
 
 config_sqlite = config['sqlite']
 SQLITE_JOURNAL_MODE = config_sqlite['journal_mode']
