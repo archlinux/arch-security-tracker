@@ -29,12 +29,13 @@ def delete_group(avg):
         packages.add(pkg)
         if advisory:
             advisories.add(advisory)
-    issues = sorted(issues, key=lambda item: item.id)
-    packages = sorted(packages, key=lambda item: item.pkgname)
-    advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
 
     if advisories:
         return forbidden()
+
+    issues = sorted(issues, key=lambda item: item.id)
+    packages = sorted(packages, key=lambda item: item.pkgname)
+    advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
 
     form = ConfirmForm()
     title = 'Delete {}'.format(avg)
@@ -52,5 +53,5 @@ def delete_group(avg):
 
     db.session.delete(group)
     db.session.commit()
-    flash('Deleted {}'.format(group.name))
+    flash('Deleted {}'.format(group))
     return redirect('/')
