@@ -11,7 +11,7 @@
 					</div>
 					<div class="row">
 						<div class="single columns">
-							{{ render_field(form.password, class='full size', placeholder='Password', required='', indent=7) }}
+							{{ render_field(form.password, class='full size', placeholder='Password', required='', maxlength=password_length.max, indent=7) }}
 						</div>
 					</div>
 					{{ render_checkbox(form.remember_me, indent=5) }}

@@ -1,0 +1,34 @@
+{%- extends "base.html" -%}
+{% block content %}
+			<h1>{% if heading %}{{ heading }}{% else %}Confirm{% endif %}</h1>
+			<div class="small size">
+				<form action="" method="post" name="confirm">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<h2>Details</h2>
+						<table class="styled-table column-major full size">
+							<tbody>
+								<tr>
+									<td>E-Mail</td>
+									<td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
+								</tr>
+								<tr>
+									<td>Role</td>
+									<td>{{ user.role.label }}</td>
+								</tr>
+								<tr>
+									<td>Active</td>
+									<td><input name="active" type="checkbox" {% if user.active %} checked="checked"{% endif %} disabled="disabled" class="no-margin" /></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="row">
+						Are you sure you want to delete <a href="/user/{{ user.name }}/edit">{{ user.name }}</a>?<br />
+						<br />
+						{{ form.confirm(class='button-primary') }}
+						{{ form.abort(class='button-primary') }}
+					</div>
+				</form>
+			</div>
+{%- endblock %}

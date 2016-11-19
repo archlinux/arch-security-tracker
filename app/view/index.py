@@ -6,7 +6,6 @@ from collections import defaultdict
 from sqlalchemy import func, and_
 
 
-@app.route('/vulnerable', methods=['GET'])
 @app.route('/open', methods=['GET'])
 @app.route('/index/vulnerable', methods=['GET'])
 @app.route('/index/open', methods=['GET'])
@@ -14,14 +13,15 @@ from sqlalchemy import func, and_
 @app.route('/issue/open', methods=['GET'])
 @app.route('/issues/vulnerable', methods=['GET'])
 @app.route('/issues/open', methods=['GET'])
+@app.route('/vulnerable', methods=['GET'])
 def index_vulnerable():
     return index(only_vulnerable=True)
 
 
-@app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
 @app.route('/issue', methods=['GET'])
 @app.route('/issues', methods=['GET'])
+@app.route('/', methods=['GET'])
 def index(only_vulnerable=False):
     select = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '),
                                func.group_concat(Advisory.id, ' '))
