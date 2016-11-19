@@ -27,8 +27,11 @@
 					{%- else %}
 					<li><a href="/cve/add">add CVE</a></li>
 					<li><a href="/avg/add">add AVG</a></li>
+					{%- if current_user.role.is_administrator %}
+					<li><a href="/admin">admin</a></li>
+					{%- endif %}
 					<li><a href="/logout">logout</a></li>
-					{%- endif -%}
+					{%- endif %}
 				</ul>
 			</div>
 			<hr />

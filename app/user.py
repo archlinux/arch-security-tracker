@@ -1,3 +1,4 @@
+from config import TRACKER_PASSWORD_LENGTH_MIN
 from flask_login import current_user, login_required
 from app import login_manager
 from app.model.user import User, Guest
@@ -11,14 +12,14 @@ from os import urandom
 login_manager.anonymous_user = Guest
 
 
-def random_string(length=16):
+def random_string(length=TRACKER_PASSWORD_LENGTH_MIN):
     salt = b85encode(urandom(length))
     return salt.decode()
 
 
 def hash_password(password, salt):
-    hashed = b85encode(shash(password, salt))
-    return hashed.decode()
+    hashed = b85encode(shash(password, salt[:User.SALT_LENGTH]))
+    return hashed.decode()[:User.PASSWORD_LENGTH]
 
 
 @login_manager.user_loader

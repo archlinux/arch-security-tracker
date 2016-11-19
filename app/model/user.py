@@ -1,6 +1,8 @@
 from app import db
 from .enum import UserRole
 
+username_regex = r'^([\w]+)$'
+
 
 class User(db.Model):
 
@@ -39,6 +41,7 @@ class Guest(User):
     def __init__(self):
         super().__init__()
         self.name = 'Guest'
+        self.id = -42
         self.active = False
         self.is_anonymous = True
         self.is_authenticated = False

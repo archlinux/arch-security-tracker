@@ -1,6 +1,6 @@
 {%- extends "base.html" -%}
 {% block content %}
-			<h1>Create User</h1>
+			<h1>{{ title }}</h1>
 			<div class="medium size">
 				<form action="" method="post" name="create_user">
 					{{ form.hidden_tag() }}
@@ -14,13 +14,25 @@
 					</div>
 					<div class="row">
 						<div class="one-half column">
-							{{ render_field(form.password, class='full size', placeholder='Password (optional)', indent=7) }}
+							{{ render_field(form.password, class='full size', placeholder='Password (optional)', maxlength=password_length.max, indent=7) }}
 						</div>
 						<div class="one-half column">
 							{{ render_field(form.role, class='full size', required='', indent=7) }}
 						</div>
 					</div>
-					{{ form.create(class='button-primary') }}
+					<div class="row">
+						{%- if random_password %}
+						<div class="one-half column">
+							{{ render_checkbox(form.random_password, indent=7) }}
+						</div>
+						<div class="one-half column">
+						{% else %}
+						<div class="single column">
+						{% endif %}
+							{{ render_checkbox(form.active, indent=7) }}
+						</div>
+					</div>
+					{{ form.submit(class='button-primary') }}
 				</form>
 			</div>
 {%- endblock %}
