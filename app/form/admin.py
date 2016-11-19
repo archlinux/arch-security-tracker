@@ -1,4 +1,5 @@
 from .base import BaseForm
+from config import TRACKER_PASSWORD_LENGTH_MIN
 from app.model.user import User
 from app.model.enum import UserRole
 from wtforms import StringField, SelectField, PasswordField, SubmitField
@@ -10,7 +11,7 @@ from sqlalchemy import or_
 class CreateUserForm(BaseForm):
     username = StringField(u'Username', validators=[DataRequired(), Length(max=User.NAME_LENGTH)])
     email = EmailField(u'E-Mail', validators=[DataRequired(), Length(max=User.EMAIL_LENGTH), Email()])
-    password = PasswordField(u'Password', validators=[Optional(), Length(min=User.PASSWORD_MIN_LENGTH)])
+    password = PasswordField(u'Password', validators=[Optional(), Length(min=TRACKER_PASSWORD_LENGTH_MIN)])
     role = SelectField(u'Role', choices=[(e.name, e.label) for e in [*UserRole]], default=UserRole.reporter.name, validators=[DataRequired()])
     create = SubmitField(u'create')
 

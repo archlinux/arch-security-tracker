@@ -8,7 +8,6 @@ class User(db.Model):
     EMAIL_LENGTH = 128
     SALT_LENGTH = 20
     PASSWORD_LENGTH = 80
-    PASSWORD_MIN_LENGTH = 10
 
     __tablename__ = 'user'
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
