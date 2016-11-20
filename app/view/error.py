@@ -7,28 +7,30 @@ from binascii import hexlify
 from app.symbol import smileys_sad
 
 
-def handle_error(e, code):
+def handle_error(e, code, json=False):
+    if json:
+        return {'message': e}, code
     return render_template('error.html', smiley=smileys_sad[randint(0, len(smileys_sad) - 1)], text=e, title='{}'.format(code)), code
 
 
 @app.errorhandler(404)
-def not_found(e='404: Not Found'):
-    return handle_error(e, 404)
+def not_found(e='404: Not Found', json=False):
+    return handle_error(e, 404, json)
 
 
 @app.errorhandler(403)
-def forbidden(e='403: Forbidden'):
-    return handle_error(e, 403)
+def forbidden(e='403: Forbidden', json=False):
+    return handle_error(e, 403, json)
 
 
 @app.errorhandler(405)
-def method_not_allowed(e='405: Method Not Allowed'):
-    return handle_error(e, 405)
+def method_not_allowed(e='405: Method Not Allowed', json=False):
+    return handle_error(e, 405, json)
 
 
 @app.errorhandler(410)
-def gone(e='410: Gone'):
-    return handle_error(e, 410)
+def gone(e='410: Gone', json=False):
+    return handle_error(e, 410, json)
 
 
 @app.errorhandler(Exception)

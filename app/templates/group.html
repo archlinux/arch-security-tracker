@@ -1,48 +1,52 @@
 {%- extends "base.html" -%}
 {%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket -%}
 {% block content %}
-			<h1>{{ group.detail.name }}
-			{%- if can_edit %} <a href="/{{  group.detail.name }}/edit">edit</a>{% endif %}
-			{%- if can_delete %} <a href="/{{  group.detail.name }}/delete">delete</a>{% endif %}</h1>
+			<h1>{{ group.name }}
+			{%- if can_edit %} <a href="/{{  group.name }}/edit">edit</a>{% endif %}
+			{%- if can_delete %} <a href="/{{  group.name }}/delete">delete</a>{% endif %}</h1>
 			<table class="styled-table column-major full size">
 				<tbody>
 					<tr>
 						<td>Package</td>
 						<td class="full size wrap">
-						{%- for pkg in group.pkgs %}
+						{%- for pkg in packages %}
 							<span class="no-wrap"><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a>{% if not loop.last %}, {% endif %}</span>
 						{%- endfor %}
 						</td>
 					</tr>
 					<tr>
 						<td>Status</td>
-						<td>{{ colorize_status(group.detail.status) }}</td>
+						<td>{{ colorize_status(group.status) }}</td>
 					</tr>
 					<tr>
 						<td>Severity</td>
-						<td>{{ colorize_severity(group.detail.severity) }}</td>
+						<td>{{ colorize_severity(group.severity) }}</td>
+					</tr>
+					<tr>
+						<td>Type</td>
+						<td>{{ issue_type }}</td>
 					</tr>
 					<tr>
 						<td>Affected</td>
-						<td>{{ group.detail.affected }}</td>
+						<td>{{ group.affected }}</td>
 					</tr>
 					<tr>
 						<td>Fixed</td>
-						<td>{% if group.detail.fixed %}{{ group.detail.fixed }}{% elif group.detail.status != Status.not_affected %}{{ colorize_unknown('Unknown') }}{% else %}{{ Status.not_affected.label }}{% endif %}</td>
+						<td>{% if group.fixed %}{{ group.fixed }}{% elif group.status != Status.not_affected %}{{ colorize_unknown('Unknown') }}{% else %}{{ Status.not_affected.label }}{% endif %}</td>
 					</tr>
 					<tr>
 						<td>Current</td>
 						<td>
-						{%- for version in group.versions %}
+						{%- for version in versions %}
 							{{ version.version }} [{{ version.database }}]<br />
 						{%- endfor %}
 						</td>
 					</tr>
 					<tr>
 						<td>Ticket</td>
-							{%- if group.detail.bug_ticket %}
-						<td>{{ bug_ticket(group.detail.bug_ticket) }}</td>
-							{%- elif group.detail.status == "Vulnerable" %}
+							{%- if group.bug_ticket %}
+						<td>{{ bug_ticket(group.bug_ticket) }}</td>
+							{%- elif group.status == "Vulnerable" %}
 						<td><a class='button button-table button-primary' href="https://bugs.archlinux.org/newtask?{{ bug_data | urlencode }}">Create</a></td>
 							{%- else %}
 						<td>None</td>
@@ -50,14 +54,14 @@
 					</tr>
 					<tr>
 						<td>Created</td>
-						<td>{{ group.detail.created.strftime('%c') }}</td>
+						<td>{{ group.created.strftime('%c') }}</td>
 					</tr>
 					{%- if advisory_pending %}
 					<tr>
 						<td>Advisory</td>
 						{%- if can_handle_advisory %}
 						<td>
-							<form action="/AVG-{{ group.detail.id }}/schedule" method="post" name="schedule">
+							<form action="/AVG-{{ group.id }}/schedule" method="post" name="schedule">
 								{{ form.hidden_tag() }}
 								{{ form.advisory_type(class='no-margin input-compact') }}
 								{{ form.submit(class='button button-table button-primary') }}
@@ -81,7 +85,7 @@
 					</tr>
 				</thead>
 				<tbody>
-				{%- for cve in group.cves %}
+				{%- for cve in issues %}
 					<tr>
 						<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
 						<td>{{ colorize_severity(cve.severity) }}</td>
@@ -92,7 +96,7 @@
 				</tbody>
 				{%- endfor %}
 			</table>
-			{%- if group.advisories %}
+			{%- if advisories %}
 			<table class="styled-table full size">
 				<thead>
 					<tr>
@@ -103,7 +107,7 @@
 					</tr>
 				</thead>
 				<tbody>
-				{% for advisory in group.advisories %}
+				{% for advisory in advisories %}
 					<tr>
 						<td>{{ advisory.created.strftime('%d %b %Y') }}</td>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
@@ -114,7 +118,7 @@
 				{% endfor %}
 			</table>
 			{%- endif %}
-			{%- if group.detail.reference %}
+			{%- if group.reference %}
 			<table class="styled-table full size">
 				<thead>
 					<tr>
@@ -123,12 +127,12 @@
 				</thead>
 				<tbody>
 					<tr>
-						<td><pre>{{ group.detail.reference|urlize }}</pre></td>
+						<td><pre>{{ group.reference|urlize }}</pre></td>
 					</tr>
 				</tbody>
 			</table>
 			{%- endif %}
-			{%- if group.detail.notes %}
+			{%- if group.notes %}
 			<table class="styled-table full size">
 				<thead>
 					<tr>
@@ -137,7 +141,7 @@
 				</thead>
 				<tbody>
 					<tr>
-						<td><pre>{{ group.detail.notes|urlize }}</pre></td>
+						<td><pre>{{ group.notes|urlize }}</pre></td>
 					</tr>
 				</tbody>
 			</table>

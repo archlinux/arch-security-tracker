@@ -1,3 +1,7 @@
+from functools import wraps
+from flask import json
+
+
 def multiline_to_list(data, whitespace_separator=True, unique_only=True, filter_empty=True):
     if not data:
         return []
@@ -50,3 +54,15 @@ def chunks(l, n):
     """Yield successive n-sized chunks from l."""
     for i in range(0, len(l), n):
         yield l[i:i + n]
+
+
+def json_response(func):
+    @wraps(func)
+    def wrapped(*args, **kwargs):
+        response = func(*args, **kwargs)
+        code = 200
+        if isinstance(response, tuple):
+            response, code = response
+        dump = json.dumps(response, indent=2, sort_keys=False)
+        return dump, code, {'Content-Type': 'application/json; charset=utf-8'}
+    return wrapped
