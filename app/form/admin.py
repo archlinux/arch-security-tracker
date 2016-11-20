@@ -33,7 +33,8 @@ class UserForm(BaseForm):
         if self.edit:
             return True
 
-        user = User.query.filter(or_(User.name == self.username.data, User.email == self.email.data)).first()
+        user = User.query.filter(or_(User.name == self.username.data,
+                                     User.email == self.email.data)).first()
         if not user:
             return True
         if user.name == self.username.data:
