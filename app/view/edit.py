@@ -32,6 +32,8 @@ def edit_advisory(advisory_id):
         if not advisory.reference and Publication.published == advisory.publication:
             form.reference.data = advisory_fetch_reference_url_from_mailman(advisory)
     if not form.validate_on_submit():
+        if advisory.reference:
+            flash('WARNING: This advisory is already published!', 'warning')
         return render_template('form/advisory.html',
                                title='Edit {}'.format(advisory.id),
                                Advisory=Advisory,
@@ -78,6 +80,8 @@ def edit_cve(cve):
         form.reference.data = cve.reference
         form.notes.data = cve.notes
     if not form.validate_on_submit():
+        if advisories:
+            flash('WARNING: This is referenced by an already published advisory!', 'warning')
         return render_template('form/cve.html',
                                title='Edit {}'.format(cve),
                                form=form,
@@ -147,6 +151,8 @@ def edit_group(avg):
 
         form.cve.data = "\n".join(issue_ids)
     if not form.validate_on_submit():
+        if advisories:
+            flash('WARNING: This is referenced by an already published advisory!', 'warning')
         return render_template('form/group.html',
                                title='Edit {}'.format(avg),
                                form=form,
