@@ -34,6 +34,6 @@ class LoginForm(BaseForm):
             return fail()
         if not user.active:
             self.username.errors.append('Account is disabled.')
-            return fail()
+            return False
         self.user = user
         return True

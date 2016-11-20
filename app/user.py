@@ -1,6 +1,7 @@
 from config import TRACKER_PASSWORD_LENGTH_MIN
 from flask_login import current_user, login_required
-from app import login_manager
+from sqlalchemy.exc import IntegrityError
+from app import login_manager, db
 from app.model.user import User, Guest
 from app.view.error import forbidden
 from functools import wraps
@@ -23,8 +24,11 @@ def hash_password(password, salt):
 
 
 @login_manager.user_loader
-def load_user(user_id):
-    user = User.query.filter(User.id == int(user_id)).first()
+def load_user(session_token):
+    if not session_token:
+        return Guest()
+
+    user = User.query.filter_by(token=session_token).first()
     if not user:
         return Guest()
     user.is_authenticated = True
@@ -84,3 +88,33 @@ def user_can_delete_group(advisories):
 
 def user_can_handle_advisory():
     return current_user.role.is_security_team
+
+
+def user_invalidate(user):
+    user.token = None
+    user.is_authenticated = False
+
+
+def user_assign_new_token(user, max_tries=32):
+    def assign_token(token):
+        user.token = token
+        return user
+    return user_generate_new_token(assign_token, max_tries)
+
+
+def user_generate_new_token(callback, max_tries=32):
+    failed = 0
+    while failed < max_tries:
+        try:
+            token = random_string(User.TOKEN_LENGTH)
+            token_owners = User.query.filter_by(token=token).count()
+            if 0 != token_owners:
+                failed += 1
+                continue
+            user = callback(token)
+            db.session.commit()
+            return user
+        except IntegrityError:
+            db.session.rollback()
+            failed += 1
+    raise Exception('Failed to obtain unique token within {} tries'.format(max_tries))

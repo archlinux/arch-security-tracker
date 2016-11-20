@@ -1,7 +1,7 @@
 from flask import render_template, redirect, flash
 from flask_login import current_user
 from app import app, db
-from app.user import administrator_required, random_string, hash_password
+from app.user import administrator_required, random_string, hash_password, user_invalidate
 from app.form.admin import UserForm
 from app.form.confirm import ConfirmForm
 from app.model.user import User, Guest, username_regex
@@ -48,6 +48,7 @@ def create_user():
 
     password = random_string() if not form.password.data else form.password.data
     salt = random_string()
+
     user = db.create(User,
                      name=form.username.data,
                      email=form.email.data,
@@ -100,6 +101,7 @@ def edit_user(username):
         user.salt = random_string()
         user.password = hash_password(form.password.data, user.salt)
     user.active = form.active.data
+    user_invalidate(user)
     db.session.commit()
 
     flash_password = ''
@@ -132,6 +134,7 @@ def delete_user(username):
     if user.id == current_user.id and 1 >= active_admins:
         return forbidden()
 
+    user_invalidate(user)
     db.session.delete(user)
     db.session.commit()
     flash('Deleted user {}'.format(user.name))
