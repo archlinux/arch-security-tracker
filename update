@@ -1,13 +1,18 @@
 #!/usr/bin/env python
+from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
 from app.pacman import update as update_pacman_db, search, get_configpath, archs, primary_arch
 from app import db
 from app.model import CVEGroup, CVEGroupPackage, CVE, CVEGroupEntry, Package
-from app.model.enum import Status, Affected, affected_to_status, status_to_affected, highest_severity
+from app.model.user import User, username_regex
+from app.model.enum import Status, Affected, UserRole, affected_to_status, status_to_affected, highest_severity
+from app.user import random_string, hash_password
 from sqlalchemy import func
 from collections import defaultdict
 from argparse import ArgumentParser
-from sys import argv
+from sys import argv, exit
 from subprocess import check_output
+from getpass import getpass
+from re import match, IGNORECASE
 
 
 def update_group_status():
@@ -88,9 +93,46 @@ def db_vacuum():
     db.session.execute('VACUUM')
 
 
+def create_user():
+    user = User()
+    user.active = True
+
+    print('Username: ', end='')
+    user.name = input()
+    if not user.name or not match(username_regex, user.name) or len(user.name) > User.NAME_LENGTH:
+        print('ERROR: Invalid username')
+        exit(1)
+
+    user.password = getpass()
+    if not user.password:
+        user.password = random_string()
+        print('Generated password: {}'.format(user.password))
+    if len(user.password) > TRACKER_PASSWORD_LENGTH_MAX or len(user.password) < TRACKER_PASSWORD_LENGTH_MIN:
+        print('ERROR: Password must be between {} and {} characters.'
+                .format(TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX))
+        exit(1)
+    user.salt = random_string()
+    user.password = hash_password(user.password, user.salt)
+
+    print('E-Mail: ', end='')
+    user.email = input()
+    if not match(r'^.+@([^.@][^@]+)$', user.email, IGNORECASE):
+        print('ERROR: Invalid E-Mail')
+        exit(1)
+
+    print('Role: ', end='')
+    user.role = UserRole.fromstring(input())
+    if not user.role:
+        user.role = UserRole.reporter
+
+    db.session.add(user)
+    db.session.commit()
+
+
 if __name__ == "__main__":
     no_args = 1 >= len(argv)
     parser = ArgumentParser(prog='update')
+    parser.add_argument('--create-user', action='store_true')
     parser.add_argument('--pacman-db', action='store_true', default=no_args)
     parser.add_argument('--group-status', action='store_true', default=no_args)
     parser.add_argument('--recalc-group-status', action='store_true')
@@ -98,6 +140,11 @@ if __name__ == "__main__":
     parser.add_argument('--package-cache', action='store_true', default=no_args)
     parser.add_argument('--db-vacuum', action='store_true')
     args = parser.parse_args()
+
+    if args.create_user:
+        print("[+] Creating user...")
+        create_user()
+        exit(0)
 
     if args.pacman_db:
         print("[+] Update pacman db...")
