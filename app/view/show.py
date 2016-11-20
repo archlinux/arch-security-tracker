@@ -2,6 +2,7 @@ from flask import render_template, redirect
 from sqlalchemy import and_
 from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL
 from app import app, db
+from app.util import json_response
 from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group, user_can_handle_advisory
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
 from app.model.enum import Publication, Status, Remote
@@ -13,7 +14,7 @@ from app.form.advisory import AdvisoryForm
 from app.view.error import not_found
 from app.advisory import advisory_extend_html
 from app.util import chunks, multiline_to_list
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from jinja2.utils import escape
 
 
@@ -58,13 +59,10 @@ def get_bug_data(cves, pkgs, group):
     }
 
 
-@app.route('/issue/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
-@app.route('/cve/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
-@app.route('/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
-def show_cve(cve):
+def get_cve_data(cve):
     cve_model = CVE.query.get(cve)
     if not cve_model:
-        return not_found()
+        return None
 
     entries = (db.session.query(CVEGroupEntry, CVEGroup, CVEGroupPackage, Advisory)
                .filter_by(cve=cve_model)
@@ -86,21 +84,54 @@ def show_cve(cve):
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     group_packages = dict(map(lambda item: (item[0], sorted(item[1])), group_packages.items()))
 
+    return {'issue': cve_model,
+            'groups': groups,
+            'group_packages': group_packages,
+            'advisories': advisories}
+
+
+@app.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve><regex("[./]json"):suffix>'.format(cve_id_regex[1:-1]), methods=['GET'])
+@json_response
+def show_cve_json(cve, path=None, suffix=None):
+    data = get_cve_data(cve)
+    if not data:
+        return not_found(json=True)
+
+    cve = data['issue']
+    references = cve.reference.replace('\r', '').split('\n') if cve.reference else []
+    packages = list(set(sorted([item for sublist in data['group_packages'].values() for item in sublist])))
+
+    json_data = OrderedDict()
+    json_data['name'] = cve.id
+    json_data['type'] = cve.issue_type
+    json_data['severity'] = cve.severity.label
+    json_data['vector'] = cve.remote.label
+    json_data['description'] = cve.description
+    json_data['groups'] = [str(group) for group in data['groups']]
+    json_data['packages'] = packages
+    json_data['advisories'] = [advisory.id for advisory in data['advisories']]
+    json_data['references'] = references
+    json_data['notes'] = cve.notes if cve.notes else None
+    return json_data
+
+
+@app.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
+def show_cve(cve, path=None):
+    data = get_cve_data(cve)
+    if not data:
+        return not_found()
     return render_template('cve.html',
-                           title=cve_model.id,
-                           issue=cve_model,
-                           groups=groups,
-                           group_packages=group_packages,
-                           advisories=advisories,
-                           can_edit=user_can_edit_issue(advisories),
-                           can_delete=user_can_delete_issue(advisories))
+                           title=data['issue'].id,
+                           issue=data['issue'],
+                           groups=data['groups'],
+                           group_packages=data['group_packages'],
+                           advisories=data['advisories'],
+                           can_edit=user_can_edit_issue(data['advisories']),
+                           can_delete=user_can_delete_issue(data['advisories']))
 
 
-@app.route('/group/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
-@app.route('/avg/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
-@app.route('/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
-def show_group(avg):
-    avg_id = avg.replace('AVG-', '')
+def get_group_data(avg):
+    avg_id = int(avg.replace('AVG-', ''))
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory, Package)
                .filter(CVEGroup.id == avg_id)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
@@ -108,59 +139,117 @@ def show_group(avg):
                .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                ).all()
     if not entries:
-        return not_found()
+        return None
 
     group = None
-    cves = set()
-    pkgs = set()
+    issues = set()
+    packages = set()
     advisories = set()
-    cve_types = set()
+    issue_types = set()
     versions = set()
     for group_entry, cve, pkg, advisory, package in entries:
         group = group_entry
-        cves.add(cve)
-        cve_types.add(cve.issue_type)
-        pkgs.add(pkg)
+        issues.add(cve)
+        issue_types.add(cve.issue_type)
+        packages.add(pkg)
         versions.add(package)
         if advisory:
             advisories.add(advisory)
 
-    cve_types = list(cve_types)
-    cves = sorted(cves, key=lambda item: item.id, reverse=True)
-    pkgs = sorted(pkgs, key=lambda item: item.pkgname)
+    issue_types = list(issue_types)
+    issues = sorted(issues, key=lambda item: item.id, reverse=True)
+    packages = sorted(packages, key=lambda item: item.pkgname)
     versions = sort_packages(filter_duplicate_packages(list(versions), True))
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     advisory_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
-    advisory_form = AdvisoryForm()
-    if 1 == len(cve_types):
-        advisory_form.advisory_type.data = cve_types[0]
 
-    out = {
-        'detail': group,
-        'pkgs': pkgs,
+    return {
+        'group': group,
+        'packages': packages,
         'versions': versions,
-        'cves': cves,
-        'advisories': advisories
+        'issues': issues,
+        'issue_types': issue_types,
+        'advisories': advisories,
+        'advisory_pending': advisory_pending
     }
 
+
+@app.route('/group/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@app.route('/avg/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@app.route('/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@json_response
+def show_group_json(avg, postfix=None):
+    data = get_group_data(avg)
+    if not data:
+        return not_found(json=True)
+
+    group = data['group']
+    advisories = data['advisories']
+    issues = data['issues']
+    packages = data['packages']
+    issue_types = data['issue_types']
+    references = group.reference.replace('\r', '').split('\n') if group.reference else []
+
+    json_data = OrderedDict()
+    json_data['name'] = group.name
+    json_data['packages'] = [package.pkgname for package in packages]
+    json_data['status'] = group.status.label
+    json_data['severity'] = group.severity.label
+    json_data['type'] = 'multiple issues' if len(issue_types) > 1 else issue_types[0]
+    json_data['affected'] = group.affected
+    json_data['fixed'] = group.fixed if group.fixed else None
+    json_data['ticket'] = group.bug_ticket if group.bug_ticket else None
+    json_data['issues'] = [str(cve) for cve in issues]
+    json_data['advisories'] = [advisory.id for advisory in advisories]
+    json_data['references'] = references
+    json_data['notes'] = group.notes if group.notes else None
+
+    return json_data
+
+
+@app.route('/group/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
+@app.route('/avg/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
+@app.route('/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
+def show_group(avg):
+    data = get_group_data(avg)
+    if not data:
+        return not_found()
+
+    group = data['group']
+    advisories = data['advisories']
+    issues = data['issues']
+    packages = data['packages']
+    issue_types = data['issue_types']
+    versions = data['versions']
+    issue_type = 'multiple issues' if len(issue_types) > 1 else issue_types[0]
+
+    form = AdvisoryForm()
+    form.advisory_type.data = issue_type
+
     return render_template('group.html',
-                           title='{}'.format(group.name),
-                           bug_data=get_bug_data(cves, pkgs, group),
-                           group=out,
+                           title='{}'.format(group),
+                           form=form,
+                           group=group,
+                           packages=packages,
+                           issues=issues,
+                           advisories=advisories,
+                           versions=versions,
                            Status=Status,
-                           advisory_pending=advisory_pending,
-                           form=advisory_form,
+                           issue_type=issue_type,
+                           bug_data=get_bug_data(issues, packages, group),
+                           advisory_pending=data['advisory_pending'],
                            can_edit=user_can_edit_group(advisories),
                            can_delete=user_can_delete_group(advisories),
                            can_handle_advisory=user_can_handle_advisory())
 
 
-@app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
-def show_package(pkgname):
-    entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory, Package)
-               .filter(CVEGroupPackage.pkgname == pkgname)
-               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
-               .outerjoin(Package, Package.name == pkgname)
+def get_package_data(pkgname):
+    entries = (db.session.query(Package, CVEGroup, CVE, Advisory)
+               .filter(Package.name == pkgname)
+               .outerjoin(CVEGroupPackage, CVEGroupPackage.pkgname == pkgname)
+               .outerjoin(CVEGroup, CVEGroup.id == CVEGroupPackage.group_id)
+               .outerjoin(CVEGroupEntry, CVEGroupPackage.group_id == CVEGroupEntry.group_id)
+               .outerjoin(CVE, CVE.id == CVEGroupEntry.cve_id)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
                                          Advisory.publication == Publication.published))
                ).all()
@@ -172,33 +261,108 @@ def show_package(pkgname):
     issues = set()
     advisories = set()
     versions = set()
-    for group, cve, pkg, advisory, package in entries:
-        groups.add(group)
+    for package, group, cve, advisory in entries:
         versions.add(package)
-        issues.add((cve, group))
+        if group:
+            groups.add(group)
+        if cve:
+            issues.add((cve, group))
         if advisory:
             advisories.add(advisory)
 
-    issues = [{'cve': e[0], 'group': e[1]} for e in issues]
-    issues = sorted(issues, key=lambda item: item['cve'].id, reverse=True)
+    issues = [{'issue': e[0], 'group': e[1]} for e in issues]
+    issues = sorted(issues, key=lambda item: item['issue'].id, reverse=True)
     issues = sorted(issues, key=lambda item: item['group'].status)
     groups = sorted(groups, key=lambda item: item.id, reverse=True)
     groups = sorted(groups, key=lambda item: item.status)
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     versions = sort_packages(filter_duplicate_packages(list(versions), True))
+    package = versions[0] if versions else None
 
-    package = {
+    return {
+        'package': package,
         'pkgname': pkgname,
         'versions': versions,
-        'groups': {'open': list(filter(lambda group: group.status.open(), groups)),
-                   'resolved': list(filter(lambda group: group.status.resolved(), groups))},
-        'issues': {'open': list(filter(lambda issue: issue['group'].status.open(), issues)),
-                   'resolved': list(filter(lambda issue: issue['group'].status.resolved(), issues))},
+        'groups': groups,
+        'issues': issues,
         'advisories': advisories
     }
+
+
+@app.route('/package/<regex("{}"):pkgname><regex("[./]json"):suffix>'.format(pkgname_regex[1:-1]), methods=['GET'])
+@json_response
+def show_package_json(pkgname, suffix=None):
+    data = get_package_data(pkgname)
+    if not data:
+        return not_found(json=True)
+
+    advisories = data['advisories']
+    versions = data['versions']
+    groups = data['groups']
+    issues = data['issues']
+
+    json_advisory = []
+    for advisory in advisories:
+        entry = OrderedDict()
+        entry['name'] = advisory.id
+        entry['date'] = advisory.created.strftime('%Y-%m-%d')
+        entry['severity'] = advisory.group_package.group.severity.label
+        entry['type'] = advisory.advisory_type
+        entry['reference'] = advisory.reference if advisory.reference else None
+        json_advisory.append(entry)
+
+    json_versions = []
+    for version in versions:
+        entry = OrderedDict()
+        entry['version'] = version.version
+        entry['database'] = version.database
+        json_versions.append(entry)
+
+    json_groups = []
+    for group in groups:
+        entry = OrderedDict()
+        entry['name'] = group.name
+        entry['status'] = group.status.label
+        entry['severity'] = group.severity.label
+        json_groups.append(entry)
+
+    json_issues = []
+    for issue in issues:
+        group = issue['group']
+        issue = issue['issue']
+        entry = OrderedDict()
+        entry['name'] = issue.id
+        entry['severity'] = issue.severity.label
+        entry['type'] = issue.issue_type
+        entry['status'] = group.status.label
+        json_issues.append(entry)
+
+    json_data = OrderedDict()
+    json_data['name'] = pkgname
+    json_data['versions'] = json_versions
+    json_data['advisories'] = json_advisory
+    json_data['groups'] = json_groups
+    json_data['issues'] = json_issues
+    return json_data
+
+
+@app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
+def show_package(pkgname):
+    data = get_package_data(pkgname)
+    if not data:
+        return not_found(json=True)
+
+    groups = data['groups']
+    data['groups'] = {'open': list(filter(lambda group: group.status.open(), groups)),
+                      'resolved': list(filter(lambda group: group.status.resolved(), groups))}
+
+    issues = data['issues']
+    data['issues'] = {'open': list(filter(lambda issue: issue['group'].status.open(), issues)),
+                      'resolved': list(filter(lambda issue: issue['group'].status.resolved(), issues))}
+
     return render_template('package.html',
                            title='{}'.format(pkgname),
-                           package=package)
+                           package=data)
 
 
 def render_html_advisory(advisory, package, group, raw_asa, generated):

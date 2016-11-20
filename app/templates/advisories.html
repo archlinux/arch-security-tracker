@@ -2,7 +2,7 @@
 {%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, bug_ticket -%}
 {% block content %}
 			<h1>Advisories</h1>
-			{%- if entries.scheduled %}
+			{%- if scheduled %}
 			<h2>Scheduled</h2>
 			<table class="styled-table medium size">
 				<thead>
@@ -16,12 +16,15 @@
 					</tr>
 				</thead>
 				<tbody>
-				{%- for advisory, pkg, group in entries.scheduled %}
+				{%- for entry in scheduled %}
+				{%- set advisory = entry.advisory %}
+				{%- set group = entry.group %}
+				{%- set package = entry.package %}
 					<tr>
 						<td>{{ advisory.created.strftime('%d %b %Y') }}</td>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-						<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
+						<td><a href="/package/{{ package.pkgname }}">{{ package.pkgname }}</a></td>
 						<td>{{ colorize_severity(group.severity) }}</td>
 						<td>{{ advisory.advisory_type }}</td>
 					</tr>
@@ -30,7 +33,7 @@
 			</table>
 			{%- endif %}
 			<h2>Published</h2>
-			{%- for month, advisories in entries.published.items() %}
+			{%- for month, advisories in published.items() %}
 			<h3>{{ month }}</h3>
 			<table class="styled-table medium size">
 				<thead>
@@ -44,17 +47,20 @@
 					</tr>
 				</thead>
 				<tbody>
-				{%- for advisory, pkg, group in advisories %}
+				{%- for entry in advisories %}
+				{%- set advisory = entry.advisory %}
+				{%- set group = entry.group %}
+				{%- set package = entry.package %}
 					<tr>
 						<td>{{ advisory.created.strftime('%d %b %Y') }}</td>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
-						<td><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></td>
+						<td><a href="/package/{{ package.pkgname }}">{{ package.pkgname }}</a></td>
 						<td>{{ colorize_severity(group.severity) }}</td>
 						<td>{{ advisory.advisory_type }}</td>
 					</tr>
-				</tbody>
 				{%- endfor %}
+				</tbody>
 			</table>
 			{%- endfor %}
 {%- endblock %}

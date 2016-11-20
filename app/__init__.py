@@ -20,6 +20,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute('PRAGMA foreign_keys = ON')
     cursor.close()
 
+
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
@@ -60,6 +61,7 @@ def get_or_create(self, model, defaults=None, **kwargs):
     if instance:
         return instance
     return self.create(model, defaults, **kwargs)
+
 
 db.get = MethodType(get, db)
 db.create = MethodType(create, db)

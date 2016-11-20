@@ -1,6 +1,7 @@
 from flask import render_template, flash, redirect
 from app import app, db
 from app.user import security_team_required
+from app.util import json_response
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
@@ -14,35 +15,66 @@ from datetime import datetime
 from re import match
 
 
-@app.route('/advisory', methods=['GET'])
-@app.route('/advisories', methods=['GET'])
-def advisory():
-    entries = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
+def get_advisory_data():
+    entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage)
                .join(CVEGroupPackage).join(CVEGroup)
                .group_by(CVEGroupPackage.id)
                .order_by(Advisory.created.desc())).all()
+    entries = [{'advisory': advisory, 'group': group, 'package': package} for advisory, group, package in entries]
 
-    scheduled = list(filter(lambda item: item[0].publication == Publication.scheduled, entries))
-    scheduled = sorted(scheduled, key=lambda item: item[0].created, reverse=True)
+    scheduled = list(filter(lambda item: item['advisory'].publication == Publication.scheduled, entries))
+    scheduled = sorted(scheduled, key=lambda item: item['advisory'].created, reverse=True)
 
-    published = list(filter(lambda item: item[0].publication == Publication.published, entries))
-    published = sorted(published, key=lambda item: item[0].created, reverse=True)
+    published = list(filter(lambda item: item['advisory'].publication == Publication.published, entries))
+    published = sorted(published, key=lambda item: item['advisory'].created, reverse=True)
+
+    return {
+        'scheduled': scheduled,
+        'published': published
+    }
+
+
+@app.route('/advisory<regex("[./]json"):postfix>', methods=['GET'])
+@app.route('/advisories<regex("[./]json"):postfix>', methods=['GET'])
+@json_response
+def advisory_json(postfix=None):
+    data = get_advisory_data()
+
+    def to_json_data(entry):
+        advisory = entry['advisory']
+        group = entry['group']
+        package = entry['package']
+
+        json_entry = OrderedDict()
+        json_entry['name'] = advisory.id
+        json_entry['date'] = advisory.created.strftime('%Y-%m-%d')
+        json_entry['group'] = group.name
+        json_entry['package'] = package.pkgname
+        json_entry['severity'] = group.severity.label
+        json_entry['type'] = advisory.advisory_type
+        json_entry['reference'] = advisory.reference if advisory.reference else None
+        return json_entry
+
+    return list(map(to_json_data, data['published']))
+
+
+@app.route('/advisory', methods=['GET'])
+@app.route('/advisories', methods=['GET'])
+def advisory():
+    data = get_advisory_data()
 
     monthly_published = OrderedDict()
-    for item in published:
-        advisory = item[0]
+    for item in data['published']:
+        advisory = item['advisory']
         month = advisory.created.strftime('%B %Y')
         if month not in monthly_published:
             monthly_published[month] = []
         monthly_published[month].append(item)
 
-    entries = {
-        'scheduled': scheduled,
-        'published': monthly_published
-    }
     return render_template('advisories.html',
                            title='Advisories',
-                           entries=entries)
+                           scheduled=data['scheduled'],
+                           published=monthly_published)
 
 
 @app.route('/group/<regex("{}"):avg>/schedule'.format(vulnerability_group_regex[1:-1]), methods=['PUT', 'POST'])

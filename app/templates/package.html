@@ -45,12 +45,12 @@
 				<tbody>
 				{%- for issue in issues %}
 					<tr>
-						<td><a href="/{{ issue.cve.id }}">{{ issue.cve.id }}</a></td>
+						<td><a href="/{{ issue.issue.id }}">{{ issue.issue.id }}</a></td>
 						<td><a href="/{{ issue.group.name }}">{{ issue.group.name }}</a></td>
-						<td>{{ colorize_severity(issue.cve.severity) }}</td>
-						<td>{{ colorize_remote(issue.cve.remote) }}</td>
-						<td>{{ colorize_unknown(issue.cve.issue_type|capitalize) }}</td>
-						<td><pre>{% if issue.cve.description %}{{ issue.cve.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}<pre></td>
+						<td>{{ colorize_severity(issue.issue.severity) }}</td>
+						<td>{{ colorize_remote(issue.issue.remote) }}</td>
+						<td>{{ colorize_unknown(issue.issue.issue_type|capitalize) }}</td>
+						<td><pre>{% if issue.issue.description %}{{ issue.issue.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}<pre></td>
 					</tr>
 				{%- endfor %}
 				</tbody>
