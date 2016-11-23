@@ -129,8 +129,8 @@ a:visited:focus {
 
 .box.warning {
   background: rgb(255, 162, 0) none repeat scroll 0 0;
-  border: 1px solid rgb(255, 102, 0);
-  color: white;
+  border: 1px solid rgb(255, 106, 0);
+  color: black;
   font-weight: bold;
 }
 
