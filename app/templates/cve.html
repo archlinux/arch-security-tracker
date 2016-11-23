@@ -9,21 +9,39 @@
 					<tr>
 						<td>Source</td>
 						<td class="wrap">
-							<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ issue.id }}">MITRE</a> |
-							<a href="https://access.redhat.com/security/cve/{{ issue.id }}">Red Hat</a> |
-							<a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ issue.id }}">NVD</a> |
-							<a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&status%5B%5D=&sort=desc&string={{ issue.id }}">Arch Linux bugs</a> |
-							<a href="https://security-tracker.debian.org/tracker/{{ issue.id }}">Debian</a> |
-							<a href="https://people.canonical.com/~ubuntu-security/cve/{{ issue.id }}">Ubuntu</a> |
-							<a href="https://bugs.gentoo.org/show_bug.cgi?id={{ issue.id }}">Gentoo</a> |
-							<a href="https://bugzilla.suse.com/show_bug.cgi?id={{ issue.id }}">SUSE</a> |
-							<a href="https://bugzilla.redhat.com/show_bug.cgi?id={{ issue.id }}">Red Hat bugs</a> |
-							<a href="https://github.com/search?type=Code&q=%22{{ issue.id }}%22">GitHub code</a> |
-							<a href="https://github.com/search?type=Issues&q=%22{{ issue.id }}%22">GitHub issues</a> |
-							<a href="https://marc.info/?l=oss-security&s={{ issue.id }}">oss-security</a> |
-							<a href="https://marc.info/?l=full-disclosure&s={{ issue.id }}">full-disclosure</a> |
-							<a href="https://marc.info/?l=bugtraq&s={{ issue.id }}">bugtraq</a> |
-							<a href="https://www.google.net/search?gws_rd=cr&q=%22{{ issue.id }}%22">web search</a>
+							<ul class="source-listing">
+								<li>CVE
+									<ul>
+										<li><a href="https://access.redhat.com/security/cve/{{ issue.id }}">Red Hat</a></li>
+									    <li><a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name={{ issue.id }}">MITRE</a></li>
+									    <li><a href="https://web.nvd.nist.gov/view/vuln/detail?vulnId={{ issue.id }}">NVD</a></li>
+									    <li><a href="https://security-tracker.debian.org/tracker/{{ issue.id }}">Debian</a></li>
+									    <li><a href="https://people.canonical.com/~ubuntu-security/cve/{{ issue.id }}">Ubuntu</a></li>
+									</ul>
+								</li>
+								<li>Bugs
+									<ul>
+										<li><a href="https://bugs.archlinux.org/?project=0&cat%5B%5D=2&order=id&status%5B%5D=&sort=desc&string={{ issue.id }}">Arch Linux</a></li>
+										<li><a href="https://bugzilla.redhat.com/show_bug.cgi?id={{ issue.id }}">Red Hat</a></li>
+										<li><a href="https://bugs.gentoo.org/show_bug.cgi?id={{ issue.id }}">Gentoo</a></li>
+										<li><a href="https://bugzilla.suse.com/show_bug.cgi?id={{ issue.id }}">SUSE</a></li>
+										<li><a href="https://github.com/search?type=Issues&q=%22{{ issue.id }}%22">GitHub</a></li>
+									</ul>
+								</li>
+								<li>Lists
+									<ul>
+										<li><a href="https://marc.info/?l=oss-security&s={{ issue.id }}">oss-security</a></li>
+										<li><a href="https://marc.info/?l=full-disclosure&s={{ issue.id }}">full-disclosure</a></li>
+										<li><a href="https://marc.info/?l=bugtraq&s={{ issue.id }}">bugtraq</a></li>
+									</ul>
+								</li>
+								<li>Misc
+									<ul>
+										<li><a href="https://github.com/search?type=Code&q=%22{{ issue.id }}%22">GitHub code</a></li>
+										<li><a href="https://www.google.net/search?gws_rd=cr&q=%22{{ issue.id }}%22">web search</a></li>
+									</ul>
+								</li>
+							</ul>
 						</td>
 					</tr>
 					<tr>

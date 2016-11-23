@@ -515,3 +515,26 @@ form .errors {
   width: 100%;
   margin-left: 0;
 }
+
+.source-listing,
+.source-listing * {
+  display: inline;
+  list-style: outside none none;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+}
+
+.source-listing ul li::after,
+.source-listing ul::before {
+  content: ' | ';
+  font-weight: normal;
+}
+
+.source-listing li:hover {
+  font-weight: bold;
+}
+
+.source-listing ul li:hover {
+  font-weight: normal;
+}
