@@ -18,7 +18,7 @@ issue_types = [
     'cross-site scripting',
     'denial of service',
     'directory traversal',
-    'improper cryptographic calculation',
+    'incorrect calculation',
     'information disclosure',
     'insufficient validation',
     'man-in-the-middle',
