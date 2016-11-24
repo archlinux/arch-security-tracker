@@ -62,7 +62,7 @@ def administrator_required(func):
     return login_required(decorated_view)
 
 
-def user_can_edit_issue(advisories):
+def user_can_edit_issue(advisories=[]):
     role = current_user.role
     if not role.is_reporter:
         return False
@@ -71,18 +71,18 @@ def user_can_edit_issue(advisories):
     return 0 == len(advisories)
 
 
-def user_can_delete_issue(advisories):
+def user_can_delete_issue(advisories=[]):
     role = current_user.role
     if not role.is_reporter:
         return False
     return 0 == len(advisories)
 
 
-def user_can_edit_group(advisories):
+def user_can_edit_group(advisories=[]):
     return user_can_edit_issue(advisories)
 
 
-def user_can_delete_group(advisories):
+def user_can_delete_group(advisories=[]):
     return user_can_delete_issue(advisories)
 
 
