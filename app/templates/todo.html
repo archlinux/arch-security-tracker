@@ -148,6 +148,39 @@ Yippie!</pre>
 				{%- endfor %}
 			</table>
 			{%- endif %}
+			{%- if entries.unknown_groups %}
+			<h2>Undetermined groups</h2>
+			<table class="styled-table medium size">
+				<thead>
+					<tr>
+						<th>Group</th>
+						<th>Package</th>
+						<th>Severity</th>
+						<th>Affected</th>
+						<th>Status</th>
+						<th class="center collapse size">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+				{%- for group, packages in entries.unknown_groups.items() %}
+					<tr>
+						<td><a href="/{{ group }}">{{ group }}</a></td>
+						<td class="wrap">
+							{%- for pkg in packages %}
+							<a href="/package/{{ pkg.name }}" class="no-wrap">{{ pkg.name }}</a>{% if not loop.last %}, {% endif %}
+							{%- endfor %}
+						</td>
+						<td>{{ colorize_severity(group.severity) }}</td>
+						<td>{{ group.affected }}</td>
+						<td>{{ colorize_unknown(group.status) }}</td>
+						<td class="no-padding">
+							<a href="{{ group.name }}/edit" class="button button-table button-primary">edit</a>
+						</td>
+					</tr>
+				</tbody>
+				{%- endfor %}
+			</table>
+			{%- endif %}
 			{%- if entries.unknown_issues %}
 			<h2>Issues missing details</h2>
 			<table class="styled-table medium size">

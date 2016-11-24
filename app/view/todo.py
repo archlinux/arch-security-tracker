@@ -52,6 +52,17 @@ def todo():
                                   CVE.issue_type == 'unknown'))
                       .order_by(CVE.id.desc())).all()
 
+    unknown_groups = CVEGroup.query.filter(CVEGroup.status == Status.unknown).all()
+    unknown_groups = (db.session.query(CVEGroup, Package)
+                        .join(CVEGroupPackage).join(Package, Package.name == CVEGroupPackage.pkgname)
+                        .filter(CVEGroup.status == Status.unknown)
+                        .group_by(CVEGroupPackage.id)
+                        .order_by(CVEGroup.created.desc())).all()
+
+    unknown_groups_data = defaultdict(list)
+    for group, package in unknown_groups:
+        unknown_groups_data[group].append(package)
+
     vulnerable_groups = (db.session.query(CVEGroup, Package)
                          .join(CVEGroupPackage).join(Package, Package.name == CVEGroupPackage.pkgname)
                          .filter(CVEGroup.status == Status.vulnerable)
@@ -79,6 +90,7 @@ def todo():
         'incomplete_advisories': incomplete_advisories,
         'unhandled_advisories': unhandled_advisories,
         'unknown_issues': unknown_issues,
+        'unknown_groups': unknown_groups_data,
         'bumped_groups': bumped_groups
     }
     return render_template('todo.html',
