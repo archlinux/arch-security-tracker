@@ -1,11 +1,13 @@
-def multiline_to_list(data, whitespace_separator=True, unique_only=True):
+def multiline_to_list(data, whitespace_separator=True, unique_only=True, filter_empty=True):
     if not data:
         return []
     if whitespace_separator:
         data = data.replace(' ', '\n')
     data_list = data.replace('\r', '').split('\n')
     if unique_only:
-        return list(set(data_list))
+        data_list = list(set(data_list))
+    if filter_empty:
+        data_list = list(filter(lambda e: len(e) > 0, data_list))
     return data_list
 
 
