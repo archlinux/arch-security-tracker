@@ -48,8 +48,11 @@ def add_group():
     cve_ids = multiline_to_list(form.cve.data)
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
 
-    for cve_id in cve_ids:
-        cve = db.get_or_create(CVE, id=cve_id)
+    issues = CVE.query.filter(CVE.id.in_(cve_ids)).all()
+    issue_ids = [issue.id for issue in issues]
+
+    for cve_id in list(filter(lambda issue: issue not in issue_ids, cve_ids)):
+        cve = db.create(CVE, id=cve_id)
         issues.append(cve)
         flash('Added {}'.format(cve.id))
 
