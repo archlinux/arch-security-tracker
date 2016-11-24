@@ -168,7 +168,7 @@ Yippie!</pre>
 					</tr>
 				</thead>
 				<tbody>
-				{%- for group, packages in entries.unknown_groups.items() %}
+				{%- for group, packages in entries.unknown_groups %}
 					<tr>
 						<td><a href="/{{ group }}">{{ group }}</a></td>
 						<td class="wrap">
@@ -206,6 +206,39 @@ Yippie!</pre>
 				</thead>
 				<tbody>
 				{%- for cve in entries.unknown_issues %}
+					<tr>
+						<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
+						<td>{{ colorize_severity(cve.severity) }}</td>
+						<td>{{ colorize_remote(cve.remote) }}</td>
+						<td>{{ colorize_unknown(cve.issue_type|capitalize) }}</td>
+						<td><pre>{% if cve.description %}{{ cve.description|wordwrap(70, wrapstring=' ')|truncate(95) }}{% endif %}<pre></td>
+						{%- if can_edit_issue %}
+						<td class="no-padding">
+							<a href="{{ cve.id }}/edit" class="button button-table button-primary">edit</a>
+						</td>
+						{%- endif %}
+					</tr>
+				</tbody>
+				{%- endfor %}
+			</table>
+			{%- endif %}
+			{%- if entries.orphan_issues %}
+			<h2>Orphan issues</h2>
+			<table class="styled-table medium size">
+				<thead>
+					<tr>
+						<th>Issue</th>
+						<th>Severity</th>
+						<th>Remote</th>
+						<th>Type</th>
+						<th class="full size">Description</th>
+						{%- if can_edit_issue %}
+						<th class="center collapse size">Action</th>
+						{%- endif %}
+					</tr>
+				</thead>
+				<tbody>
+				{%- for cve in entries.orphan_issues %}
 					<tr>
 						<td><a href="/{{ cve.id }}">{{ cve.id }}</a></td>
 						<td>{{ colorize_severity(cve.severity) }}</td>

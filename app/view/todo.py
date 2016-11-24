@@ -1,7 +1,7 @@
 from flask import render_template
 from app import app, db
 from app.user import user_can_handle_advisory, user_can_edit_group, user_can_edit_issue
-from app.model import CVE, CVEGroup, CVEGroupPackage, Advisory, Package
+from app.model import CVE, CVEGroup, CVEGroupPackage, CVEGroupEntry, Advisory, Package
 from app.model.enum import Status, Remote, Severity, Publication
 from app.model.package import filter_duplicate_packages
 from app.symbol import smileys_happy
@@ -62,6 +62,10 @@ def todo():
     unknown_groups_data = defaultdict(list)
     for group, package in unknown_groups:
         unknown_groups_data[group].append(package)
+    unknown_groups = []
+    for group, packages in unknown_groups_data.items():
+        unknown_groups.append((group, packages))
+    unknown_groups = sorted(unknown_groups, key=lambda item: item[0].id)
 
     vulnerable_groups = (db.session.query(CVEGroup, Package)
                          .join(CVEGroupPackage).join(Package, Package.name == CVEGroupPackage.pkgname)
@@ -85,13 +89,20 @@ def todo():
     bumped_groups = sorted(bumped_groups, key=lambda item: item[0].id, reverse=True)
     bumped_groups = sorted(bumped_groups, key=lambda item: item[0].severity)
 
+    orphan_issues = (db.session.query(CVE)
+                       .outerjoin(CVEGroupEntry)
+                       .group_by(CVE.id)
+                       .having(func.count(CVEGroupEntry.id) == 0)
+                       .order_by(CVE.id)).all()
+
     entries = {
         'scheduled_advisories': scheduled_advisories,
         'incomplete_advisories': incomplete_advisories,
         'unhandled_advisories': unhandled_advisories,
         'unknown_issues': unknown_issues,
-        'unknown_groups': unknown_groups_data,
-        'bumped_groups': bumped_groups
+        'unknown_groups': unknown_groups,
+        'bumped_groups': bumped_groups,
+        'orphan_issues': orphan_issues
     }
     return render_template('todo.html',
                            title='Todo Lists',
