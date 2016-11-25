@@ -5,10 +5,15 @@ def multiline_to_list(data, whitespace_separator=True, unique_only=True, filter_
         data = data.replace(' ', '\n')
     data_list = data.replace('\r', '').split('\n')
     if unique_only:
-        data_list = list(set(data_list))
+        data_list = list_uniquify(data_list)
     if filter_empty:
         data_list = list(filter(lambda e: len(e) > 0, data_list))
     return data_list
+
+
+def list_uniquify(data):
+    used = set()
+    return [e for e in data if e not in used and (used.add(e) or True)]
 
 
 def cmp_to_key(cmp_func, getter=None):
