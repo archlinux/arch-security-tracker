@@ -10,3 +10,4 @@ from .todo import *
 from .error import *
 from .blueprint import *
 from .admin import *
+from .user import *
