@@ -1,5 +1,5 @@
 from flask import render_template, redirect, flash
-from flask_login import current_user
+from flask_login import current_user, login_required
 from app import app, db
 from app.user import administrator_required, random_string, hash_password, user_invalidate
 from app.form.admin import UserForm
@@ -12,6 +12,7 @@ from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
 
 @app.route('/admin', methods=['GET', 'POST'])
 @app.route('/user', methods=['GET', 'POST'])
+@login_required
 def list_user():
     users = User.query.order_by(User.name).all()
     users = sorted(users, key=lambda u: u.name)
