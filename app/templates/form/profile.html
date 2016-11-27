@@ -1,0 +1,23 @@
+{%- extends "base.html" -%}
+{% block content %}
+			<h1>{{ title }}</h1>
+			<div class="medium size">
+				<form action="" method="post" name="edit_profile">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<div class="one-half column">
+							{{ render_field(form.password, class='full size', maxlength=password_length.max, placeholder='New password', autofocus='', required='', indent=7) }}
+						</div>
+						<div class="one-half column">
+							{{ render_field(form.password_repeat, class='full size', maxlength=password_length.max, placeholder='Repeat password', required='', indent=7) }}
+						</div>
+					</div>
+					<div class="row">
+						<div class="one-half column">
+							{{ render_field(form.password_current, class='full size', maxlength=password_length.max, placeholder='Current password', required='', indent=7) }}
+						</div>
+					</div>
+					{{ form.submit(class='button-primary') }}
+				</form>
+			</div>
+{%- endblock %}

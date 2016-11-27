@@ -22,6 +22,7 @@
 					<li><a href="/">issues</a></li>
 					<li><a href="/advisory">advisories</a></li>
 					<li><a href="/todo">todo</a></li>
+					<li><a href="/user">user</a></li>
 					{%- if not current_user.is_authenticated %}
 					<li><a href="/login">login</a></li>
 					{%- else %}
@@ -30,6 +31,7 @@
 					{%- if current_user.role.is_administrator %}
 					<li><a href="/admin">admin</a></li>
 					{%- endif %}
+					<li><a href="/profile">profile</a></li>
 					<li><a href="/logout">logout</a></li>
 					{%- endif %}
 				</ul>
