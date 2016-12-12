@@ -39,6 +39,12 @@ run debug mode:
 ./run.py
 ```
 
+adding a new user:
+
+```
+./update --create-user
+```
+
 For production run it through ```uwsgi```
 
 ## Configuration
