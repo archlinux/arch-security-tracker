@@ -27,6 +27,14 @@ vulnerability details and generating security advisories.
 * sqlite
 * expac
 
+Python dependencies can be installed in a virtual environment (`virtualenv`), by running:
+
+```
+virtualenv .virtualenv
+. .virtualenv/bin/activate
+pip install -r requirements.txt
+```
+
 ## Setup
 
 ```
