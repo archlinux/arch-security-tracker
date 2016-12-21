@@ -1,2 +1,4 @@
 __pycache__/
 app.db
+
+.virtualenv
