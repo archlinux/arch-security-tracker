@@ -9,6 +9,9 @@
 				{%- elif advisory.content -%}
 					<a href="/{{  advisory.id }}">original</a>
 				{%- endif %}
+				{%- if advisory.reference %}
+				<a href="{{  advisory.reference }}">external</a>
+				{%- endif %}
 				<a href="/{{  advisory.id }}/{% if generated %}generate/{% endif %}raw">raw</a>
 			</h1>
 			<table class="styled-table full size">
