@@ -4,3 +4,4 @@ Flask-SQLAlchemy
 Flask-WTF
 requests
 scrypt
+https://git.archlinux.org/users/remy/pyalpm.git/snapshot/pyalpm-0.8.tar.xz
