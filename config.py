@@ -13,6 +13,8 @@ config_tracker = config['tracker']
 TRACKER_ADVISORY_URL = config_tracker['advisory_url']
 TRACKER_BUGTRACKER_URL = config_tracker['bugtracker_url']
 TRACKER_MAILMAN_URL = config_tracker['mailman_url']
+TRACKER_GROUP_URL = config_tracker['group_url']
+TRACKER_ISSUE_URL = config_tracker['issue_url']
 TRACKER_PASSWORD_LENGTH_MIN = config_tracker.getint('password_length_min')
 TRACKER_PASSWORD_LENGTH_MAX = config_tracker.getint('password_length_max')
 

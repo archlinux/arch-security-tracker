@@ -1,6 +1,6 @@
 from flask import render_template, redirect
 from sqlalchemy import and_
-from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL
+from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL
 from app import app, db
 from app.util import json_response
 from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group, user_can_handle_advisory
@@ -20,7 +20,6 @@ from jinja2.utils import escape
 
 def get_bug_data(cves, pkgs, group):
     references = []
-    # TODO: add backreference to AVG tracker page
     references = [ref for ref in multiline_to_list(group.reference)
                   if ref not in references]
     list(map(lambda issue: references.extend(
@@ -34,7 +33,9 @@ def get_bug_data(cves, pkgs, group):
             unique_issue_types.append(issue.issue_type)
 
     bug_desc = render_template('bug.txt', cves=cves, group=group, references=references,
-                               pkgs=pkgs, unique_issue_types=unique_issue_types)
+                               pkgs=pkgs, unique_issue_types=unique_issue_types,
+                               TRACKER_ISSUE_URL=TRACKER_ISSUE_URL,
+                               TRACKER_GROUP_URL=TRACKER_GROUP_URL)
     pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
     group_type = 'multiple issues' if len(unique_issue_types) > 1 else unique_issue_types[0]
     summary = '[{}] [Security] {} ({})'.format(pkg_str, group_type, ' '.join([cve.id for cve in cves]))
@@ -476,7 +477,9 @@ def show_generated_advisory(advisory_id, raw=False):
                               upstream_released=upstream_released,
                               upstream_version=upstream_version,
                               unique_issue_types=unique_issue_types,
-                              references=references)
+                              references=references,
+                              TRACKER_ISSUE_URL=TRACKER_ISSUE_URL,
+                              TRACKER_GROUP_URL=TRACKER_GROUP_URL)
     if raw:
         return raw_asa
 

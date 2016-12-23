@@ -37,6 +37,10 @@ Guidance
 
 References
 ==========
-{% for reference in references %}
+
+{{ TRACKER_GROUP_URL.format(group.id) }}
+{%- for reference in references %}
 {{ reference }}
 {%- endfor -%}
+{%- for issue in issues %}{{ TRACKER_ISSUE_URL.format(issue.id) }}
+{% endfor %}
