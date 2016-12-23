@@ -84,5 +84,5 @@ References
 {% for reference in references %}
 {{- reference }}
 {% endfor %}
-{%- for issue in issues %}https://access.redhat.com/security/cve/{{ issue.id }}
+{%- for issue in issues %}{{ TRACKER_ISSUE_URL.format(issue.id) }}
 {% endfor %}
