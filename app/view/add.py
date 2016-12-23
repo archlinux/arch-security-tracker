@@ -61,7 +61,7 @@ def add_group():
     affected = Affected.fromstring(form.status.data)
     status = affected_to_status(affected, pkgnames[0], fixed)
     severity = highest_severity([issue.severity for issue in issues])
-    advisory_qualified = form.advisory_qualified and status is not Status.not_affected
+    advisory_qualified = form.advisory_qualified.data and status is not Status.not_affected
 
     group = db.create(CVEGroup,
                       affected=form.affected.data,
