@@ -32,6 +32,35 @@ select {
   padding: 10px 15px !important;
 }
 
+#archnavbar ul {
+  display: inline;
+  float: right;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#archnavbar ul li {
+  float: left;
+  font-size: 14px;
+  font-family: sans-serif !important;
+  line-height: 45px;
+  letter-spacing: 0;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+#archnavbarlist li a {
+  color: #999;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+#archnavbar ul li a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
 .navbar {
   margin: 1.5em 0;
 }
@@ -55,6 +84,7 @@ select {
   margin: 0 !important;
   padding: 0 !important;
   width: 190px !important;
+  float: left !important;
 }
 
 #logo a {
