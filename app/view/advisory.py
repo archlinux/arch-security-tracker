@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect
+from flask import render_template, flash, redirect, request
 from app import app, db
 from app.user import security_team_required
 from app.util import json_response
@@ -13,6 +13,8 @@ from collections import OrderedDict
 from sqlalchemy import and_
 from datetime import datetime
 from re import match
+from werkzeug.contrib.atom import AtomFeed
+from config import TRACKER_ISSUE_URL
 
 
 def get_advisory_data():
@@ -32,6 +34,28 @@ def get_advisory_data():
         'scheduled': scheduled,
         'published': published
     }
+
+
+@app.route('/advisories/feed.atom', methods=['GET'])
+@app.route('/advisory/feed.atom', methods=['GET'])
+def advisory_atom():
+    data = get_advisory_data()
+    feed = AtomFeed('Arch Linux - Recent advisories',
+            feed_url=request.url, url=request.url_root)
+
+    for entry in data['published']:
+        advisory = entry['advisory']
+        package = entry['package']
+        title = '[{}] {}: {}'.format(advisory.id, package.pkgname, advisory.advisory_type)
+
+        feed.add(title, advisory.content,
+                content_type='html',
+                author='Arch Linux Security Team',
+                url=TRACKER_ISSUE_URL.format(advisory.id),
+                published=advisory.created,
+                updated=advisory.created)
+
+    return feed.get_response()
 
 
 @app.route('/advisory<regex("[./]json"):postfix>', methods=['GET'])
