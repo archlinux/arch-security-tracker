@@ -2,6 +2,7 @@ Flask
 Flask-Login
 Flask-SQLAlchemy
 Flask-WTF
+flask-talisman
 requests
 scrypt
 https://git.archlinux.org/users/remy/pyalpm.git/snapshot/pyalpm-0.8.tar.xz
