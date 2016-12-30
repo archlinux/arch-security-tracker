@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from flask_talisman import Talisman
 from werkzeug.routing import BaseConverter
 from types import MethodType
 from sqlalchemy.engine import Engine
@@ -24,9 +25,17 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     dbapi_connection.isolation_level = isolation_level
 
 
+csp = {
+    'default-src': '\'self\'',
+    'style-src': '\'self\'',
+    'font-src': '\'self\'',
+    'form-action': '\'self\''
+}
+
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
+talisman = Talisman(app, force_https=False, session_cookie_secure=False, content_security_policy=csp)
 
 login_manager = LoginManager()
 login_manager.init_app(app)

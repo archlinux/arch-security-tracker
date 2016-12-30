@@ -21,6 +21,7 @@ vulnerability details and generating security advisories.
 * python-sqlalchemy
 * python-flask
 * python-flask-sqlalchemy
+* python-flask-talisman
 * python-flask-wtf
 * python-flask-login
 * python-requests
