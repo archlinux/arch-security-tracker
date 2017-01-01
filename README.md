@@ -15,6 +15,8 @@ vulnerability details and generating security advisories.
 
 ## Dependencies
 
+### Application
+
 * python >= 3.4
 * python-sqlalchemy
 * python-flask
@@ -27,12 +29,23 @@ vulnerability details and generating security advisories.
 * sqlite
 * expac
 
+### Tests
+
+* python-pytest
+
+### Virtualenv
+
 Python dependencies can be installed in a virtual environment (`virtualenv`), by running:
 
 ```
 virtualenv .virtualenv
 . .virtualenv/bin/activate
 pip install -r requirements.txt
+```
+
+For running tests:
+```
+pip install -r test-requirements.txt
 ```
 
 ## Setup
