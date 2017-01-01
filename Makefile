@@ -1,3 +1,5 @@
+PYTEST=py.test
+
 all: update
 
 setup: submodule
@@ -10,6 +12,9 @@ submodule:
 
 update: setup
 	./update
+
+test:
+	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} tests
 
 clean:
 	rm -rf ./pacman/{cache,log}
