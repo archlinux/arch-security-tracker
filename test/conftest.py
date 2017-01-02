@@ -13,7 +13,8 @@ def app(request):
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     flask_app.config['TESTING'] = True
     flask_app.config['WTF_CSRF_ENABLED'] = False
-    flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    flask_app.config['SERVER_NAME'] = 'localhost'
     with flask_app.app_context():
         yield flask_app
 
@@ -30,7 +31,7 @@ def db(request):
 
 
 @pytest.fixture(autouse=True, scope='function')
-def run_scoped(app, db, request):
+def run_scoped(app, db, client, request):
     with app.app_context():
         connection = db.engine.connect()
         transaction = connection.begin()
@@ -41,7 +42,8 @@ def run_scoped(app, db, request):
         db.session = session
         db.create_all()
 
-        yield
+        with client:
+            yield
 
         db.drop_all()
         transaction.rollback()
@@ -49,6 +51,7 @@ def run_scoped(app, db, request):
         session.remove()
 
 
+@pytest.fixture
 def create_user(db, username=USERNAME, password=None, role=UserRole.reporter,
                 email=None, salt=None, active=True):
     user = User()

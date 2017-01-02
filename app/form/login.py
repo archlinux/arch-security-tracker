@@ -7,6 +7,8 @@ from wtforms.validators import DataRequired, Length
 from hmac import compare_digest
 
 
+ERROR_INVALID_USERNAME_PASSWORD = 'Invalid username or password.'
+ERROR_ACCOUNT_DISABLED = 'Account is disabled.'
 dummy_password = hash_password(random_string(), random_string())
 
 
@@ -23,7 +25,7 @@ class LoginForm(BaseForm):
             return False
 
         def fail():
-            self.password.errors.append('Invalid username or password.')
+            self.password.errors.append(ERROR_INVALID_USERNAME_PASSWORD)
             return False
 
         user = User.query.filter(User.name == self.username.data).first()
@@ -33,7 +35,7 @@ class LoginForm(BaseForm):
         if not compare_digest(user.password, hash_password(self.password.data, user.salt)):
             return fail()
         if not user.active:
-            self.username.errors.append('Account is disabled.')
+            self.username.errors.append(ERROR_ACCOUNT_DISABLED)
             return False
         self.user = user
         return True
