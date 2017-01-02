@@ -51,20 +51,20 @@ def add_group():
     issues = CVE.query.filter(CVE.id.in_(cve_ids)).all()
     issue_ids = [issue.id for issue in issues]
 
-
     pkgnames = multiline_to_list(form.pkgnames.data)
 
-    select = db.session.query(CVEGroup, CVE,
-        CVEGroupPackage).join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
-    select = select.filter(CVEGroupPackage.pkgname.in_(pkgnames)).filter(CVE.id.in_(issue_ids))
-    # Iterate and find the package
-    if len(list(select)):
-        for group, cve, package in list(select):
-            flash('There is a group for the package {} and {}; AVG-{}'.format(package.pkgname, cve.id, group.id))
-            return render_template('form/group.html',
-                                   title='Add AVG',
-                                   form=form,
-                                   CVEGroup=CVEGroup)
+    # Check if a package with a CVE crashes with an existing group
+    if not form.force_submit.data:
+        select = db.session.query(CVEGroup, CVE, CVEGroupPackage).join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+        select = select.filter(CVEGroupPackage.pkgname.in_(pkgnames)).filter(CVE.id.in_(issue_ids)).all()
+        if len(select):
+            for group, cve, package in select:
+                flash('There is a group for the package {} and {}; AVG-{}'
+                        .format(package.pkgname, cve.id, group.id), "warning")
+                return render_template('form/group.html',
+                                       title='Add AVG',
+                                       form=form,
+                                       CVEGroup=CVEGroup)
 
     for cve_id in list(filter(lambda issue: issue not in issue_ids, cve_ids)):
         cve = db.create(CVE, id=cve_id)

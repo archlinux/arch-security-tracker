@@ -29,6 +29,7 @@
 					{{ render_field(form.reference, class='full size', maxlength=CVEGroup.REFERENCES_LENGTH, placeholder='Relevant external group references...', indent=5) }}
 					{{ render_field(form.notes, class='full size', maxlength=CVEGroup.NOTES_LENGTH, placeholder='Internal group side notes...', indent=5) }}
 					{{ render_checkbox(form.advisory_qualified, indent=5) }}
+					{{ render_checkbox(form.force_submit, indent=5) }}
 					{{ form.submit(class='button-primary') }}
 				</form>
 			</div>
