@@ -66,6 +66,12 @@ adding a new user:
 ./update --create-user
 ```
 
+run tests:
+
+```
+make test
+```
+
 For production run it through ```uwsgi```
 
 ## Configuration
