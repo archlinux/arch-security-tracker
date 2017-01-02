@@ -57,7 +57,7 @@ def add_group():
     if not form.force_submit.data:
         select = db.session.query(CVEGroup, CVE, CVEGroupPackage).join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
         select = select.filter(CVEGroupPackage.pkgname.in_(pkgnames)).filter(CVE.id.in_(issue_ids)).all()
-        if len(select):
+        if select:
             for group, cve, package in select:
                 flash('There is a group for the package {} and {}; AVG-{}'
                         .format(package.pkgname, cve.id, group.id), "warning")
