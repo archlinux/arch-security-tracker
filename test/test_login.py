@@ -1,5 +1,6 @@
 import pytest
 from .conftest import create_user, USERNAME
+from werkzeug.exceptions import Unauthorized
 
 
 @pytest.fixture(autouse=True)
@@ -17,5 +18,5 @@ def test_login(client):
 
 def test_login_invalid(client):
     resp = client.post('/login', data={'username': USERNAME, 'password': 'nein'})
-    assert 200 == resp.status_code
+    assert Unauthorized.code == resp.status_code
     assert b'Login' in resp.data
