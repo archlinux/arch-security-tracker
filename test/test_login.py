@@ -23,10 +23,9 @@ def test_login_invalid_credentials(db, client):
     assert ERROR_INVALID_USERNAME_PASSWORD in resp.data.decode()
 
 
-@create_user(username='deactivated-user-account', active=False)
+@create_user(active=False)
 def test_login_disabled(db, client):
-    username = 'deactivated-user-account'
-    resp = client.post(url_for('login'), data={'username': username, 'password': username})
+    resp = client.post(url_for('login'), data={'username': DEFAULT_USERNAME, 'password': DEFAULT_USERNAME})
     assert_not_logged_in(resp, status_code=Unauthorized.code)
     assert ERROR_ACCOUNT_DISABLED in resp.data.decode()
 
