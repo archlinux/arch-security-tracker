@@ -1,4 +1,5 @@
-PYTEST=py.test
+PYTEST?=py.test
+PYTEST_OPTIONS+=-v -s
 
 all: update
 
@@ -14,7 +15,7 @@ update: setup
 	./update
 
 test:
-	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} tests
+	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} tests ${PYTEST_OPTIONS}
 
 clean:
 	rm -rf ./pacman/{cache,log}
