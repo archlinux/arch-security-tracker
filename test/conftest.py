@@ -1,11 +1,15 @@
 import pytest
 
+from functools import wraps
+from flask import url_for
+from flask_login import current_user
+
 from app import app as flask_app, db as flask_db
 from app.user import random_string, hash_password
 from app.model.user import User
 from app.model.enum import UserRole
 
-USERNAME = 'cyberwehr12345678'
+DEFAULT_USERNAME = 'cyberwehr12345678'
 
 
 @pytest.fixture(scope="session")
@@ -52,17 +56,56 @@ def run_scoped(app, db, client, request):
 
 
 @pytest.fixture
-def create_user(db, username=USERNAME, password=None, role=UserRole.reporter,
-                email=None, salt=None, active=True):
-    user = User()
-    user.active = active
-    user.name = username
-    user.password = password if password else username
-    user.role = role
-    user.email = email if email else '{}@cyber.cyber'.format(username)
-    user.salt = salt if salt else random_string()
-    user.password = hash_password(user.password, user.salt)
+def assert_logged_in(response, status_code=200):
+    assert status_code == response.status_code
+    assert b'logout' in response.data
+    assert b'login' not in response.data
+    assert current_user.is_authenticated
 
-    db.session.add(user)
-    db.session.commit()
-    return user
+
+@pytest.fixture
+def assert_not_logged_in(response, status_code=200):
+    assert status_code == response.status_code
+    assert b'logout' not in response.data
+    assert b'login' in response.data
+    assert not current_user.is_authenticated
+
+
+@pytest.fixture
+def logged_in(func=None, role=UserRole.administrator, username=DEFAULT_USERNAME, password=None):
+    def decorator(func):
+        @create_user(role=role, username=username, password=password)
+        @wraps(func)
+        def wrapper(db, client, *args, **kwargs):
+            resp = client.post(url_for('login'), follow_redirects=True,
+                               data=dict(username=username, password=password if password else username))
+            assert_logged_in(resp)
+            func(db=db, client=client, *args, **kwargs)
+        return wrapper
+    if not func:
+        return decorator
+    return decorator(func)
+
+
+@pytest.fixture
+def create_user(func=None, username=DEFAULT_USERNAME, password=None, role=UserRole.reporter,
+                email=None, salt=None, active=True):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(db, *args, **kwargs):
+            user = User()
+            user.active = active
+            user.name = username
+            user.password = password if password else username
+            user.role = role
+            user.email = email if email else '{}@cyber.cyber'.format(username)
+            user.salt = salt if salt else random_string()
+            user.password = hash_password(user.password, user.salt)
+
+            db.session.add(user)
+            db.session.commit()
+            func(db=db, *args, **kwargs)
+        return wrapper
+    if not func:
+        return decorator
+    return decorator(func)
