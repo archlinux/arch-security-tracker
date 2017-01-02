@@ -15,12 +15,13 @@ def login():
 
     form = LoginForm()
     if not form.validate_on_submit():
+        status_code = Unauthorized.code if form.is_submitted() else 200
         return render_template('login.html',
                                title='Login',
                                form=form,
                                User=User,
                                password_length={'min': TRACKER_PASSWORD_LENGTH_MIN,
-                                                'max': TRACKER_PASSWORD_LENGTH_MAX}), Unauthorized.code
+                                                'max': TRACKER_PASSWORD_LENGTH_MAX}), status_code
 
     user = user_assign_new_token(form.user)
     user.is_authenticated = True
