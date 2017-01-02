@@ -7,6 +7,11 @@ from config import TRACKER_PASSWORD_LENGTH_MIN
 from app.form.login import ERROR_INVALID_USERNAME_PASSWORD, ERROR_ACCOUNT_DISABLED
 
 
+def test_login_view(db, client):
+    resp = client.get(url_for('login'))
+    assert 200 == resp.status_code
+
+
 @create_user
 def test_login_success(db, client):
     resp = client.post(url_for('login'), follow_redirects=True,
