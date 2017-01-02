@@ -1,6 +1,8 @@
 PYTEST?=py.test
 PYTEST_OPTIONS+=-v -s
 
+.PHONY: update test
+
 all: update
 
 setup: submodule
@@ -15,10 +17,8 @@ update: setup
 	./update
 
 test:
-	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} tests ${PYTEST_OPTIONS}
+	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} test ${PYTEST_OPTIONS}
 
 clean:
 	rm -rf ./pacman/{cache,log}
 	rm -rf ./pacman/arch/{i686,x86_64}/db
-
-forceme:

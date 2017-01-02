@@ -1,5 +1,5 @@
 import pytest
-from tests.conftest import create_user, USERNAME
+from .conftest import create_user, USERNAME
 
 
 @pytest.fixture(autouse=True)
