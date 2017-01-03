@@ -1,7 +1,7 @@
 from flask import url_for
 from flask_login import current_user
 
-from .conftest import logged_in, assert_logged_in, DEFAULT_USERNAME
+from .conftest import logged_in, assert_logged_in, assert_not_logged_in, DEFAULT_USERNAME
 
 
 @logged_in
@@ -11,6 +11,9 @@ def test_change_password(db, client):
                        data=dict(password=new_password, new_password=new_password, password_current=DEFAULT_USERNAME))
     assert resp.status_code == 200
 
+    # logout and test if new password was applied
+    resp = client.post(url_for('logout'), follow_redirects=True)
+    assert_not_logged_in(resp)
     resp = client.post(url_for('login'), follow_redirects=True,
                        data=dict(username=DEFAULT_USERNAME, password=new_password))
     assert_logged_in(resp)
