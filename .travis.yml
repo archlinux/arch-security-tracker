@@ -1,0 +1,29 @@
+dist: trusty
+
+sudo: required
+
+env: ARCH_TRAVIS_CLEAN_CHROOT=1
+
+arch:
+
+  packages:
+    - python
+    - python-pytest
+    - python-sqlalchemy
+    - python-flask
+    - python-flask-sqlalchemy
+    - python-flask-wtf
+    - python-flask-login
+    - python-requests
+    - python-scrypt
+    - pyalpm
+    - sqlite
+    - expac
+
+  script:
+    - python3 -m py_compile $(git ls-files '*.py')
+    - make test
+
+script: 'curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash'
+
+# vim: ft=yaml ts=2 sw=2 et:
