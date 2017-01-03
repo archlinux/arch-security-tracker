@@ -7,6 +7,11 @@ from wtforms.validators import DataRequired, Length
 from hmac import compare_digest
 
 
+ERROR_PASSWORD_CONTAINS_USERNAME = 'Password must not contain the username.'
+ERROR_PASSWORD_REPEAT_MISMATCHES = 'Repeated password mismatches.'
+ERROR_PASSWORD_INCORRECT = 'Current password incorrect.'
+
+
 class UserPasswordForm(BaseForm):
     password = PasswordField(u'New Password', validators=[DataRequired(), Length(min=TRACKER_PASSWORD_LENGTH_MIN, max=TRACKER_PASSWORD_LENGTH_MAX)])
     password_repeat = PasswordField(u'Repeat Password', validators=[DataRequired(), Length(min=TRACKER_PASSWORD_LENGTH_MIN, max=TRACKER_PASSWORD_LENGTH_MAX)])
@@ -22,15 +27,15 @@ class UserPasswordForm(BaseForm):
             return False
 
         if current_user.name in self.password.data:
-            self.password.errors.append('Password must not contain the username.')
+            self.password.errors.append(ERROR_PASSWORD_CONTAINS_USERNAME)
             return False
 
-        if self.password.data != self.password.data:
-            self.password_repeat.errors.append('Repeated password mismatches.')
+        if self.password.data != self.password_repeat.data:
+            self.password_repeat.errors.append(ERROR_PASSWORD_REPEAT_MISMATCHES)
             return False
 
         if not compare_digest(current_user.password, hash_password(self.password_current.data, current_user.salt)):
-            self.password_current.errors.append('Current password incorrect.')
+            self.password_current.errors.append(ERROR_PASSWORD_INCORRECT)
             return False
 
         return True
