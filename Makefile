@@ -16,7 +16,7 @@ submodule:
 update: setup
 	./update
 
-test:
+test: setup
 	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} test ${PYTEST_OPTIONS}
 
 clean:
