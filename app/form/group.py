@@ -18,6 +18,7 @@ class GroupForm(BaseForm):
     reference = TextAreaField(u'References', validators=[Optional(), Length(max=CVEGroup.REFERENCES_LENGTH), ValidURLs()])
     notes = TextAreaField(u'Notes', validators=[Optional(), Length(max=CVEGroup.NOTES_LENGTH)])
     advisory_qualified = BooleanField(u'Advisory qualified', default=True, validators=[Optional()])
+    force_submit = BooleanField(u'Force advisory creation', default=False , validators=[Optional()])
     submit = SubmitField(u'submit')
 
     def validate(self):
