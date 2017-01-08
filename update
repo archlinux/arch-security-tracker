@@ -4,7 +4,7 @@ from app.pacman import update as update_pacman_db, search, get_configpath, archs
 from app import db
 from app.model import CVEGroup, CVEGroupPackage, CVE, CVEGroupEntry, Package
 from app.model.user import User, username_regex
-from app.model.enum import Status, Affected, UserRole, affected_to_status, status_to_affected, highest_severity
+from app.model.enum import Status, UserRole, affected_to_status, status_to_affected, highest_severity
 from app.user import random_string, hash_password
 from sqlalchemy import func
 from collections import defaultdict
