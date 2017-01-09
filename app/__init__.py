@@ -11,6 +11,8 @@ from config import SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, S
 
 @event.listens_for(Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
+    isolation_level = dbapi_connection.isolation_level
+    dbapi_connection.isolation_level = None
     cursor = dbapi_connection.cursor()
     cursor.execute('PRAGMA temp_store = {}'.format(SQLITE_TEMP_STORE))
     cursor.execute('PRAGMA journal_mode = {}'.format(SQLITE_JOURNAL_MODE))
@@ -19,6 +21,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute('PRAGMA cache_size = {}'.format(SQLITE_CACHE_SIZE))
     cursor.execute('PRAGMA foreign_keys = ON')
     cursor.close()
+    dbapi_connection.isolation_level = isolation_level
 
 
 app = Flask(__name__)
