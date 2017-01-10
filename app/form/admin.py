@@ -8,6 +8,10 @@ from wtforms.fields.html5 import EmailField
 from sqlalchemy import or_
 
 
+ERROR_USERNAME_EXISTS = 'Username already exists.'
+ERROR_EMAIL_EXISTS = 'E-Mail already exists.'
+
+
 class UserForm(BaseForm):
     username = StringField(u'Username', validators=[DataRequired(), Length(max=User.NAME_LENGTH), Regexp(username_regex)])
     email = EmailField(u'E-Mail', validators=[DataRequired(), Length(max=User.EMAIL_LENGTH), Email()])
@@ -38,7 +42,7 @@ class UserForm(BaseForm):
         if not user:
             return True
         if user.name == self.username.data:
-            self.username.errors.append('Username already exists.')
+            self.username.errors.append(ERROR_USERNAME_EXISTS)
         if user.email == self.email.data:
-            self.email.errors.append('E-Mail already exists.')
+            self.email.errors.append(ERROR_EMAIL_EXISTS)
         return False
