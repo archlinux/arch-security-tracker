@@ -68,7 +68,8 @@ def get_cve_data(cve):
     entries = (db.session.query(CVEGroupEntry, CVEGroup, CVEGroupPackage, Advisory)
                .filter_by(cve=cve_model)
                .join(CVEGroup).join(CVEGroupPackage)
-               .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
+               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
+                                         Advisory.publication == Publication.published))
                .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
 
     group_packages = defaultdict(set)
@@ -137,7 +138,8 @@ def get_group_data(avg):
                .filter(CVEGroup.id == avg_id)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                .outerjoin(Package, Package.name == CVEGroupPackage.pkgname)
-               .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
+               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
+                                         Advisory.publication == Publication.published))
                ).all()
     if not entries:
         return None
