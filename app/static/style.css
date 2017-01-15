@@ -380,7 +380,6 @@ input[type="button"].button-primary:focus {
 }
 
 .errors {
-  float: left;
   clear: none;
   color: red;
 }
