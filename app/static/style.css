@@ -568,3 +568,15 @@ form .errors {
 .source-listing ul li:hover {
   font-weight: normal;
 }
+
+.scroll {
+  overflow: auto;
+}
+
+.scroll-x {
+  overflow-x: auto;
+}
+
+.scroll-y {
+  overflow-y: auto;
+}
