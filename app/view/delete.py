@@ -1,10 +1,12 @@
 from flask import render_template, flash, redirect
 from app import app, db
-from app.user import reporter_required, user_can_delete_group, user_can_delete_issue
+from app.user import reporter_required, security_team_required, user_can_delete_group, user_can_delete_issue
 from app.form.confirm import ConfirmForm
 from app.model import CVEGroup, CVE, CVEGroupPackage, CVEGroupEntry, Advisory
 from app.model.cvegroup import vulnerability_group_regex
+from app.model.advisory import advisory_regex
 from app.model.cve import cve_id_regex
+from app.model.enum import Publication
 from app.view.error import not_found, forbidden
 from collections import defaultdict
 
@@ -122,4 +124,38 @@ def delete_issue(issue):
     db.session.delete(issue)
     db.session.commit()
     flash('Deleted {}'.format(issue))
+    return redirect('/')
+
+
+@app.route('/advisory/<regex("{}"):advisory_id>/delete'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
+@app.route('/<regex("{}"):advisory_id>/delete'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
+@security_team_required
+def delete_advisory(advisory_id):
+    advisory, pkg, group = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
+                            .filter(Advisory.id == advisory_id)
+                            .join(CVEGroupPackage).join(CVEGroup)).first()
+
+    if not advisory:
+        return not_found()
+
+    if Publication.scheduled != advisory.publication:
+        return forbidden()
+
+    form = ConfirmForm()
+    title = 'Delete {}'.format(advisory.id)
+    if not form.validate_on_submit():
+        return render_template('form/delete_advisory.html',
+                               title=title,
+                               heading=title,
+                               form=form,
+                               advisory=advisory,
+                               pkg=pkg,
+                               group=group)
+
+    if not form.confirm.data:
+        return redirect('/{}'.format(advisory.id))
+
+    db.session.delete(advisory)
+    db.session.commit()
+    flash('Deleted {}'.format(advisory.id))
     return redirect('/')
