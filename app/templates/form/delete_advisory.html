@@ -1,0 +1,41 @@
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import colorize_severity -%}
+{% block content %}
+			<h1>{% if heading %}{{ heading }}{% else %}Confirm{% endif %}</h1>
+			<div class="short size">
+				<form action="" method="post" name="confirm">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<h2>Details</h2>
+						<table class="styled-table column-major full size">
+							<tbody>
+								<tr>
+									<td>Package</td>
+									<td class="full size wrap">
+										<span class="no-wrap"><a href="/package/{{ pkg.pkgname }}">{{ pkg.pkgname }}</a></span>
+									</td>
+								</tr>
+								<tr>
+									<td>Type</td>
+									<td>{{ advisory.advisory_type }}</td>
+								</tr>
+								<tr>
+									<td>Severity</td>
+									<td>{{ colorize_severity(group.severity) }}</td>
+								</tr>
+								<tr>
+									<td>Group</td>
+									<td><a href="/{{ group }}">{{ group }}</a></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="row">
+						Are you sure you want to delete <a href="/{{ advisory.id }}">{{ advisory.id }}</a>?<br />
+						<br />
+						{{ form.confirm(class='button-primary') }}
+						{{ form.abort(class='button-primary') }}
+					</div>
+				</form>
+			</div>
+{%- endblock %}

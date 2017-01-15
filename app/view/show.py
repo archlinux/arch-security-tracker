@@ -373,7 +373,8 @@ def render_html_advisory(advisory, package, group, raw_asa, generated):
                            package=package,
                            raw_asa=raw_asa,
                            generated=generated,
-                           can_handle_advisory=user_can_handle_advisory())
+                           can_handle_advisory=user_can_handle_advisory(),
+                           Publication=Publication)
 
 
 @app.route('/advisory/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
