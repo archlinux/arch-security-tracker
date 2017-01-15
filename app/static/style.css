@@ -61,6 +61,10 @@ select {
   text-decoration: underline;
 }
 
+#archnavbarlist #anb-security a {
+  color: white; !important;
+}
+
 .navbar {
   margin: 1.5em 0;
 }
