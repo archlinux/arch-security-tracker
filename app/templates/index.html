@@ -8,50 +8,52 @@
 					<li>{%- if not only_vulnerable %}<a href="/vulnerable">vulnerable</a>{%- else %}<b>vulnerable</b>{%- endif %}</li>
 				</ul>
 			</div>
-			<table class="styled-table full size">
-				<thead>
-					<tr>
-						<th>Group</th>
-						<th>Issue</th>
-						<th>Package</th>
-						<th>Affected</th>
-						<th>Fixed</th>
-						<th>Severity</th>
-						<th>Status</th>
-						<th>Ticket</th>
-						<th class="center">Advisory</th>
-					</tr>
-				</thead>
-				<tbody>
-				{%- for entry in entries %}
-					<tr>
-						<td><a href="/{{ entry.group.name }}">{{ entry.group.name }}</a></td>
-						<td>
-							{%- for cve in entry.issues %}
-							<a href="/{{ cve.id }}">{{ cve.id }}</a>{% if not loop.last %}<br />{% endif %}
-							{%- endfor %}
-						</td>
-						<td class="wrap">
-							{%- for pkg in entry.pkgs %}
-							<span class="no-wrap"><a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}</span>
-							{%- endfor %}
-						</td>
-						<td>{{ entry.group.affected }}</td>
-						<td>{{ entry.group.fixed }}</td>
-						<td>{{ colorize_severity(entry.group.severity) }}</td>
-						<td>{{ colorize_status(entry.group.status) }}</td>
-						<td>{{ bug_ticket(entry.group.bug_ticket) }}</td>
-						<td class="center">
-							{%- if entry.advisories -%}
-								{%- for advisory in entry.advisories -%}
-								<a href="/{{ advisory }}">{{ advisory }}</a>{% if not loop.last %}<br/>{% endif %}
-								{%- endfor -%}
-							{%- elif not entry.group.advisory_qualified -%}
-								None
-							{%- endif -%}
-						</td>
-					</tr>
-				{%- endfor %}
-				</tbody>
-			</table>
+			<div class="scroll-x">
+				<table class="styled-table full size">
+					<thead>
+						<tr>
+							<th>Group</th>
+							<th>Issue</th>
+							<th>Package</th>
+							<th>Affected</th>
+							<th>Fixed</th>
+							<th>Severity</th>
+							<th>Status</th>
+							<th>Ticket</th>
+							<th class="center">Advisory</th>
+						</tr>
+					</thead>
+					<tbody>
+					{%- for entry in entries %}
+						<tr>
+							<td><a href="/{{ entry.group.name }}">{{ entry.group.name }}</a></td>
+							<td>
+								{%- for cve in entry.issues %}
+								<a href="/{{ cve.id }}">{{ cve.id }}</a>{% if not loop.last %}<br />{% endif %}
+								{%- endfor %}
+							</td>
+							<td class="wrap">
+								{%- for pkg in entry.pkgs %}
+								<span class="no-wrap"><a href="/package/{{ pkg }}">{{ pkg }}</a>{% if not loop.last %}, {% endif %}</span>
+								{%- endfor %}
+							</td>
+							<td>{{ entry.group.affected }}</td>
+							<td>{{ entry.group.fixed }}</td>
+							<td>{{ colorize_severity(entry.group.severity) }}</td>
+							<td>{{ colorize_status(entry.group.status) }}</td>
+							<td>{{ bug_ticket(entry.group.bug_ticket) }}</td>
+							<td class="center">
+								{%- if entry.advisories -%}
+									{%- for advisory in entry.advisories -%}
+									<a href="/{{ advisory }}">{{ advisory }}</a>{% if not loop.last %}<br/>{% endif %}
+									{%- endfor -%}
+								{%- elif not entry.group.advisory_qualified -%}
+									None
+								{%- endif -%}
+							</td>
+						</tr>
+					{%- endfor %}
+					</tbody>
+				</table>
+			</div>
 {%- endblock %}
