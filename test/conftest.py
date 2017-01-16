@@ -1,14 +1,19 @@
 import pytest
 
 from functools import wraps
+from datetime import datetime
 from flask import url_for
 from flask_login import current_user
 
 from app import app as flask_app, db as flask_db
 from app.user import random_string, hash_password
 from app.model.user import User
-from app.model.enum import UserRole, Severity, Remote
+from app.model.enum import UserRole, Severity, Remote, Affected, Status
 from app.model.cve import CVE, issue_types
+from app.model.cvegroup import CVEGroup
+from app.model.cvegroupentry import CVEGroupEntry
+from app.model.cvegrouppackage import CVEGroupPackage
+from app.model.package import Package
 
 DEFAULT_USERNAME = 'cyberwehr12345678'
 ERROR_LOGIN_REQUIRED = 'Please log in to access this page.'
@@ -58,7 +63,6 @@ def run_scoped(app, db, client, request):
         session.remove()
 
 
-@pytest.fixture
 def assert_logged_in(response, status_code=200):
     assert status_code == response.status_code
     assert b'logout' in response.data
@@ -66,7 +70,6 @@ def assert_logged_in(response, status_code=200):
     assert current_user.is_authenticated
 
 
-@pytest.fixture
 def assert_not_logged_in(response, status_code=200):
     assert status_code == response.status_code
     assert b'logout' not in response.data
@@ -74,7 +77,6 @@ def assert_not_logged_in(response, status_code=200):
     assert not current_user.is_authenticated
 
 
-@pytest.fixture
 def logged_in(func=None, role=UserRole.administrator, username=DEFAULT_USERNAME, password=None):
     def decorator(func):
         @create_user(role=role, username=username, password=password)
@@ -90,7 +92,6 @@ def logged_in(func=None, role=UserRole.administrator, username=DEFAULT_USERNAME,
     return decorator(func)
 
 
-@pytest.fixture
 def create_user(func=None, username=DEFAULT_USERNAME, password=None, role=UserRole.reporter,
                 email=None, salt=None, active=True):
     def decorator(func):
@@ -117,12 +118,13 @@ def create_user(func=None, username=DEFAULT_USERNAME, password=None, role=UserRo
 DEFAULT_ISSUE_ID = 'CVE-2016-1337'
 
 
-def default_issue_dict():
-    return dict(cve=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown.name,
+def default_issue_dict(overrides=dict()):
+    data = dict(cve=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown.name,
                 severity=Severity.unknown.name, description=None, notes=None, reference=None)
+    data.update(overrides)
+    return data
 
 
-@pytest.fixture
 def create_issue(func=None, id=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown,
                  severity=Severity.unknown, description=None, notes=None, reference=None):
     def decorator(func):
@@ -139,6 +141,84 @@ def create_issue(func=None, id=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remo
 
             db.session.add(issue)
             db.session.commit()
+            func(db=db, *args, **kwargs)
+        return wrapper
+    if not func:
+        return decorator
+    return decorator(func)
+
+
+def create_package(func=None, id=None, name=None, base=None, version='1.0-1', arch='any',
+                   database='core', description='', url=None, filename='somefile-1.0-1-any.tar.xz',
+                   md5sum='md5', sha256sum='sha256', builddate=0):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(db, *args, **kwargs):
+            package = Package()
+            if id:
+                package.id = id
+            package.name = name
+            package.base = base if base else name
+            package.version = version
+            package.arch = arch
+            package.database = database
+            package.description = description
+            package.url = url
+            package.filename = filename
+            package.md5sum = md5sum
+            package.sha256sum = sha256sum
+            package.builddate = builddate
+
+            db.session.add(package)
+            db.session.commit()
+            func(db=db, *args, **kwargs)
+        return wrapper
+    if not func:
+        return decorator
+    return decorator(func)
+
+
+DEFAULT_GROUP_ID = 1
+DEFAULT_GROUP_NAME = 'AVG-{}'.format(DEFAULT_GROUP_ID)
+
+
+def default_group_dict(overrides=dict()):
+    data = dict(cve=DEFAULT_ISSUE_ID, pkgnames='foopkg', affected='1.0-1', fixed='1.1-1',
+                status=Affected.unknown.name, bug_ticket=None, reference=None, notes=None,
+                advisory_qualified=True)
+    data.update(overrides)
+    return data
+
+
+def create_group(func=None, id=DEFAULT_GROUP_ID, status=Status.unknown, severity=Severity.unknown,
+                 affected='1.0-1', fixed=None, bug_ticket=None, reference=None, notes=None,
+                 created=datetime.utcnow(), advisory_qualified=True, issues=[], packages=[]):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(db, *args, **kwargs):
+            group = CVEGroup()
+            if id:
+                group.id = id
+            group.status = status
+            group.severity = severity
+            group.affected = affected
+            group.fixed = fixed
+            group.bug_ticket = bug_ticket
+            group.reference = reference
+            group.notes = notes
+            group.created = created
+            group.advisory_qualified = advisory_qualified
+
+            db.session.add(group)
+            db.session.commit()
+
+            for issue in issues:
+                cve = db.get_or_create(CVE, id=issue)
+                db.get_or_create(CVEGroupEntry, group=group, cve=cve)
+            for pkgname in packages:
+                db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
+            db.session.commit()
+
             func(db=db, *args, **kwargs)
         return wrapper
     if not func:

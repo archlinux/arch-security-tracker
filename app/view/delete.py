@@ -87,10 +87,14 @@ def delete_issue(issue):
     if not user_can_delete_issue(advisories):
         return forbidden()
 
+    group_ids = [group.id for group in groups]
+
     group_entries = (db.session.query(CVEGroup, CVE)
-                     .filter(CVEGroup.id.in_([group.id for group in groups]))
                      .join(CVEGroupEntry).join(CVE)
-                     .order_by(CVE.id.desc())).all()
+                     .order_by(CVE.id.desc()))
+    if group_ids:
+        group_entries = group_entries.filter(CVEGroup.id.in_(group_ids))
+    group_entries = group_entries.all()
 
     group_issues = defaultdict(set)
     for group, cve in group_entries:

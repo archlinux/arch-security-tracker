@@ -10,7 +10,6 @@ from pyalpm import vercmp
 class GroupForm(BaseForm):
     cve = TextAreaField(u'CVE', validators=[DataRequired(), ValidIssues()])
     pkgnames = TextAreaField(u'Package', validators=[DataRequired(), ValidPackageNames(), SamePackageBase()])
-    description = TextAreaField(u'Description', validators=[Optional()])
     affected = StringField(u'Affected', validators=[DataRequired(), Regexp(pkgver_regex)])
     fixed = StringField(u'Fixed', validators=[Optional(), Regexp(pkgver_regex)])
     status = SelectField(u'Status', choices=[(e.name, e.label) for e in [*Affected]], validators=[DataRequired()])
