@@ -99,10 +99,14 @@ def edit_cve(cve):
 
     if severity_changed:
         # update cached group severity for all goups containing this issue
+        group_ids = [group.id for group in groups]
         issues = (db.session.query(CVEGroup, CVE)
-                  .filter(CVEGroup.id.in_([group.id for group in groups]))
                   .join(CVEGroupEntry).join(CVE)
-                  .group_by(CVEGroup.id).group_by(CVE.id)).all()
+                  .group_by(CVEGroup.id).group_by(CVE.id))
+        if group_ids:
+            issues = issues.filter(CVEGroup.id.in_(group_ids))
+        issues = (issues).all()
+
         group_severity = defaultdict(list)
         for group, issue in issues:
             group_severity[group].append(issue.severity)

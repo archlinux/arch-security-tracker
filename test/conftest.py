@@ -7,9 +7,12 @@ from flask_login import current_user
 from app import app as flask_app, db as flask_db
 from app.user import random_string, hash_password
 from app.model.user import User
-from app.model.enum import UserRole
+from app.model.enum import UserRole, Severity, Remote
+from app.model.cve import CVE, issue_types
 
 DEFAULT_USERNAME = 'cyberwehr12345678'
+ERROR_LOGIN_REQUIRED = 'Please log in to access this page.'
+ERROR_INVALID_CHOICE = 'Not a valid choice'
 
 
 @pytest.fixture(scope="session")
@@ -103,6 +106,38 @@ def create_user(func=None, username=DEFAULT_USERNAME, password=None, role=UserRo
             user.password = hash_password(user.password, user.salt)
 
             db.session.add(user)
+            db.session.commit()
+            func(db=db, *args, **kwargs)
+        return wrapper
+    if not func:
+        return decorator
+    return decorator(func)
+
+
+DEFAULT_ISSUE_ID = 'CVE-2016-1337'
+
+
+def default_issue_dict():
+    return dict(cve=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown.name,
+                severity=Severity.unknown.name, description=None, notes=None, reference=None)
+
+
+@pytest.fixture
+def create_issue(func=None, id=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown,
+                 severity=Severity.unknown, description=None, notes=None, reference=None):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(db, *args, **kwargs):
+            issue = CVE()
+            issue.id = id
+            issue.issue_type = issue_type
+            issue.remote = remote
+            issue.severity = severity
+            issue.description = description
+            issue.notes = notes
+            issue.reference = reference
+
+            db.session.add(issue)
             db.session.commit()
             func(db=db, *args, **kwargs)
         return wrapper

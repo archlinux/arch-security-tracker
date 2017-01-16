@@ -8,6 +8,9 @@ from app.advisory import advisory_fetch_from_mailman
 from app import db
 from re import match, search
 
+ERROR_ISSUE_ID_INVALID = u'Invalid issue.'
+ERROR_INVALID_URL = u'Invalid URL {}.'
+
 
 class ValidAdvisoryReference(object):
     def __call__(self, form, field):
@@ -80,7 +83,7 @@ class SamePackageBase(object):
 
 class ValidIssue(object):
     def __init__(self):
-        self.message = u'Invalid issue.'
+        self.message = ERROR_ISSUE_ID_INVALID
 
     def __call__(self, form, field):
         if not match(cve_id_regex, field.data):
@@ -103,7 +106,7 @@ class ValidIssues(object):
 
 class ValidURLs(object):
     def __init__(self):
-        self.message = u'Invalid URL {}.'
+        self.message = ERROR_INVALID_URL
         self.regex = URLValidator().regex
 
     def fail(self, url):
