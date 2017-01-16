@@ -2,7 +2,7 @@ from app import db
 from .enum import Severity, Remote
 
 
-cve_id_regex = r'^(CVE\-\d{4}\-\d+)$'
+cve_id_regex = r'^(CVE\-\d{4}\-\d{4,})$'
 issue_types = [
     'unknown',
     'access restriction bypass',
