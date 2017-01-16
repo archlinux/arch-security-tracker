@@ -1,5 +1,6 @@
 PYTEST?=py.test
 PYTEST_OPTIONS+=-v -s
+PYTEST_INPUT=test
 
 .PHONY: update test
 
@@ -17,7 +18,7 @@ update: setup
 	./update
 
 test: setup
-	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} test ${PYTEST_OPTIONS}
+	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} ${PYTEST_INPUT} ${PYTEST_OPTIONS}
 
 clean:
 	rm -rf ./pacman/{cache,log}
