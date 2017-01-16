@@ -57,8 +57,10 @@ def add_group():
     if not form.force_submit.data:
         same_group = (db.session.query(CVEGroup, CVE, CVEGroupPackage)
                       .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
-                      .filter(CVEGroupPackage.pkgname.in_(pkgnames))
-                      .filter(CVE.id.in_(issue_ids))).all()
+                      .filter(CVEGroupPackage.pkgname.in_(pkgnames)))
+        if issue_ids:
+            same_group = same_group.filter(CVE.id.in_(issue_ids))
+        same_group = same_group.all()
         if same_group:
             for group, cve, package in same_group:
                 flash('The group AVG-{} already contains {} for the package {}'

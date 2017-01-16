@@ -6,7 +6,7 @@ class CVEGroupEntry(db.Model):
     group_id = db.Column(db.Integer(), db.ForeignKey('cve_group.id', ondelete="CASCADE"), nullable=False)
     cve_id = db.Column(db.String(15), db.ForeignKey('cve.id', ondelete="CASCADE"), nullable=False)
 
-    group = db.relationship("CVEGroup")
+    group = db.relationship("CVEGroup", back_populates="issues")
     cve = db.relationship("CVE")
 
     __tablename__ = 'cve_group_entry'

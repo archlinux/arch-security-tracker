@@ -24,6 +24,9 @@ class CVEGroup(db.Model):
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     advisory_qualified = db.Column(db.Boolean(), default=True, nullable=False)
 
+    issues = db.relationship("CVEGroupEntry", back_populates="group")
+    packages = db.relationship("CVEGroupPackage", back_populates="group")
+
     @property
     def name(self):
         return 'AVG-{}'.format(self.id)
