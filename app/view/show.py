@@ -138,9 +138,7 @@ def get_group_data(avg):
                .filter(CVEGroup.id == avg_id)
                .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                .outerjoin(Package, Package.name == CVEGroupPackage.pkgname)
-               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.publication == Publication.published))
-               ).all()
+               .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)).all()
     if not entries:
         return None
 
@@ -159,11 +157,12 @@ def get_group_data(avg):
         if advisory:
             advisories.add(advisory)
 
+    published_advisories = list(filter(lambda advisory: advisory.publication == Publication.published, advisories))
+    published_advisories = sorted(published_advisories, key=lambda item: item.id, reverse=True)
     issue_types = list(issue_types)
     issues = sorted(issues, key=lambda item: item.id, reverse=True)
     packages = sorted(packages, key=lambda item: item.pkgname)
     versions = sort_packages(filter_duplicate_packages(list(versions), True))
-    advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     advisory_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
 
     return {
@@ -172,7 +171,7 @@ def get_group_data(avg):
         'versions': versions,
         'issues': issues,
         'issue_types': issue_types,
-        'advisories': advisories,
+        'advisories': published_advisories,
         'advisory_pending': advisory_pending
     }
 
