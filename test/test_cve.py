@@ -1,3 +1,4 @@
+import json
 from werkzeug.exceptions import NotFound
 from flask import url_for
 
@@ -198,3 +199,12 @@ def test_edit_issue_not_found(db, client):
 def test_delete_issue_not_found(db, client):
     resp = client.post(url_for('delete_issue', issue='CVE-2011-0000'), follow_redirects=True)
     assert resp.status_code == NotFound.code
+
+@create_issue
+@logged_in(role=UserRole.reporter)
+def test_issue_json(db, client):
+    resp = client.get(url_for('show_cve_json', cve=DEFAULT_ISSUE_ID, path='', suffix='.json'), follow_redirects=True)
+    assert 200 == resp.status_code
+
+    data = json.loads(resp.data)
+    assert DEFAULT_ISSUE_ID == data['name']
