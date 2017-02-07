@@ -1,13 +1,13 @@
 from flask import render_template
 from app import app, db
 from app.util import json_response
-from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
+from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
 from app.model.enum import Publication, Status
 from collections import defaultdict, OrderedDict
 from sqlalchemy import func, and_
 
 
-def get_index_data(only_vulnerable=False):
+def get_index_data(only_vulnerable=False, only_in_repo=True):
     select = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '),
                                func.group_concat(Advisory.id, ' '))
                         .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
@@ -15,6 +15,8 @@ def get_index_data(only_vulnerable=False):
                                                   Advisory.publication == Publication.published)))
     if only_vulnerable:
         select = select.filter(CVEGroup.status.in_([Status.unknown, Status.vulnerable, Status.testing]))
+    if only_in_repo:
+        select = select.join(Package, Package.name == CVEGroupPackage.pkgname)
 
     entries = (select.group_by(CVEGroup.id).group_by(CVE.id)
                      .order_by(CVEGroup.status.desc())
@@ -24,7 +26,7 @@ def get_index_data(only_vulnerable=False):
     for group, cve, pkgs, advisories in entries:
         group_entry = groups.setdefault(group.id, {})
         group_entry['group'] = group
-        group_entry['pkgs'] = pkgs.split(' ')
+        group_entry['pkgs'] = list(set(pkgs.split(' ')))
         group_entry['advisories'] = advisories.split(' ') if advisories else []
         group_entry.setdefault('issues', []).append(cve)
 

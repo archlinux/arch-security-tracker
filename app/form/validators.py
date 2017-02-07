@@ -60,6 +60,8 @@ class ValidPackageNames(object):
             .group_by(Package.name).all()
         db_packages = set([pkg.name for pkg in db_packages])
         diff = [pkg for pkg in pkgnames if pkg not in db_packages]
+        if hasattr(form, 'packages'):
+            diff = [pkg for pkg in diff if pkg not in form.packages]
         for pkgname in diff:
             self.fail(pkgname)
 

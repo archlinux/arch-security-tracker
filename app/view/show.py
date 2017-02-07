@@ -153,7 +153,8 @@ def get_group_data(avg):
         issues.add(cve)
         issue_types.add(cve.issue_type)
         packages.add(pkg)
-        versions.add(package)
+        if package:
+            versions.add(package)
         if advisory:
             advisories.add(advisory)
 
@@ -256,15 +257,27 @@ def get_package_data(pkgname):
                                          Advisory.publication == Publication.published))
                ).all()
 
+    # fallback for dropped packages
     if not entries:
-        return not_found()
+        entries = (db.session.query(CVEGroupPackage, CVEGroup, CVE, Advisory)
+                   .filter(CVEGroupPackage.pkgname == pkgname)
+                   .join(CVEGroup, CVEGroup.id == CVEGroupPackage.group_id)
+                   .join(CVEGroupEntry, CVEGroupPackage.group_id == CVEGroupEntry.group_id)
+                   .join(CVE, CVE.id == CVEGroupEntry.cve_id)
+                   .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
+                                             Advisory.publication == Publication.published))
+                   ).all()
+
+    if not entries:
+        return None
 
     groups = set()
     issues = set()
     advisories = set()
     versions = set()
     for package, group, cve, advisory in entries:
-        versions.add(package)
+        if isinstance(package, Package):
+            versions.add(package)
         if group:
             groups.add(group)
         if cve:
@@ -352,7 +365,7 @@ def show_package_json(pkgname, suffix=None):
 def show_package(pkgname):
     data = get_package_data(pkgname)
     if not data:
-        return not_found(json=True)
+        return not_found()
 
     groups = data['groups']
     data['groups'] = {'open': list(filter(lambda group: group.status.open(), groups)),

@@ -20,6 +20,10 @@ class GroupForm(BaseForm):
     force_submit = BooleanField(u'Force creation', default=False, validators=[Optional()])
     submit = SubmitField(u'submit')
 
+    def __init__(self, packages=[]):
+        super().__init__()
+        self.packages = packages
+
     def validate(self):
         rv = BaseForm.validate(self)
         if not rv:

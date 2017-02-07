@@ -142,7 +142,7 @@ def edit_group(avg):
     if not user_can_edit_group(advisories):
         return forbidden()
 
-    form = GroupForm()
+    form = GroupForm(pkgnames)
     if not form.is_submitted():
         form.affected.data = group.affected
         form.fixed.data = group.fixed
