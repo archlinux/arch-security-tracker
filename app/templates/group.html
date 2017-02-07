@@ -36,11 +36,15 @@
 					</tr>
 					<tr>
 						<td>Current</td>
+						{% if not versions -%}
+						<td><span class="red">Removed</span></td>
+						{%- else -%}
 						<td>
 						{%- for version in versions %}
-							{{ version.version }} [{{ version.database }}]<br />
+							{{ version.version }} [{{ version.database }}]{% if not loop.last %}<br />{% endif %}
 						{%- endfor %}
 						</td>
+						{%- endif %}
 					</tr>
 					<tr>
 						<td>Ticket</td>

@@ -94,12 +94,19 @@ def test_edit_needs_login(db, client):
 
 
 @logged_in
-def test_show_issue_not_found(db, client):
+def test_show_group_not_found(db, client):
     resp = client.get(url_for('show_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
 @logged_in
-def test_edit_issue_not_found(db, client):
+def test_edit_group_not_found(db, client):
     resp = client.get(url_for('edit_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
+
+
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
+@logged_in
+def test_group_packge_dropped_from_repo(db, client):
+    resp = client.get(url_for('show_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert 200 == resp.status_code
