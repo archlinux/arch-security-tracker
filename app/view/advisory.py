@@ -39,7 +39,8 @@ def get_advisory_data():
 @app.route('/advisories/feed.atom', methods=['GET'])
 @app.route('/advisory/feed.atom', methods=['GET'])
 def advisory_atom():
-    data = get_advisory_data()['published']
+    last_recent_entries = 15
+    data = get_advisory_data()['published'][:last_recent_entries]
     feed = AtomFeed('Arch Linux Security - Recent advisories',
                     feed_url=request.url, url=request.url_root)
 
