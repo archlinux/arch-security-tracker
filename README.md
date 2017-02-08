@@ -1,4 +1,4 @@
-# Arch Linux Security Tracker [![Build Status](https://travis-ci.org/anthraxx/arch-security-tracker.svg?branch=master)](https://travis-ci.org/anthraxx/arch-security-tracker) [![License](https://img.shields.io/github/license/anthraxx/arch-security-tracker.svg)](https://github.com/anthraxx/arch-security-tracker/blob/master/LICENSE)
+# Arch Linux Security Tracker [![Build Status](https://travis-ci.org/anthraxx/arch-security-tracker.svg?branch=master)](https://travis-ci.org/anthraxx/arch-security-tracker)
 
 The **Arch Linux Security Tracker** is a lightweight flask based panel
 for tracking vulnerabilities in Arch Linux packages, displaying
