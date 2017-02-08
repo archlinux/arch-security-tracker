@@ -39,22 +39,24 @@ def get_advisory_data():
 @app.route('/advisories/feed.atom', methods=['GET'])
 @app.route('/advisory/feed.atom', methods=['GET'])
 def advisory_atom():
-    data = get_advisory_data()
-    feed = AtomFeed('Arch Linux - Recent advisories',
-            feed_url=request.url, url=request.url_root)
+    data = get_advisory_data()['published']
+    feed = AtomFeed('Arch Linux Security - Recent advisories',
+                    feed_url=request.url, url=request.url_root)
 
-    for entry in data['published']:
+    for entry in data:
         advisory = entry['advisory']
         package = entry['package']
         title = '[{}] {}: {}'.format(advisory.id, package.pkgname, advisory.advisory_type)
 
-        feed.add(title, advisory.content,
-                content_type='html',
-                author='Arch Linux Security Team',
-                url=TRACKER_ISSUE_URL.format(advisory.id),
-                published=advisory.created,
-                updated=advisory.created)
-
+        feed.add(title=title,
+                 content='<pre>{}</pre>'.format(advisory.content),
+                 content_type='html',
+                 summary='<pre>{}</pre>'.format(advisory.impact),
+                 summary_tpe='html',
+                 author='Arch Linux Security Team',
+                 url=TRACKER_ISSUE_URL.format(advisory.id),
+                 published=advisory.created,
+                 updated=advisory.created)
     return feed.get_response()
 
 
