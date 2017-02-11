@@ -9,6 +9,8 @@ config_files = sorted(glob('{}/config/*.conf'.format(basedir)))
 for config_file in config_files:
     config.read(config_file)
 
+atom_feeds = []
+
 config_tracker = config['tracker']
 TRACKER_ADVISORY_URL = config_tracker['advisory_url']
 TRACKER_BUGTRACKER_URL = config_tracker['bugtracker_url']

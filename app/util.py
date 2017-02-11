@@ -1,5 +1,6 @@
 from functools import wraps
 from flask import json
+from config import atom_feeds
 
 
 def multiline_to_list(data, whitespace_separator=True, unique_only=True, filter_empty=True):
@@ -66,3 +67,14 @@ def json_response(func):
         dump = json.dumps(response, indent=2, sort_keys=False)
         return dump, code, {'Content-Type': 'application/json; charset=utf-8'}
     return wrapped
+
+
+def atom_feed(title):
+    def decorator(func):
+        atom_feeds.append({'func': func.__name__, 'title': title})
+
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapped
+    return decorator
