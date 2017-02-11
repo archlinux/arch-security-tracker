@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, request
 from app import app, db
 from app.user import security_team_required
-from app.util import json_response
+from app.util import json_response, atom_feed
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
@@ -36,6 +36,7 @@ def get_advisory_data():
     }
 
 
+@atom_feed('Recent advisories')
 @app.route('/advisories/feed.atom', methods=['GET'])
 @app.route('/advisory/feed.atom', methods=['GET'])
 def advisory_atom():

@@ -6,7 +6,7 @@ from types import MethodType
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.sql.expression import ClauseElement
-from config import SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE, SQLITE_CACHE_SIZE, FLASK_SESSION_PROTECTION
+from config import atom_feeds, SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE, SQLITE_CACHE_SIZE, FLASK_SESSION_PROTECTION
 
 
 @event.listens_for(Engine, 'connect')
@@ -41,6 +41,7 @@ class RegexConverter(BaseConverter):
 
 
 app.url_map.converters['regex'] = RegexConverter
+app.jinja_env.globals['ATOM_FEEDS'] = atom_feeds
 
 from app.view import *
 from app.model import *
