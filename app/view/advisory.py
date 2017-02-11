@@ -50,9 +50,9 @@ def advisory_atom():
         title = '[{}] {}: {}'.format(advisory.id, package.pkgname, advisory.advisory_type)
 
         feed.add(title=title,
-                 content='<pre>{}</pre>'.format(advisory.content),
+                 content=render_template('feed.html', content=advisory.content),
                  content_type='html',
-                 summary='<pre>{}</pre>'.format(advisory.impact),
+                 summary=render_template('feed.html', content=advisory.impact),
                  summary_tpe='html',
                  author='Arch Linux Security Team',
                  url=TRACKER_ISSUE_URL.format(advisory.id),
