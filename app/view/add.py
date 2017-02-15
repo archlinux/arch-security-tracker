@@ -44,12 +44,11 @@ def add_group():
                                form=form,
                                CVEGroup=CVEGroup)
 
-    issues = []
-    cve_ids = multiline_to_list(form.cve.data)
-    cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
+    issue_ids = multiline_to_list(form.cve.data)
+    issue_ids = set(filter(lambda s: s.startswith('CVE-'), issue_ids))
 
-    issues = CVE.query.filter(CVE.id.in_(cve_ids)).all()
-    issue_ids = [issue.id for issue in issues]
+    existing_issues = CVE.query.filter(CVE.id.in_(issue_ids)).all()
+    existing_issue_ids = [issue.id for issue in existing_issues]
 
     pkgnames = multiline_to_list(form.pkgnames.data)
 
@@ -71,15 +70,15 @@ def add_group():
                                    CVEGroup=CVEGroup,
                                    show_force=True)
 
-    for cve_id in list(filter(lambda issue: issue not in issue_ids, cve_ids)):
+    for cve_id in list(filter(lambda issue: issue not in existing_issue_ids, issue_ids)):
         cve = db.create(CVE, id=cve_id)
-        issues.append(cve)
+        existing_issues.append(cve)
         flash('Added {}'.format(cve.id))
 
     fixed = form.fixed.data
     affected = Affected.fromstring(form.status.data)
     status = affected_to_status(affected, pkgnames[0], fixed)
-    severity = highest_severity([issue.severity for issue in issues])
+    severity = highest_severity([issue.severity for issue in existing_issues])
     advisory_qualified = form.advisory_qualified.data and status is not Status.not_affected
 
     group = db.create(CVEGroup,
@@ -93,7 +92,7 @@ def add_group():
                       advisory_qualified=advisory_qualified)
     db.session.commit()
 
-    for cve in issues:
+    for cve in existing_issues:
         db.create(CVEGroupEntry, group=group, cve=cve)
 
     for pkgname in pkgnames:
