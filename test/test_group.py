@@ -5,6 +5,7 @@ from .conftest import logged_in, create_package, create_group, default_group_dic
 from app.model.enum import UserRole, Affected, Status
 from app.model.cve import CVE
 from app.model.cvegroup import CVEGroup
+from app.view.add import ERROR_GROUP_WITH_ISSUE_EXISTS
 
 
 def set_and_assert_group_data(db, client, route):
@@ -110,3 +111,33 @@ def test_edit_group_not_found(db, client):
 def test_group_packge_dropped_from_repo(db, client):
     resp = client.get(url_for('show_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert 200 == resp.status_code
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
+@logged_in
+def test_warn_on_add_group_with_existing_issue(db, client):
+    pkgnames = ['foo']
+    issues = ['CVE-1234-1234', 'CVE-2222-2222', DEFAULT_ISSUE_ID]
+    data = default_group_dict(dict(
+        cve='\n'.join(issues),
+        pkgnames='\n'.join(pkgnames)))
+
+    resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert ERROR_GROUP_WITH_ISSUE_EXISTS.format(DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, pkgnames[0]) in resp.data.decode()
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
+@logged_in
+def test_dont_warn_on_add_group_without_existing_issue(db, client):
+    pkgnames = ['foo']
+    issues = ['CVE-1234-1234', 'CVE-2222-2222']
+    data = default_group_dict(dict(
+        cve='\n'.join(issues),
+        pkgnames='\n'.join(pkgnames)))
+
+    resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert ERROR_GROUP_WITH_ISSUE_EXISTS.format(DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, pkgnames[0]) not in resp.data.decode()
