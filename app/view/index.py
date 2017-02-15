@@ -40,14 +40,8 @@ def get_index_data(only_vulnerable=False, only_in_repo=True):
     return groups
 
 
-@app.route('/<regex("(issues?/)?(open|vulnerable)"):path>', methods=['GET'])
-def index_vulnerable(path=None):
-    return index(only_vulnerable=True)
-
-
-@app.route('/<regex("(issues?|index)?"):path>', methods=['GET'])
-@app.route('/', defaults={'path': '', 'only_vulnerable': False})
-def index(only_vulnerable=False, path=None):
+@app.route('/', defaults={'path': '', 'only_vulnerable': True}, methods=['GET'])
+def index(only_vulnerable=True, path=None):
     groups = get_index_data(only_vulnerable)
     return render_template('index.html',
                            title='Issues' if not only_vulnerable else 'Vulnerable issues',
@@ -55,7 +49,19 @@ def index(only_vulnerable=False, path=None):
                            only_vulnerable=only_vulnerable)
 
 
-@app.route('/<regex("(issues?[./])?json"):path>', methods=['GET'])
+@app.route('/<regex("(issues?/)?(open|vulnerable)?"):path>', defaults={'path': ''}, methods=['GET'])
+def index_vulnerable(path=None):
+    return index(only_vulnerable=True)
+
+
+@app.route('/<regex("(issues/)?(all)?"):path>', defaults={'path': ''}, methods=['GET'])
+def index_all(path=None):
+    return index(only_vulnerable=False)
+
+
+# TODO: temporarily keep /json this way until tools adopted new endpoint
+@app.route('/json', defaults={'path': 'json', 'only_vulnerable': False}, methods=['GET'])
+@app.route('/<regex("(issues/?)?(all)?.json"):path>', defaults={'path': 'all.json', 'only_vulnerable': False}, methods=['GET'])
 @json_response
 def index_json(only_vulnerable=False, path=None):
     entries = get_index_data(only_vulnerable)
@@ -79,6 +85,6 @@ def index_json(only_vulnerable=False, path=None):
     return json_data
 
 
-@app.route('/<regex("(issues?/)?(open|vulnerable)[./]json"):path>', methods=['GET'])
+@app.route('/<regex("(issues/?)?(open|vulnerable).json"):path>', methods=['GET'])
 def index_vulnerable_json(path=None):
     return index_json(only_vulnerable=True)
