@@ -7,6 +7,9 @@ from app.model.enum import Remote, Status, Severity, Affected, affected_to_statu
 from app.util import multiline_to_list
 
 
+ERROR_GROUP_WITH_ISSUE_EXISTS = 'The group AVG-{} already contains {} for the package {}'
+
+
 @app.route('/cve/add', methods=['GET', 'POST'])
 @reporter_required
 def add_cve():
@@ -62,7 +65,7 @@ def add_group():
         same_group = same_group.all()
         if same_group:
             for group, cve, package in same_group:
-                flash('The group AVG-{} already contains {} for the package {}'
+                flash(ERROR_GROUP_WITH_ISSUE_EXISTS
                       .format(group.id, cve.id, package.pkgname), 'warning')
             return render_template('form/group.html',
                                    title='Add AVG',
