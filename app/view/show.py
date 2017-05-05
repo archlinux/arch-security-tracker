@@ -19,6 +19,10 @@ from jinja2.utils import escape
 
 
 def get_bug_data(cves, pkgs, group):
+
+    # the form's summary of bugs.archlinux.org has a maximum field length of 200
+    MAXLENGTH_SUMMARY = 200
+
     references = []
     references = [ref for ref in multiline_to_list(group.reference)
                   if ref not in references]
@@ -39,6 +43,9 @@ def get_bug_data(cves, pkgs, group):
     pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
     group_type = 'multiple issues' if len(unique_issue_types) > 1 else unique_issue_types[0]
     summary = '[{}] [Security] {} ({})'.format(pkg_str, group_type, ' '.join([cve.id for cve in cves]))
+
+    if len(summary) > MAXLENGTH_SUMMARY:
+        summary = "[{}] [Security] {} (Multiple CVE's)".format(pkg_str, group_type)
 
     # 5: critical, 4: high, 3: medium, 2: low, 1: very low.
     severitiy_mapping = {
