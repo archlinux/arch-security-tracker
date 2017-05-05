@@ -19,6 +19,7 @@ TRACKER_GROUP_URL = config_tracker['group_url']
 TRACKER_ISSUE_URL = config_tracker['issue_url']
 TRACKER_PASSWORD_LENGTH_MIN = config_tracker.getint('password_length_min')
 TRACKER_PASSWORD_LENGTH_MAX = config_tracker.getint('password_length_max')
+TRACKER_SUMMARY_LENGTH_MAX = config_tracker.getint('summary_length_max')
 
 config_sqlite = config['sqlite']
 SQLITE_JOURNAL_MODE = config_sqlite['journal_mode']

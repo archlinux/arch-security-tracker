@@ -1,6 +1,6 @@
 from flask import render_template, redirect
 from sqlalchemy import and_
-from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL
+from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL, TRACKER_SUMMARY_LENGTH_MAX
 from app import app, db
 from app.util import json_response
 from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group, user_can_handle_advisory
@@ -19,6 +19,7 @@ from jinja2.utils import escape
 
 
 def get_bug_data(cves, pkgs, group):
+
     references = []
     references = [ref for ref in multiline_to_list(group.reference)
                   if ref not in references]
@@ -39,6 +40,9 @@ def get_bug_data(cves, pkgs, group):
     pkg_str = ' '.join((pkg.pkgname for pkg in pkgs))
     group_type = 'multiple issues' if len(unique_issue_types) > 1 else unique_issue_types[0]
     summary = '[{}] [Security] {} ({})'.format(pkg_str, group_type, ' '.join([cve.id for cve in cves]))
+
+    if TRACKER_SUMMARY_LENGTH_MAX != 0 and len(summary) > TRACKER_SUMMARY_LENGTH_MAX:
+        summary = "[{}] [Security] {} (Multiple CVE's)".format(pkg_str, group_type)
 
     # 5: critical, 4: high, 3: medium, 2: low, 1: very low.
     severitiy_mapping = {
