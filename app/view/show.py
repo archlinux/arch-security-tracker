@@ -17,9 +17,20 @@ from app.util import chunks, multiline_to_list
 from collections import defaultdict, OrderedDict
 from jinja2.utils import escape
 
+def get_bug_project(databases):
+    bug_project_mapping = {
+        1: ['core', 'extra', 'testing'],
+        5: ['community', 'community-testing', 'multilib', 'multilib-testing']
+    }
 
-def get_bug_data(cves, pkgs, group):
+    for category, repos in bug_project_mapping.items():
+        if all((database in repos for database in databases)):
+            return category
 
+    # Fallback
+    return 1
+
+def get_bug_data(cves, pkgs, versions, group):
     references = []
     references = [ref for ref in multiline_to_list(group.reference)
                   if ref not in references]
@@ -54,9 +65,10 @@ def get_bug_data(cves, pkgs, group):
     }
 
     task_severity = severitiy_mapping.get(group.severity.name)
+    project = get_bug_project((pkg.database for pkg in versions))
 
     return {
-        'project': 1,  # all packages
+        'project': project,
         'product_category': 13,  # security
         'item_summary': summary,
         'task_severity': task_severity,
@@ -243,7 +255,7 @@ def show_group(avg):
                            versions=versions,
                            Status=Status,
                            issue_type=issue_type,
-                           bug_data=get_bug_data(issues, packages, group),
+                           bug_data=get_bug_data(issues, packages, versions, group),
                            advisory_pending=data['advisory_pending'],
                            can_edit=user_can_edit_group(advisories),
                            can_delete=user_can_delete_group(advisories),
