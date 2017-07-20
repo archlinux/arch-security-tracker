@@ -8,17 +8,10 @@ from app.model.cvegroup import CVEGroup
 from app.view.add import ERROR_GROUP_WITH_ISSUE_EXISTS
 
 
-def set_and_assert_group_data(db, client, route):
-    pkgnames = ['foo']
-    issues = ['CVE-1234-1234', 'CVE-2222-2222']
-    affected = '1.2.3-4'
-    fixed = '1.2.3-5'
-    status = Affected.affected
-    bug_ticket = '1234'
-    reference = 'https://security.archlinux.org'
-    notes = 'the cacke\nis\na\nlie'
-    advisory_qualified = False
-
+def set_and_assert_group_data(db, client, route, pkgnames=['foo'], issues=['CVE-1234-1234', 'CVE-2222-2222'],
+                              affected='1.2.3-4', fixed='1.2.3-5', status=Affected.affected, bug_ticket='1234',
+                              reference='https://security.archlinux.org', notes='the cacke\nis\na\nlie',
+                              advisory_qualified=False):
     data = default_group_dict(dict(
         cve='\n'.join(issues),
         pkgnames='\n'.join(pkgnames),
@@ -156,3 +149,24 @@ def test_warn_on_add_group_with_package_already_having_open_group(db, client):
     resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_GROUP_WITH_ISSUE_EXISTS.format(DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, pkgnames[0]) in resp.data.decode()
+
+
+@create_package(name='foo')
+@logged_in
+def test_add_group_with_dot_in_pkgrel(db, client):
+    set_and_assert_group_data(db, client, url_for('add_group'), affected='1.2-3.4')
+
+
+@create_package(name='foo')
+@logged_in
+def test_dont_add_group_with_dot_at_beginning_of_pkgrel(db, client):
+    pkgnames = ['foo']
+    issues = [DEFAULT_ISSUE_ID]
+    affected = '1.3-.37'
+    data = default_group_dict(dict(
+        cve='\n'.join(issues),
+        pkgnames='\n'.join(pkgnames),
+        affected=affected))
+
+    resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
+    assert 'Invalid input.' in resp.data.decode()
