@@ -1,6 +1,6 @@
 from flask import render_template, redirect
 from sqlalchemy import and_
-from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL
+from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL, TRACKER_SUMMARY_LENGTH_MAX
 from app import app, db
 from app.util import json_response
 from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group, user_can_handle_advisory
@@ -19,9 +19,6 @@ from jinja2.utils import escape
 
 
 def get_bug_data(cves, pkgs, group):
-
-    # the form's summary of bugs.archlinux.org has a maximum field length of 200
-    MAXLENGTH_SUMMARY = 200
 
     references = []
     references = [ref for ref in multiline_to_list(group.reference)
@@ -44,7 +41,7 @@ def get_bug_data(cves, pkgs, group):
     group_type = 'multiple issues' if len(unique_issue_types) > 1 else unique_issue_types[0]
     summary = '[{}] [Security] {} ({})'.format(pkg_str, group_type, ' '.join([cve.id for cve in cves]))
 
-    if len(summary) > MAXLENGTH_SUMMARY:
+    if TRACKER_SUMMARY_LENGTH_MAX != 0 and len(summary) > TRACKER_SUMMARY_LENGTH_MAX:
         summary = "[{}] [Security] {} (Multiple CVE's)".format(pkg_str, group_type)
 
     # 5: critical, 4: high, 3: medium, 2: low, 1: very low.
