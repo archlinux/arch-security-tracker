@@ -8,6 +8,7 @@ from app.util import multiline_to_list
 
 
 ERROR_GROUP_WITH_ISSUE_EXISTS = 'The group AVG-{} already contains {} for the package {}'
+ERROR_OPEN_GROUP_EXISTS = 'The group AVG-{} already has open issues for the package {}'
 
 
 @app.route('/cve/add', methods=['GET', 'POST'])
