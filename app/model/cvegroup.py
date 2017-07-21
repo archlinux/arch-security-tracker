@@ -4,7 +4,7 @@ from .enum import Status, Severity
 
 
 pkgname_regex = r'^([a-z\d@\.\_\+-]+)$'
-pkgver_regex = r'^(\d+:)?([\w]+[\._+]*)+\-\d+$'
+pkgver_regex = r'^(\d+:)?([\w]+[\._+]*)+\-\d+(\.\d+)?$'
 vulnerability_group_regex = r'^AVG-\d+$'
 
 
