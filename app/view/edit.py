@@ -89,6 +89,7 @@ def edit_cve(cve):
 
     severity = Severity.fromstring(form.severity.data)
     severity_changed = cve.severity != severity
+    issue_type_changed = cve.issue_type != form.issue_type.data
 
     cve.issue_type = form.issue_type.data
     cve.description = form.description.data
@@ -97,7 +98,7 @@ def edit_cve(cve):
     cve.reference = form.reference.data
     cve.notes = form.notes.data
 
-    if severity_changed:
+    if severity_changed or issue_type_changed:
         # update cached group severity for all goups containing this issue
         group_ids = [group.id for group in groups]
         issues = (db.session.query(CVEGroup, CVE)
@@ -107,11 +108,24 @@ def edit_cve(cve):
             issues = issues.filter(CVEGroup.id.in_(group_ids))
         issues = (issues).all()
 
-        group_severity = defaultdict(list)
-        for group, issue in issues:
-            group_severity[group].append(issue.severity)
-        for group, severities in group_severity.items():
-            group.severity = highest_severity(severities)
+        if severity_changed:
+            group_severity = defaultdict(list)
+            for group, issue in issues:
+                group_severity[group].append(issue.severity)
+            for group, severities in group_severity.items():
+                group.severity = highest_severity(severities)
+
+        # update scheduled advisories if the issue type changes
+        if advisories and issue_type_changed:
+            group_issue_type = defaultdict(set)
+            for group, issue in issues:
+                group_issue_type[group].add(issue.issue_type)
+            for advisory in advisories:
+                if Publication.published == advisory.publication:
+                    continue
+                issue_types = group_issue_type[advisory.group_package.group]
+                issue_type = 'multiple issues' if len(issue_types) > 1 else next(iter(issue_types))
+                advisory.advisory_type = issue_type
 
     db.session.commit()
     flash('Edited {}'.format(cve.id))
@@ -175,6 +189,7 @@ def edit_group(avg):
     cve_ids = set(filter(lambda s: s.startswith('CVE-'), cve_ids))
     issues_removed = set(filter(lambda issue: issue not in cve_ids, issue_ids))
     issues_added = set(filter(lambda issue: issue not in issue_ids, cve_ids))
+    issues_final = set(filter(lambda issue: issue.id not in issues_removed, issues))
 
     if issues_removed:
         (db.session.query(CVEGroupEntry)
@@ -188,6 +203,7 @@ def edit_group(avg):
         cve = db.get_or_create(CVE, id=cve_id)
         db.get_or_create(CVEGroupEntry, group=group, cve=cve)
         severities.append(cve.severity)
+        issues_final.add(cve)
         flash('Added {}'.format(cve.id))
     group.severity = highest_severity(severities)
 
@@ -204,6 +220,13 @@ def edit_group(avg):
     for pkgname in pkgnames_added:
         db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
         flash('Added {}'.format(pkgname))
+
+    # update scheduled advisories
+    for advisory in advisories:
+        if Publication.published == advisory.publication:
+            continue
+        issue_type = 'multiple issues' if len(set([issue.issue_type for issue in issues_final])) > 1 else next(iter(issues_final)).issue_type
+        advisory.advisory_type = issue_type
 
     db.session.commit()
     flash('Edited {}'.format(group.name))
