@@ -16,6 +16,9 @@ from itertools import chain
 from collections import defaultdict
 
 
+WARNING_ADVISORY_ALREADY_PUBLISHED = 'WARNING: This advisory is already published!'
+
+
 @app.route('/advisory/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
 @app.route('/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
 @security_team_required
@@ -33,18 +36,18 @@ def edit_advisory(advisory_id):
             form.reference.data = advisory_fetch_reference_url_from_mailman(advisory)
     if not form.validate_on_submit():
         if advisory.reference:
-            flash('WARNING: This advisory is already published!', 'warning')
+            flash(WARNING_ADVISORY_ALREADY_PUBLISHED, 'warning')
         return render_template('form/advisory.html',
                                title='Edit {}'.format(advisory.id),
                                Advisory=Advisory,
                                form=form)
 
-    advisory.impact = form.impact.data
-    advisory.workaround = form.workaround.data
+    advisory.impact = form.impact.data or None
+    advisory.workaround = form.workaround.data or None
     if advisory.reference != form.reference.data:
         advisory.content = form.advisory_content
         advisory_extend_model_from_advisory_text(advisory)
-    advisory.reference = form.reference.data
+    advisory.reference = form.reference.data or None
     db.session.commit()
 
     flash('Edited {}'.format(advisory.id))
