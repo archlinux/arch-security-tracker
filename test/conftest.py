@@ -7,8 +7,10 @@ from flask_login import current_user
 
 from app import app as flask_app, db as flask_db
 from app.user import random_string, hash_password
+from app.advisory import advisory_get_label
 from app.model.user import User
-from app.model.enum import UserRole, Severity, Remote, Affected, Status
+from app.model.enum import UserRole, Severity, Remote, Affected, Publication, affected_to_status
+from app.model.advisory import Advisory
 from app.model.cve import CVE, issue_types
 from app.model.cvegroup import CVEGroup
 from app.model.cvegroupentry import CVEGroupEntry
@@ -190,16 +192,16 @@ def default_group_dict(overrides=dict()):
     return data
 
 
-def create_group(func=None, id=DEFAULT_GROUP_ID, status=Status.unknown, severity=Severity.unknown,
+def create_group(func=None, id=DEFAULT_GROUP_ID, status=None, severity=Severity.unknown,
                  affected='1.0-1', fixed=None, bug_ticket=None, reference=None, notes=None,
-                 created=datetime.utcnow(), advisory_qualified=True, issues=[], packages=[]):
+                 created=datetime.utcnow(), advisory_qualified=True, issues=[DEFAULT_ISSUE_ID], packages=['foo']):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
             group = CVEGroup()
             if id:
                 group.id = id
-            group.status = status
+            group.status = status if status else affected_to_status(Affected.affected, packages[0], fixed)
             group.severity = severity
             group.affected = affected
             group.fixed = fixed
@@ -224,3 +226,40 @@ def create_group(func=None, id=DEFAULT_GROUP_ID, status=Status.unknown, severity
     if not func:
         return decorator
     return decorator(func)
+
+
+DEFAULT_ADVISORY_ID = advisory_get_label()
+
+
+def create_advisory(func=None, id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[0],
+                    publication=Publication.scheduled, workaround=None, impact=None, content=None, created=datetime.utcnow(),
+                    reference=None):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(db, *args, **kwargs):
+            advisory = Advisory()
+            advisory.id = id
+            advisory.group_package_id = group_package_id
+            advisory.advisory_type = advisory_type
+            advisory.publication = publication
+            advisory.workaround = workaround
+            advisory.impact = impact
+            advisory.content = content
+            advisory.created = created
+            advisory.reference = reference
+
+            db.session.add(advisory)
+            db.session.commit()
+            func(db=db, *args, **kwargs)
+        return wrapper
+    if not func:
+        return decorator
+    return decorator(func)
+
+
+def get_advisory(advisory_id=DEFAULT_ADVISORY_ID):
+    return Advisory.query.get(advisory_id)
+
+
+def advisory_count():
+    return len(Advisory.query.all())

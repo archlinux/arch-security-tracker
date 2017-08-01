@@ -1,20 +1,24 @@
 from flask import render_template, flash, redirect, request
 from app import app, db
 from app.user import security_team_required
+from app.advisory import advisory_get_label, advisory_get_date_label
 from app.util import json_response, atom_feed
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
 from app.model.cvegroup import vulnerability_group_regex
 from app.model.advisory import advisory_regex
-from app.model.enum import Publication
+from app.model.enum import Publication, Status
 from app.view.error import not_found
 from app.advisory import advisory_extend_model_from_advisory_text, advisory_fetch_reference_url_from_mailman
 from app.form.advisory import AdvisoryForm, AdvisoryPublishForm
 from collections import OrderedDict
 from sqlalchemy import and_
-from datetime import datetime
 from re import match
 from werkzeug.contrib.atom import AtomFeed
 from config import TRACKER_ISSUE_URL
+
+
+ERROR_ADVISORY_GROUP_NOT_FIXED = 'AVG is not fixed yet.'
+ERROR_ADVISORY_ALREADY_EXISTS = 'Advisory already exists.'
 
 
 def get_advisory_data():
@@ -131,12 +135,15 @@ def schedule_advisory(avg):
         if advisory:
             advisories.add(advisory)
 
-    if 0 < len(advisories):
-        flash('Advisory already exists', 'error')
+    if Status.fixed != group_entry.status:
+        flash(ERROR_ADVISORY_GROUP_NOT_FIXED, 'error')
         return redirect('/{}'.format(avg))
 
-    now = datetime.utcnow().utctimetuple()
-    last_advisory_date = '{}{}'.format(now.tm_year, '{}'.format(now.tm_mon).rjust(2, '0'))
+    if 0 < len(advisories):
+        flash(ERROR_ADVISORY_ALREADY_EXISTS, 'error')
+        return redirect('/{}'.format(avg))
+
+    last_advisory_date = advisory_get_date_label()
     last_advisory_num = 0
     last_advisory = (db.session.query(Advisory).order_by(Advisory.created.desc()).limit(1)).first()
     if last_advisory:
@@ -146,7 +153,7 @@ def schedule_advisory(avg):
 
     for pkg in pkgs:
         last_advisory_num += 1
-        asa = 'ASA-{}-{}'.format(last_advisory_date, last_advisory_num)
+        asa = advisory_get_label(last_advisory_date, last_advisory_num)
         db.create(Advisory,
                   id=asa,
                   advisory_type=form.advisory_type.data,

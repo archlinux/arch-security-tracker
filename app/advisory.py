@@ -2,7 +2,7 @@ from config import TRACKER_MAILMAN_URL
 from re import sub, search
 from requests import get
 from html import unescape
-from datetime import date
+from datetime import date, datetime
 
 
 def advisory_fetch_from_mailman(url):
@@ -80,3 +80,13 @@ def advisory_extend_model_from_advisory_text(advisory):
     advisory.impact = advisory_get_impact_from_text(advisory.content)
     advisory.workaround = advisory_get_workaround_from_text(advisory.content)
     return advisory
+
+
+def advisory_get_date_label(utctimetuple=None):
+    now = utctimetuple if utctimetuple else datetime.utcnow().utctimetuple()
+    return '{}{:02}'.format(now.tm_year, now.tm_mon)
+
+
+def advisory_get_label(date_label=None, number=1):
+    date_label = date_label if date_label else advisory_get_date_label()
+    return 'ASA-{}-{}'.format(date_label, number)
