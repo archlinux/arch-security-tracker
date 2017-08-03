@@ -2,3 +2,5 @@ __pycache__/
 app.db
 .cache
 .virtualenv
+.coverage
+test/coverage

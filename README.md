@@ -33,6 +33,7 @@ vulnerability details and generating security advisories.
 ### Tests
 
 * python-pytest
+* python-pytest-cov
 
 ### Virtualenv
 
