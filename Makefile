@@ -1,6 +1,7 @@
 PYTEST?=py.test
 PYTEST_OPTIONS+=-v -s
-PYTEST_INPUT=test
+PYTEST_INPUT?=test
+PYTEST_COVERAGE_OPTIONS+=--cov-report=term-missing:skip-covered --cov-report=html:test/coverage --cov=app
 
 .PHONY: update test
 
@@ -18,7 +19,7 @@ update: setup
 	./update
 
 test: setup
-	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} ${PYTEST_INPUT} ${PYTEST_OPTIONS}
+	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} ${PYTEST_INPUT} ${PYTEST_OPTIONS} ${PYTEST_COVERAGE_OPTIONS}
 
 clean:
 	rm -rf ./pacman/{cache,log}
