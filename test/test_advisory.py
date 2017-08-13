@@ -1,8 +1,8 @@
 from werkzeug.exceptions import NotFound, Forbidden
 from flask import url_for
 
-from .conftest import logged_in, create_issue, create_package, create_group, create_advisory, advisory_count, get_advisory, DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED, default_issue_dict
-from app.advisory import advisory_get_label
+from .conftest import logged_in, create_issue, create_package, create_group, create_advisory, advisory_count, get_advisory, DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED, default_issue_dict, DEFAULT_ADVISORY_CONTENT
+from app.advisory import advisory_get_label, advisory_get_impact_from_text, advisory_get_workaround_from_text
 from app.model.enum import UserRole, Publication
 from app.model.cve import issue_types
 from app.model.cvegroup import CVEGroup
@@ -158,3 +158,31 @@ def test_reporter_cant_edit_advisory(db, client):
     assert Forbidden.code == resp.status_code
     assert_advisory_data(DEFAULT_ADVISORY_ID, workaround='yay', impact='meh')
     assert 1 == advisory_count()
+
+
+def test_advisory_get_impact_from_text(db, client):
+    impact = advisory_get_impact_from_text(DEFAULT_ADVISORY_CONTENT)
+    assert 'Robots will take over' in impact
+    assert 'Impact' not in impact
+    assert 'References' not in impact
+
+
+def test_advisory_get_impact_from_text_invalid(db, client):
+    assert advisory_get_impact_from_text('test') is None
+
+
+def test_advisory_get_workaround_from_text(db, client):
+    impact = advisory_get_workaround_from_text(DEFAULT_ADVISORY_CONTENT)
+    assert 'Update your machine' in impact
+    assert 'Workaround' not in impact
+    assert 'Description' not in impact
+
+
+def test_advisory_get_workaround_from_text_no_workaround(db, client):
+    content = '\nWorkaround\n==========\n\nNone.\n\nDescription\n'
+    impact = advisory_get_workaround_from_text(content)
+    assert impact is None
+
+
+def test_advisory_get_workaround_from_text_invalid(db, client):
+    assert advisory_get_workaround_from_text('test') is None
