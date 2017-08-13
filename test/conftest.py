@@ -229,6 +229,8 @@ def create_group(func=None, id=DEFAULT_GROUP_ID, status=None, severity=Severity.
 
 
 DEFAULT_ADVISORY_ID = advisory_get_label()
+DEFAULT_ADVISORY_CONTENT = """\nImpact\n======\n\nRobots will take over\n\nReferences\n'
+                              \nWorkaround\n==========\n\nUpdate your machine\n\nDescription\n"""
 
 
 def create_advisory(func=None, id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[0],
