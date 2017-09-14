@@ -23,7 +23,7 @@
 					{{ render_field(form.description, class='full size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...', indent=5) }}
 					{{ render_field(form.reference, class='full size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...', indent=5) }}
 					{{ render_field(form.notes, class='full size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...', indent=5) }}
-					{{ form.submit(class='button-primary') }}
+					{{ form.submit(class='button-primary', accesskey='s') }}
 				</form>
 			</div>
 {%- endblock %}

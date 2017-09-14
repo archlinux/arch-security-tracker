@@ -2,8 +2,8 @@
 {%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket -%}
 {% block content %}
 			<h1>{{ group.name }}
-			{%- if can_edit %} <a href="/{{  group.name }}/edit">edit</a>{% endif %}
-			{%- if can_delete %} <a href="/{{  group.name }}/delete">delete</a>{% endif %}</h1>
+			{%- if can_edit %} <a href="/{{  group.name }}/edit" accesskey="e">edit</a>{% endif %}
+			{%- if can_delete %} <a href="/{{  group.name }}/delete" accesskey="d">delete</a>{% endif %}</h1>
 			<table class="styled-table column-major full size">
 				<tbody>
 					<tr>
@@ -51,7 +51,7 @@
 							{%- if group.bug_ticket %}
 						<td>{{ bug_ticket(group.bug_ticket) }}</td>
 							{%- elif group.status == "Vulnerable" %}
-						<td><a class='button button-table button-primary' href="https://bugs.archlinux.org/newtask?{{ bug_data | urlencode }}">Create</a></td>
+						<td><a class='button button-table button-primary' href="https://bugs.archlinux.org/newtask?{{ bug_data | urlencode }}", accesskey='t'>Create</a></td>
 							{%- else %}
 						<td>None</td>
 							{%- endif %}
