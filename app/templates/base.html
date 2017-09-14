@@ -37,13 +37,13 @@
 					<li><a href="/advisory">advisories</a></li>
 					<li><a href="/todo">todo</a></li>
 					{%- if not current_user.is_authenticated %}
-					<li><a href="/login">login</a></li>
+					<li><a href="/login" accesskey="l">login</a></li>
 					{%- else %}
 					<li><a href="/user">user</a></li>
 					<li><a href="/cve/add">add CVE</a></li>
 					<li><a href="/avg/add">add AVG</a></li>
 					<li><a href="/profile">profile</a></li>
-					<li><a href="/logout">logout</a></li>
+					<li><a href="/logout" accesskey="q">logout</a></li>
 					{%- endif %}
 				</ul>
 			</div>
