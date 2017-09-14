@@ -2,20 +2,20 @@
 {% block content %}
 			<h1>{{ advisory.id }}
 				{%- if can_handle_advisory %}
-				<a href="/{{  advisory.id }}/edit">edit</a>
+				<a href="/{{  advisory.id }}/edit" accesskey="e">edit</a>
 					{%- if advisory.publication == Publication.scheduled %}
-				<a href="/{{  advisory.id }}/delete">delete</a>
+				<a href="/{{  advisory.id }}/delete" accesskey="d">delete</a>
 					{%- endif %}
 				{%- endif %}
 				{%- if not generated %}
-				<a href="/{{  advisory.id }}/generate">generated</a>
+				<a href="/{{  advisory.id }}/generate" accesskey="g">generated</a>
 				{%- elif advisory.content %}
-				<a href="/{{  advisory.id }}">original</a>
+				<a href="/{{  advisory.id }}" accesskey="o">original</a>
 				{%- endif %}
 				{%- if advisory.reference %}
-				<a href="{{  advisory.reference }}">external</a>
+				<a href="{{  advisory.reference }}" accesskey="x">external</a>
 				{%- endif %}
-				<a href="/{{  advisory.id }}/{% if generated %}generate/{% endif %}raw">raw</a>
+				<a href="/{{  advisory.id }}/{% if generated %}generate/{% endif %}raw" accesskey="r">raw</a>
 			</h1>
 			<table class="styled-table full size">
 				<thead>
