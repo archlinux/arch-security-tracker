@@ -6,7 +6,7 @@
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="two-thirds column">
-							{{ render_field(form.reference, class='full size', maxlength=Advisory.REFERENCE_LENGTH, placeholder='External reference...', autofocus='', indent=7) }}
+							{{ render_field(form.reference, class='full size', maxlength=Advisory.REFERENCE_LENGTH, placeholder='External reference...', indent=7) }}
 						</div>
 					</div>
 					<div class="row">
@@ -16,7 +16,7 @@
 					</div>
 					<div class="row">
 						<div class="two-thirds column">
-							{{ render_field(form.impact, class='full size', maxlength=Advisory.IMPACT_LENGTH, placeholder='Overall impact...', indent=7) }}
+							{{ render_field(form.impact, class='full size', maxlength=Advisory.IMPACT_LENGTH, placeholder='Overall impact...', indent=7, autofocus='') }}
 						</div>
 					</div>
 					{{ form.edit(class='button-primary') }}
