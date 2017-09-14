@@ -35,7 +35,11 @@ csp = {
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
-talisman = Talisman(app, force_https=False, session_cookie_secure=False, content_security_policy=csp)
+talisman = Talisman(app,
+                    force_https=False,
+                    session_cookie_secure=False,
+                    content_security_policy=csp,
+                    referrer_policy='no-referrer')
 
 login_manager = LoginManager()
 login_manager.init_app(app)
