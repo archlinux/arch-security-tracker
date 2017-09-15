@@ -28,4 +28,17 @@ arch:
 
 script: 'curl -s https://raw.githubusercontent.com/mikkeloscar/arch-travis/master/arch-travis.sh | bash'
 
+notifications:
+  irc:
+    channels:
+      - 'ircs://chat.freenode.net:7070/#archlinux-security'
+    template:
+      - "[%{repository_name}] %{result} %{branch} %{commit} %{author}: %{commit_subject}"
+      - "Change view : %{compare_url}"
+      - "Build details : %{build_url}"
+    on_success: always
+    on_failure: always
+    use_notice: false
+    skip_join: false
+
 # vim: ft=yaml ts=2 sw=2 et:
