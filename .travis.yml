@@ -33,9 +33,9 @@ notifications:
     channels:
       - 'ircs://chat.freenode.net:7070/#archlinux-security'
     template:
-      - "[%{repository_name}] %{result} %{branch} %{commit} %{author}: %{commit_subject}"
-      - "Change view : %{compare_url}"
-      - "Build details : %{build_url}"
+      - "[\x0313%{repository_name}\x0f] \x02\x0302%{result}\x0f \x0306%{branch}\x0f \x0314%{commit}\x0f \x0300%{author}\x0f: %{commit_subject}"
+      - "Commit changes: \x0302%{compare_url}\x0f"
+      - " Build details: \x0302%{build_url}\x0f"
     on_success: always
     on_failure: always
     use_notice: false
