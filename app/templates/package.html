@@ -70,7 +70,12 @@
 					<tr>
 						<td>Link</td>
 						<td class="full size">
+							{% if package.versions[0] -%}
+							{%- set version = package.versions[0] -%}
+							<a href="https://www.archlinux.org/packages/{{version.database|urlencode}}/{{version.arch|urlencode}}/{{ package.pkgname|urlencode }}">package</a> |
+							{%- else -%}
 							<a href="https://www.archlinux.org/packages/?name={{ package.pkgname|urlencode }}">package</a> |
+							{%- endif %}
 							<a href="https://bugs.archlinux.org/?project=0&order=id&sort=desc&string={{ package.pkgname|urlencode }}">bugs open</a> |
 							<a href="https://bugs.archlinux.org/?project=0&order=id&sort=desc&status%5B%5D=closed&string={{ package.pkgname|urlencode }}">bugs closed</a> |
 							<a href="https://wiki.archlinux.org/index.php/Special:Search?search=%22{{ package.pkgname|urlencode }}%22">Wiki</a> |
