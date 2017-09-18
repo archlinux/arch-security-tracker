@@ -5,7 +5,9 @@ from flask import url_for
 from .conftest import logged_in, create_issue, default_issue_dict, DEFAULT_ISSUE_ID, ERROR_LOGIN_REQUIRED, ERROR_INVALID_CHOICE
 from app.model.enum import Remote, Severity, UserRole
 from app.model.cve import issue_types, CVE
+from app.form import CVEForm
 from app.form.validators import ERROR_ISSUE_ID_INVALID, ERROR_INVALID_URL
+from app.view.add import CVE_MERGED, CVE_MERGED_PARTIALLY
 
 
 def set_and_assert_cve_data(db, client, cve_id, route):
@@ -208,3 +210,67 @@ def test_issue_json(db, client):
 
     data = json.loads(resp.data)
     assert DEFAULT_ISSUE_ID == data['name']
+
+
+@create_issue
+@logged_in
+def test_add_cve_overwrites_existing_but_empty_cve(db, client):
+    issue_type = issue_types[1]
+    severity = Severity.critical
+    remote = Remote.remote
+    description = 'much wow'
+    reference = 'https://security.archlinux.org'
+    notes = 'very secret'
+    resp = client.post(url_for('add_cve'), follow_redirects=True, data=default_issue_dict(dict(
+                       cve=DEFAULT_ISSUE_ID,
+                       issue_type=issue_type,
+                       severity=severity.name,
+                       remote=remote.name,
+                       description=description,
+                       reference=reference,
+                       notes=notes)))
+    assert 200 == resp.status_code
+    assert CVE_MERGED.format(DEFAULT_ISSUE_ID) in resp.data.decode()
+    assert CVE_MERGED_PARTIALLY.format(DEFAULT_ISSUE_ID, '') not in resp.data.decode()
+
+    cve = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert DEFAULT_ISSUE_ID == cve.id
+    assert issue_type == cve.issue_type
+    assert severity == cve.severity
+    assert remote == cve.remote
+    assert description == cve.description
+    assert reference == cve.reference
+    assert notes == cve.notes
+
+
+@create_issue(issue_type=issue_types[3], severity=Severity.low, remote=Remote.local,
+              description='foobar', reference='https://archlinux.org', notes='the cake is a lie')
+@logged_in
+def test_add_cve_does_not_overwrite_existing_cve(db, client):
+    resp = client.post(url_for('add_cve'), follow_redirects=True, data=default_issue_dict(dict(
+                       cve=DEFAULT_ISSUE_ID,
+                       issue_type=issue_types[1],
+                       severity=Severity.critical.name,
+                       remote=Remote.remote.name,
+                       description='deadbeef',
+                       reference='https://security.archlinux.org',
+                       notes='very secret')))
+    assert 200 == resp.status_code
+
+    assert CVE_MERGED.format(DEFAULT_ISSUE_ID) in resp.data.decode()
+    form = CVEForm()
+    unmerged_fields = [form.issue_type.label.text,
+                       form.severity.label.text,
+                       form.remote.label.text,
+                       form.description.label.text,
+                       form.notes.label.text]
+    assert CVE_MERGED_PARTIALLY.format(DEFAULT_ISSUE_ID, ', '.join(unmerged_fields)) in resp.data.decode()
+
+    cve = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert DEFAULT_ISSUE_ID == cve.id
+    assert issue_types[3] == cve.issue_type
+    assert Severity.low == cve.severity
+    assert Remote.local == cve.remote
+    assert 'foobar' == cve.description
+    assert 'https://archlinux.org\nhttps://security.archlinux.org' == cve.reference
+    assert 'the cake is a lie' == cve.notes
