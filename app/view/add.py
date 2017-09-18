@@ -9,6 +9,9 @@ from app.util import multiline_to_list
 
 ERROR_GROUP_WITH_ISSUE_EXISTS = 'The group AVG-{} already contains {} for the package {}'
 ERROR_OPEN_GROUP_EXISTS = 'The group AVG-{} already has open issues for the package {}'
+CVE_MERGED = 'Merged existing {} with the provided data'
+CVE_MERGED_PARTIALLY = 'Failed to fully merge {}, check the following fields: {}'
+ERROR_UNMERGEABLE = 'Unmergeable field, old value shown'
 
 
 @app.route('/cve/add', methods=['GET', 'POST'])
@@ -23,8 +26,87 @@ def add_cve():
 
     cve = db.get(CVE, id=form.cve.data)
     if cve is not None:
-        flash('{} already existed, redirected to edit form:'.format(cve.id))
-        return redirect('/{}/edit'.format(cve.id))
+        not_merged = []
+        merged = False
+
+        # try to merge issue_type
+        if 'unknown' != form.issue_type.data:
+            if 'unknown' == cve.issue_type:
+                cve.issue_type = form.issue_type.data
+                merged = True
+            elif form.issue_type.data != cve.issue_type:
+                not_merged.append(form.issue_type)
+        form.issue_type.data = cve.issue_type
+
+        # try to merge severity
+        form_severity = Severity.fromstring(form.severity.data)
+        if Severity.unknown != form_severity:
+            if Severity.unknown == cve.severity:
+                cve.severity = form_severity
+                merged = True
+            elif form_severity != cve.severity:
+                not_merged.append(form.severity)
+        form.severity.data = cve.severity.name
+
+        # try to merge remote
+        form_remote = Remote.fromstring(form.remote.data)
+        if Remote.unknown != form_remote:
+            if Remote.unknown == cve.remote:
+                cve.remote = form_remote
+                merged = True
+            elif form_remote != cve.remote:
+                not_merged.append(form.remote)
+        form.remote.data = cve.remote.name
+
+        # try to merge description
+        if form.description.data:
+            if not cve.description:
+                cve.description = form.description.data
+                merged = True
+            elif form.description.data != cve.description:
+                not_merged.append(form.description)
+        form.description.data = cve.description
+
+        # try to merge references
+        references = cve.reference.splitlines() if cve.reference else []
+        old_references = references.copy()
+        form_references = form.reference.data.splitlines() if form.reference.data else []
+        for reference in form_references:
+            if reference not in references:
+                references.append(reference)
+                merged = True
+        if old_references != references:
+            cve.reference = '\n'.join(references)
+        form.reference.data = cve.reference
+
+        # try to merge notes
+        if form.notes.data:
+            if not cve.notes:
+                cve.notes = form.notes.data
+                merged = True
+            elif form.notes.data != cve.notes:
+                not_merged.append(form.notes)
+        form.notes.data = cve.notes
+
+        # if something got merged, commit and flash
+        if merged:
+            db.session.commit()
+            flash(CVE_MERGED.format(cve.id))
+
+        # warn if something failed to be merged
+        if not_merged:
+            for field in not_merged:
+                field.errors.append(ERROR_UNMERGEABLE)
+
+            not_merged_labels = [field.label.text for field in not_merged]
+            flash(CVE_MERGED_PARTIALLY.format(cve.id, ', '.join(not_merged_labels)), 'warning')
+            return render_template('form/cve.html',
+                                   title='Edit {}'.format(cve),
+                                   form=form,
+                                   CVE=CVE,
+                                   action='{}/edit'.format(cve.id))
+
+        return redirect('/{}'.format(cve.id))
 
     cve = db.create(CVE, id=form.cve.data)
     cve.issue_type = form.issue_type.data
