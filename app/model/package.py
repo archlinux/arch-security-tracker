@@ -40,7 +40,7 @@ def filter_duplicate_packages(packages, filter_arch=False):
 
 
 def sort_packages(packages):
-    packages = sorted(packages, key=lambda item: item.arch)
+    packages = sorted(packages, key=lambda item: item.arch, reverse=True)
     packages = sorted(packages, key=lambda item: item.database)
     packages = sorted(packages, key=cmp_to_key(vercmp, attrgetter('version')), reverse=True)
     return packages

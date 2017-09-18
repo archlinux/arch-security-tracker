@@ -179,7 +179,7 @@ def get_group_data(avg):
     issue_types = list(issue_types)
     issues = sorted(issues, key=lambda item: item.id, reverse=True)
     packages = sorted(packages, key=lambda item: item.pkgname)
-    versions = sort_packages(filter_duplicate_packages(list(versions), True))
+    versions = filter_duplicate_packages(sort_packages(list(versions)), True)
     advisory_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
 
     return {
@@ -307,7 +307,7 @@ def get_package_data(pkgname):
     groups = sorted(groups, key=lambda item: item.id, reverse=True)
     groups = sorted(groups, key=lambda item: item.status)
     advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
-    versions = sort_packages(filter_duplicate_packages(list(versions), True))
+    versions = filter_duplicate_packages(sort_packages(list(versions)), True)
     package = versions[0] if versions else None
 
     return {
