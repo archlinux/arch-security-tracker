@@ -9,7 +9,7 @@ from app import app as flask_app, db as flask_db
 from app.user import random_string, hash_password
 from app.advisory import advisory_get_label
 from app.model.user import User
-from app.model.enum import UserRole, Severity, Remote, Affected, Publication, affected_to_status
+from app.model.enum import UserRole, Severity, Remote, Affected, Publication, affected_to_status, highest_severity
 from app.model.advisory import Advisory
 from app.model.cve import CVE, issue_types
 from app.model.cvegroup import CVEGroup
@@ -128,20 +128,20 @@ def default_issue_dict(overrides=dict()):
 
 
 def create_issue(func=None, id=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown,
-                 severity=Severity.unknown, description=None, notes=None, reference=None):
+                 severity=Severity.unknown, description=None, notes=None, reference=None, count=1):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
-            issue = CVE()
-            issue.id = id
-            issue.issue_type = issue_type
-            issue.remote = remote
-            issue.severity = severity
-            issue.description = description
-            issue.notes = notes
-            issue.reference = reference
-
-            db.session.add(issue)
+            for num in range(1, count + 1):
+                issue = CVE()
+                issue.id = id if count <= 1 else '{}{}'.format(id, num)
+                issue.issue_type = issue_type
+                issue.remote = remote
+                issue.severity = severity
+                issue.description = description
+                issue.notes = notes
+                issue.reference = reference
+                db.session.add(issue)
             db.session.commit()
             func(db=db, *args, **kwargs)
         return wrapper
@@ -192,35 +192,39 @@ def default_group_dict(overrides=dict()):
     return data
 
 
-def create_group(func=None, id=DEFAULT_GROUP_ID, status=None, severity=Severity.unknown,
+def create_group(func=None, id=None, status=None, severity=None,
                  affected='1.0-1', fixed=None, bug_ticket=None, reference=None, notes=None,
-                 created=datetime.utcnow(), advisory_qualified=True, issues=[DEFAULT_ISSUE_ID], packages=['foo']):
+                 created=datetime.utcnow(), advisory_qualified=True, issues=[DEFAULT_ISSUE_ID], packages=['foo'], count=1):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
-            group = CVEGroup()
-            if id:
-                group.id = id
-            group.status = status if status else affected_to_status(Affected.affected, packages[0], fixed)
-            group.severity = severity
-            group.affected = affected
-            group.fixed = fixed
-            group.bug_ticket = bug_ticket
-            group.reference = reference
-            group.notes = notes
-            group.created = created
-            group.advisory_qualified = advisory_qualified
-
-            db.session.add(group)
-            db.session.commit()
-
+            issue_objs = []
             for issue in issues:
-                cve = db.get_or_create(CVE, id=issue)
-                db.get_or_create(CVEGroupEntry, group=group, cve=cve)
-            for pkgname in packages:
-                db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
-            db.session.commit()
+                issue_objs.append(db.get_or_create(CVE, id=issue))
+            max_severity = highest_severity([issue.severity for issue in issue_objs])
 
+            for num in range(1, count + 1):
+                group = CVEGroup()
+                if id:
+                    group.id = id if count <= 1 else '{}{}'.format(id, num)
+                group.status = status if status else affected_to_status(Affected.affected, packages[0], fixed)
+                group.severity = severity if severity else max_severity
+                group.affected = affected
+                group.fixed = fixed
+                group.bug_ticket = bug_ticket
+                group.reference = reference
+                group.notes = notes
+                group.created = created
+                group.advisory_qualified = advisory_qualified
+
+                db.session.add(group)
+                db.session.commit()
+
+                for issue in issue_objs:
+                    db.get_or_create(CVEGroupEntry, group=group, cve=issue)
+                for pkgname in packages:
+                    db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
+            db.session.commit()
             func(db=db, *args, **kwargs)
         return wrapper
     if not func:
@@ -233,24 +237,30 @@ DEFAULT_ADVISORY_CONTENT = """\nImpact\n======\n\nRobots will take over\n\nRefer
                               \nWorkaround\n==========\n\nUpdate your machine\n\nDescription\n"""
 
 
-def create_advisory(func=None, id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[0],
+def create_advisory(func=None, id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=None,
                     publication=Publication.scheduled, workaround=None, impact=None, content=None, created=datetime.utcnow(),
-                    reference=None):
+                    reference=None, count=1):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
-            advisory = Advisory()
-            advisory.id = id
-            advisory.group_package_id = group_package_id
-            advisory.advisory_type = advisory_type
-            advisory.publication = publication
-            advisory.workaround = workaround
-            advisory.impact = impact
-            advisory.content = content
-            advisory.created = created
-            advisory.reference = reference
+            group_package = CVEGroupPackage.query.filter_by(id=group_package_id).first()
+            issues = group_package.group.issues
+            issue_types = list(set([issue.cve.issue_type for issue in issues]))
+            issue_type = issue_types[0] if len(issue_types) == 1 else 'multiple issues'
 
-            db.session.add(advisory)
+            for num in range(1, count + 1):
+                advisory = Advisory()
+                advisory.id = id if count <= 1 else '{}{}'.format(id, num)
+                advisory.group_package_id = group_package_id
+                advisory.advisory_type = advisory_type if advisory_type else issue_type
+                advisory.publication = publication
+                advisory.workaround = workaround
+                advisory.impact = impact
+                advisory.content = content
+                advisory.created = created
+                advisory.reference = reference
+
+                db.session.add(advisory)
             db.session.commit()
             func(db=db, *args, **kwargs)
         return wrapper

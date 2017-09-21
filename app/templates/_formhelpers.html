@@ -29,33 +29,33 @@
 	{%- if value -%}{{ value }}{%- else -%}{{ default }}{%- endif -%}
 {%- endmacro -%}
 
-{%- macro colorize_severity(severity) -%}
+{%- macro colorize_severity(severity, label="") -%}
 	{%- if not severity or severity == "Unknown" -%}
-		<span class="purple">Unknown</span>
+		<span class="purple">{% if label %}{{ label }}{% else %}Unknown{% endif %}</span>
 	{%- elif severity == "Low" -%}
-		<span class="green">Low</span>
+		<span class="green">{% if label %}{{ label }}{% else %}Low{% endif %}</span>
 	{%- elif severity == "Medium" -%}
-		<span class="light_orange">Medium</span>
+		<span class="light_orange">{% if label %}{{ label }}{% else %}Medium{% endif %}</span>
 	{%- elif severity == "High" -%}
-		<span class="orange">High</span>
+		<span class="orange">{% if label %}{{ label }}{% else %}High{% endif %}</span>
 	{%- elif severity == "Critical" -%}
-		<span class="red">Critical</span>
+		<span class="red">{% if label %}{{ label }}{% else %}Critical{% endif %}</span>
 	{%- else -%}
 		<span>{{ severity }}</span>
 	{%- endif -%}
 {%- endmacro -%}
 
-{%- macro colorize_status(status) -%}
+{%- macro colorize_status(status, label="") -%}
 	{%- if not status or status == "Unknown" -%}
-		<span class="purple">Unknown</span>
+		<span class="purple">{% if label %}{{ label }}{% else %}Unknown{% endif %}</span>
 	{%- elif status == "Testing" -%}
-		<span class="orange">Testing</span>
+		<span class="orange">{% if label %}{{ label }}{% else %}Testing{% endif %}</span>
 	{%- elif status == "Vulnerable" -%}
-		<span class="red">Vulnerable</span>
+		<span class="red">{% if label %}{{ label }}{% else %}Vulnerable{% endif %}</span>
 	{%- elif status == "Fixed" -%}
-		<span class="green">Fixed</span>
+		<span class="green">{% if label %}{{ label }}{% else %}Fixed{% endif %}</span>
 	{%- elif status == "Not affected" -%}
-		<span>Not affected</span>
+		<span>{% if label %}{{ label }}{% else %}Not affected{% endif %}</span>
 	{%- else -%}
 		<span>{{ status }}</span>
 	{%- endif -%}
