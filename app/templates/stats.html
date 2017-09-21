@@ -1,0 +1,129 @@
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import colorize_severity, colorize_status, colorize_remote, colorize_unknown -%}
+{% block content %}
+			<h1>Stats</h1>
+			<h2>Status</h2>
+			<table class="styled-table stats-table column-major full size">
+				<thead>
+					<tr>
+						<th>Type</th>
+						<th>Issues</th>
+						<th>{{ colorize_severity(Severity.medium, 'Local') }}</th>
+						<th>{{ colorize_severity(Severity.high, 'Remote') }}</th>
+						<th>{{ colorize_status(Status.vulnerable, 'Open') }}</th>
+						<th class="separator-right">{{ colorize_status(Status.fixed) }}</th>
+						<th>Groups</th>
+						<th>{{ colorize_status(Status.vulnerable, 'Open') }}</th>
+						<th class="separator-right">{{ colorize_status(Status.fixed) }}</th>
+						<th>Packages</th>
+						<th>{{ colorize_status(Status.vulnerable, 'Open') }}</th>
+						<th class="separator-right">{{ colorize_status(Status.fixed) }}</th>
+						<th>Advisories</th>
+						<th class="full size"></th>
+					</tr>
+				</thead>
+				<tbody>
+					{%- for severity in Severity %}
+					<tr{% if loop.last %} class="separator-bottom"{% endif %}>
+						<td>{{ colorize_severity(severity.label) }}</td>
+						<td>{{ issues.severity.total[severity.name] }}</td>
+						<td>{{ issues.severity.local[severity.name] }}</td>
+						<td>{{ issues.severity.remote[severity.name] }}</td>
+						<td>{{ issues.severity.vulnerable[severity.name] }}</td>
+						<td class="separator-right">{{ issues.severity.fixed[severity.name] }}</td>
+						<td>{{ groups.severity.total[severity.name] }}</td>
+						<td>{{ groups.severity.vulnerable[severity.name] }}</td>
+						<td class="separator-right">{{ groups.severity.fixed[severity.name] }}</td>
+						<td>{{ packages.severity.total[severity.name] }}</td>
+						<td>{{ packages.severity.vulnerable[severity.name] }}</td>
+						<td class="separator-right">{{ packages.severity.fixed[severity.name] }}</td>
+						<td>{{ advisories.severity[severity.name] }}</td>
+						<td></td>
+					</tr>
+					{%- endfor %}
+					<tr>
+						<td>Total</td>
+						<td>{{ issues.total }}</td>
+						<td>{{ issues.severity.local.total }}</td>
+						<td>{{ issues.severity.remote.total }}</td>
+						<td>{{ issues.severity.vulnerable.total }}</td>
+						<td class="separator-right">{{ issues.severity.fixed.total }}</td>
+						<td>{{ groups.total }}</td>
+						<td>{{ groups.severity.vulnerable.total }}</td>
+						<td class="separator-right">{{ groups.severity.fixed.total }}</td>
+						<td>{{ packages.total }}</td>
+						<td>{{ packages.severity.vulnerable.total }}</td>
+						<td class="separator-right">{{ packages.severity.fixed.total }}</td>
+						<td>{{ advisories.total }}</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+			<h2>Types</h2>
+			<table class="styled-table stats-table column-major full size">
+				<thead>
+					<tr>
+						<th>Type</th>
+						<th>Issues</th>
+						<th>{{ colorize_severity(Severity.medium, 'Local') }}</th>
+						<th>{{ colorize_severity(Severity.high, 'Remote') }}</th>
+						<th>{{ colorize_status(Status.vulnerable, 'Open') }}</th>
+						<th class="separator-right">{{ colorize_status(Status.fixed) }}</th>
+						<th>Advisories</th>
+						<th class="full size"></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>multiple issues</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td>-</td>
+						<td class="separator-right">-</td>
+						<td>{{ advisories.type['multiple issues'] }}</td>
+						<td></td>
+					</tr>
+					{%- for issue_type in issue_types %}
+					<tr{% if loop.last %} class="separator-bottom"{% endif %}>
+						<td>{{ issue_type }}</td>
+						<td>{{ issues.type.total[issue_type] }}</td>
+						<td>{{ issues.type.local[issue_type] }}</td>
+						<td>{{ issues.type.remote[issue_type] }}</td>
+						<td>{{ issues.type.vulnerable[issue_type] }}</td>
+						<td class="separator-right">{{ issues.type.fixed[issue_type] }}</td>
+						<td>{{ advisories.type[issue_type] }}</td>
+						<td></td>
+					</tr>
+					{%- endfor %}
+					<tr>
+						<td>Total</td>
+						<td>{{ issues.total }}</td>
+						<td>{{ issues.type.vulnerable.total }}</td>
+						<td class="separator-right">{{ issues.type.fixed.total }}</td>
+						<td>{{ advisories.total }}</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+			<h2>Misc</h2>
+			<table class="styled-table column-major full size">
+				<tbody>
+					<tr>
+						<td>Bug tickets</td>
+						<td class="align-right">{{ tickets.total }}</td>
+						<td class="full size"></td>
+					</tr>
+					<tr>
+						<td>Team member</td>
+						<td class="align-right">{{ users.team }}</td>
+						<td></td>
+					</tr>
+					<tr>
+						<td>Reporter</td>
+						<td class="align-right">{{ users.reporter }}</td>
+						<td></td>
+					</tr>
+				</tbody>
+			</table>
+{%- endblock %}

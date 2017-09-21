@@ -236,8 +236,24 @@ table.styled-table tr td {
 	border-top: 1px dotted #bcd;
 }
 
+table.stats-table tr td:first-child {
+	text-align: left;
+}
+
+table.stats-table tr td {
+	text-align: right;
+}
+
 table.column-major tr td:first-child {
 	font-weight: bold;
+}
+
+.separator-bottom, .separator-bottom td {
+	border-bottom: 1px solid #bcd;
+}
+
+.separator-right, .separator-right td {
+	border-right: 1px solid #bcd;
 }
 
 .center {
@@ -596,4 +612,8 @@ form .errors {
 
 .scroll-y {
 	overflow-y: auto;
+}
+
+.align-right {
+	text-align: right;
 }
