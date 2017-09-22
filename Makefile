@@ -18,8 +18,11 @@ submodule:
 update: setup
 	./update
 
-test: setup
+test coverage: setup
 	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} ${PYTEST_INPUT} ${PYTEST_OPTIONS} ${PYTEST_COVERAGE_OPTIONS}
+
+open-coverage: coverage
+	${BROWSER} test/coverage/index.html
 
 clean:
 	rm -rf ./pacman/{cache,log}
