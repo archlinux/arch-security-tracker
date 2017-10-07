@@ -1,5 +1,5 @@
 from config import TRACKER_MAILMAN_URL
-from re import sub, search
+from re import sub, search, IGNORECASE
 from requests import get
 from html import unescape
 from datetime import date, datetime
@@ -69,8 +69,9 @@ def advisory_get_workaround_from_text(advisory):
 def advisory_extend_html(advisory, issues, package):
     for issue in issues:
         advisory = advisory.replace(' {}'.format(issue.id), ' <a href="/{0}">{0}</a>'.format(issue.id))
-    advisory = advisory.replace(' {}'.format(package.pkgname), ' <a href="/package/{0}">{0}</a>'.format(package.pkgname))
-    advisory = advisory.replace(';{}'.format(package.pkgname), ';<a href="/package/{0}">{0}</a>'.format(package.pkgname))
+    advisory = sub('({}) '.format(package.pkgname), '<a href="/package/{0}">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(' ({})'.format(package.pkgname), ' <a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(';({})'.format(package.pkgname), ';<a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
     return advisory
 
 
