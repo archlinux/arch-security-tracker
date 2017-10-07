@@ -186,3 +186,29 @@ def test_advisory_get_workaround_from_text_no_workaround(db, client):
 
 def test_advisory_get_workaround_from_text_invalid(db, client):
     assert advisory_get_workaround_from_text('test') is None
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_issue(description='foo is broken and foo.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_html_replace_package_name(db, client):
+    resp = client.get(url_for('show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '<a href="/package/foo">foo</a> is broken' in data
+    assert 'and <a href="/package/foo">foo</a>' in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_issue(description='FoO is broken and fOO.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_html_replace_package_name_case_insensitive(db, client):
+    resp = client.get(url_for('show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '<a href="/package/foo">FoO</a> is broken' in data
+    assert 'and <a href="/package/foo">fOO</a>.' in data
