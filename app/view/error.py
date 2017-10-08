@@ -19,7 +19,7 @@ def handle_error(e, code, json=False):
 
 @app.errorhandler(NotFound.code)
 def not_found(e='404: Not Found', json=False):
-    return handle_error(e, NotFound.code, json)
+    return handle_error(e if 'check your spelling' not in '{}'.format(e) else '404: Not Found', NotFound.code, json)
 
 
 @app.errorhandler(Forbidden.code)
