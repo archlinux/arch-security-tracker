@@ -61,6 +61,15 @@ def test_reporter_can_add(db, client):
 
 
 @create_package(name='foo')
+@create_group(packages=['foo'])
+@logged_in(role=UserRole.reporter)
+def test_reporter_can_copy(db, client):
+    resp = client.get(url_for('copy_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert 200 == resp.status_code
+    assert ERROR_LOGIN_REQUIRED not in resp.data.decode()
+
+
+@create_package(name='foo')
 @logged_in
 def test_add_implicit_issue_creation(db, client):
     issue_id = 'CVE-4242-4242'
@@ -108,6 +117,12 @@ def test_edit_needs_login(db, client):
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
+@create_group
+def test_copy_needs_login(db, client):
+    resp = client.get(url_for('copy_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert ERROR_LOGIN_REQUIRED in resp.data.decode()
+
+
 @logged_in
 def test_show_group_not_found(db, client):
     resp = client.get(url_for('show_group', avg='AVG-42'), follow_redirects=True)
@@ -117,6 +132,12 @@ def test_show_group_not_found(db, client):
 @logged_in
 def test_edit_group_not_found(db, client):
     resp = client.get(url_for('edit_group', avg='AVG-42'), follow_redirects=True)
+    assert resp.status_code == NotFound.code
+
+
+@logged_in
+def test_copy_group_not_found(db, client):
+    resp = client.get(url_for('copy_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 

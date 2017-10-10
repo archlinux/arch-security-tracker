@@ -3,6 +3,7 @@
 {% block content %}
 			<h1>{{ group.name }}
 			{%- if can_edit %} <a href="/{{  group.name }}/edit" accesskey="e">edit</a>{% endif %}
+			{%- if can_edit %} <a href="/{{  group.name }}/copy" accesskey="c">copy</a>{% endif %}
 			{%- if can_delete %} <a href="/{{  group.name }}/delete" accesskey="d">delete</a>{% endif %}</h1>
 			<table class="styled-table column-major full size">
 				<tbody>
