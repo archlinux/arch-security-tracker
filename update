@@ -13,6 +13,7 @@ from sys import argv, exit
 from subprocess import check_output
 from getpass import getpass
 from re import match, IGNORECASE
+from datetime import datetime
 
 
 def update_group_status():
@@ -22,7 +23,10 @@ def update_group_status():
               .group_by(CVEGroupPackage.group_id)).all()
     for group, pkgnames in groups:
         pkgnames = pkgnames.split(' ')
-        group.status = affected_to_status(status_to_affected(group.status), pkgnames[0], group.fixed)
+        new_status = affected_to_status(status_to_affected(group.status), pkgnames[0], group.fixed)
+        if group.status is not new_status:
+            print('    --> Updated {}: {} -> {}'.format(group.name, group.status, new_status))
+        group.status = new_status
     db.session.commit()
 
 
@@ -32,7 +36,10 @@ def recalc_group_status():
               .group_by(CVEGroupPackage.group_id)).all()
     for group, pkgnames in groups:
         pkgnames = pkgnames.split(' ')
-        group.status = affected_to_status(status_to_affected(group.status), pkgnames[0], group.fixed)
+        new_status = affected_to_status(status_to_affected(group.status), pkgnames[0], group.fixed)
+        if group.status is not new_status:
+            print('    --> Updated {}: {} -> {}'.format(group.name, group.status, new_status))
+        group.status = new_status
     db.session.commit()
 
 
@@ -44,7 +51,10 @@ def recalc_group_severity():
     for group, entry, issue in entries:
         issues[group].add(issue)
     for group, issues in issues.items():
-        group.severity = highest_severity([issue.severity for issue in issues])
+        new_severity = highest_severity([issue.severity for issue in issues])
+        if group.severity is not new_severity:
+            print('    --> Updated {}: {} -> {}'.format(group.name, group.severity, new_severity))
+        group.severity = new_severity
     db.session.commit()
 
 
@@ -61,12 +71,20 @@ def update_package_cache():
     print('    --> Collecting pkgbases...')
     # query all pkgbases per arch
     for arch in archs:
-        cmd = ['expac', '-S', '--config', get_configpath(arch), '%n %e']
+        cmd = ['expac', '-t', '%s', '-S', '--config', get_configpath(arch), '%n %e %v %b']
         cmd.extend(list(packages_by_arch[arch]))
         bases = check_output(cmd).decode().split('\n')[:-1]
+        latest = None
         for base in bases:
-            pkgname, pkgbase = (base.split(' '))
-            pkgbases[pkgname] = pkgbase if pkgbase != '(null)' else pkgname
+            pkgname, pkgbase, version, builddate = (base.split(' '))
+            pkgbaseorname = pkgbase if pkgbase != '(null)' else pkgname
+            pkgbases[pkgname] = pkgbaseorname
+            if not latest or builddate > latest['builddate']:
+                latest = dict(pkg=pkgbaseorname, version=version, builddate=builddate)
+    latest_package = 'None' if not latest else \
+                     '{} {} {}'.format(latest['pkg'], latest['version'],
+                                       datetime.fromtimestamp(int(latest['builddate'])).strftime('%c'))
+    print('    --> Latest package: {}'.format(latest_package))
 
     print('    --> Updating database cache...')
     new_packages = []
@@ -109,7 +127,7 @@ def create_user():
         print('Generated password: {}'.format(user.password))
     if len(user.password) > TRACKER_PASSWORD_LENGTH_MAX or len(user.password) < TRACKER_PASSWORD_LENGTH_MIN:
         print('ERROR: Password must be between {} and {} characters.'
-                .format(TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX))
+              .format(TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX))
         exit(1)
     user.salt = random_string()
     user.password = hash_password(user.password, user.salt)
