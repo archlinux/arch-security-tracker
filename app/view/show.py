@@ -17,6 +17,7 @@ from app.util import chunks, multiline_to_list
 from collections import defaultdict, OrderedDict
 from jinja2.utils import escape
 
+
 def get_bug_project(databases):
     bug_project_mapping = {
         1: ['core', 'extra', 'testing'],
@@ -29,6 +30,7 @@ def get_bug_project(databases):
 
     # Fallback
     return 1
+
 
 def get_bug_data(cves, pkgs, versions, group):
     references = []
@@ -138,8 +140,14 @@ def show_cve(cve, path=None):
     data = get_cve_data(cve)
     if not data:
         return not_found()
+
+    packages = list(set(sorted([item for sublist in data['group_packages'].values() for item in sublist])))
+    title = '{} - {}'.format(data['issue'].id, ' '.join(packages)) \
+            if len(packages) else \
+            '{}'.format(data['issue'].id)
+
     return render_template('cve.html',
-                           title=data['issue'].id,
+                           title=title,
                            issue=data['issue'],
                            groups=data['groups'],
                            group_packages=data['group_packages'],
@@ -241,12 +249,13 @@ def show_group(avg):
     issue_types = data['issue_types']
     versions = data['versions']
     issue_type = 'multiple issues' if len(issue_types) > 1 else issue_types[0]
+    pkgnames = list(set(sorted([pkg.pkgname for pkg in packages])))
 
     form = AdvisoryForm()
     form.advisory_type.data = issue_type
 
     return render_template('group.html',
-                           title='{}'.format(group),
+                           title='{} - {}'.format(group, ' '.join(pkgnames)),
                            form=form,
                            group=group,
                            packages=packages,
