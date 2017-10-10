@@ -73,7 +73,7 @@ def edit_cve(cve):
     if not user_can_edit_issue(advisories):
         return forbidden()
 
-    form = CVEForm()
+    form = CVEForm(edit=True)
     if not form.is_submitted():
         form.cve.data = cve.id
         form.issue_type.data = cve.issue_type

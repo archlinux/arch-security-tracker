@@ -15,3 +15,9 @@ class CVEForm(BaseForm):
     reference = TextAreaField(u'References', validators=[Optional(), Length(max=CVE.REFERENCES_LENGTH), ValidURLs()])
     notes = TextAreaField(u'Notes', validators=[Optional(), Length(max=CVE.NOTES_LENGTH)])
     submit = SubmitField(u'submit')
+
+    def __init__(self, edit=False):
+        super().__init__()
+        self.edit = edit
+        if edit:
+            self.cve.render_kw = {'readonly': True}
