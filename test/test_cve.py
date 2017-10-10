@@ -157,6 +157,14 @@ def test_reporter_can_delete(db, client):
 
 @create_issue
 @logged_in(role=UserRole.reporter)
+def test_reporter_can_copy(db, client):
+    resp = client.get(url_for('copy_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    assert ERROR_LOGIN_REQUIRED not in resp.data.decode()
+
+
+@create_issue
+@logged_in(role=UserRole.reporter)
 def test_abort_delete(db, client):
     resp = client.post(url_for('delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True,
                        data=dict(abort=True))
@@ -178,6 +186,12 @@ def test_delete_needs_login(db, client):
 
 
 @create_issue
+def test_copy_needs_login(db, client):
+    resp = client.get(url_for('copy_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
+    assert ERROR_LOGIN_REQUIRED in resp.data.decode()
+
+
+@create_issue
 def test_show_issue(db, client):
     resp = client.get(url_for('show_cve', cve=DEFAULT_ISSUE_ID, path=''))
     assert 200 == resp.status_code
@@ -194,6 +208,12 @@ def test_show_issue_not_found(db, client):
 def test_edit_issue_not_found(db, client):
     resp = client.post(url_for('edit_cve', cve='CVE-2011-0000'), follow_redirects=True,
                        data=default_issue_dict())
+    assert resp.status_code == NotFound.code
+
+
+@logged_in
+def test_copy_issue_not_found(db, client):
+    resp = client.get(url_for('copy_issue', issue='CVE-2011-0000', path=''), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 

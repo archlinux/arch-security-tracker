@@ -2,7 +2,7 @@
 {% block content %}
 			<h1>{{ title }}</h1>
 			<div class="wide size">
-				<form action="" method="post" name="add">
+				<form action="{{ action }}" method="post" name="add">
 					{{ form.hidden_tag() }}
 					<div class="row">
 						<div class="one-half column">
