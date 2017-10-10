@@ -386,6 +386,10 @@ input[type="button"].button-primary:focus {
 	border-color: rgb(155, 187, 224);
 }
 
+input[readonly] {
+	background-color: #f1f1f1;
+}
+
 .button.button-table {
 	height: 2.2em;
 	line-height: 2.0em;
