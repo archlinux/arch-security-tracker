@@ -61,7 +61,7 @@
 						<td>Created</td>
 						<td>{{ group.created.strftime('%c') }}</td>
 					</tr>
-					{%- if advisory_pending %}
+					{%- if advisories_pending %}
 					<tr>
 						<td>Advisory</td>
 						{%- if can_handle_advisory %}
