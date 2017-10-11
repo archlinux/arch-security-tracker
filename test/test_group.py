@@ -1,10 +1,10 @@
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Forbidden
 from flask import url_for
 
-from .conftest import logged_in, create_package, create_group, default_group_dict, DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME, DEFAULT_ISSUE_ID, ERROR_LOGIN_REQUIRED
+from .conftest import logged_in, create_package, create_group, create_advisory, default_group_dict, DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED
 from config import TRACKER_BUGTRACKER_URL
 from app.model.enum import UserRole, Affected, Status
-from app.model.cve import CVE
+from app.model.cve import issue_types, CVE
 from app.model.cvegroup import CVEGroup
 from app.view.add import ERROR_GROUP_WITH_ISSUE_EXISTS
 from app.view.show import get_bug_project
@@ -212,3 +212,47 @@ def test_dont_add_group_with_dot_at_beginning_of_pkgrel(db, client):
 
     resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
     assert 'Invalid input.' in resp.data.decode()
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
+@logged_in(role=UserRole.reporter)
+def test_reporter_can_delete(db, client):
+    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True,
+                       data=dict(confirm=True))
+    assert 200 == resp.status_code
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    assert avg is None
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
+@logged_in(role=UserRole.reporter)
+def test_abort_delete(db, client):
+    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True,
+                       data=dict(abort=True))
+    assert 200 == resp.status_code
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    assert DEFAULT_GROUP_ID == avg.id
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
+def test_delete_needs_login(db, client):
+    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert ERROR_LOGIN_REQUIRED in resp.data.decode()
+
+
+@logged_in
+def test_delete_issue_not_found(db, client):
+    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert resp.status_code == NotFound.code
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_forbid_delete_with_advisory(db, client):
+    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert Forbidden.code == resp.status_code

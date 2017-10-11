@@ -1,8 +1,8 @@
 import json
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, Forbidden
 from flask import url_for
 
-from .conftest import logged_in, create_issue, default_issue_dict, DEFAULT_ISSUE_ID, ERROR_LOGIN_REQUIRED, ERROR_INVALID_CHOICE
+from .conftest import logged_in, create_issue, create_package, create_group, create_advisory, DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED, ERROR_INVALID_CHOICE, default_issue_dict
 from app.model.enum import Remote, Severity, UserRole
 from app.model.cve import issue_types, CVE
 from app.form import CVEForm
@@ -183,6 +183,15 @@ def test_edit_needs_login(db, client):
 def test_delete_needs_login(db, client):
     resp = client.post(url_for('delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_forbid_delete_with_advisory(db, client):
+    resp = client.post(url_for('delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
+    assert Forbidden.code == resp.status_code
 
 
 @create_issue

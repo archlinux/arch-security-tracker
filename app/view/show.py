@@ -1,4 +1,5 @@
 from flask import render_template, redirect
+from flask_login import current_user
 from sqlalchemy import and_
 from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL, TRACKER_SUMMARY_LENGTH_MAX
 from app import app, db
@@ -86,8 +87,7 @@ def get_cve_data(cve):
     entries = (db.session.query(CVEGroupEntry, CVEGroup, CVEGroupPackage, Advisory)
                .filter_by(cve=cve_model)
                .join(CVEGroup).join(CVEGroupPackage)
-               .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
-                                         Advisory.publication == Publication.published))
+               .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
 
     group_packages = defaultdict(set)
@@ -120,6 +120,9 @@ def show_cve_json(cve, path=None, suffix=None):
     cve = data['issue']
     references = cve.reference.replace('\r', '').split('\n') if cve.reference else []
     packages = list(set(sorted([item for sublist in data['group_packages'].values() for item in sublist])))
+    advisories = data['advisories']
+    if not current_user.role.is_reporter:
+        advisories = list(filter(lambda advisory: advisory.publication == Publication.published, advisories))
 
     json_data = OrderedDict()
     json_data['name'] = cve.id
@@ -129,7 +132,7 @@ def show_cve_json(cve, path=None, suffix=None):
     json_data['description'] = cve.description
     json_data['groups'] = [str(group) for group in data['groups']]
     json_data['packages'] = packages
-    json_data['advisories'] = [advisory.id for advisory in data['advisories']]
+    json_data['advisories'] = [advisory.id for advisory in advisories]
     json_data['references'] = references
     json_data['notes'] = cve.notes if cve.notes else None
     return json_data
@@ -146,14 +149,18 @@ def show_cve(cve, path=None):
             if len(packages) else \
             '{}'.format(data['issue'].id)
 
+    advisories = data['advisories']
+    if not current_user.role.is_reporter:
+        advisories = list(filter(lambda advisory: advisory.publication == Publication.published, advisories))
+
     return render_template('cve.html',
                            title=title,
                            issue=data['issue'],
                            groups=data['groups'],
-                           group_packages=data['group_packages'],
-                           advisories=data['advisories'],
-                           can_edit=user_can_edit_issue(data['advisories']),
-                           can_delete=user_can_delete_issue(data['advisories']))
+                           group_packages=advisories,
+                           advisories=advisories,
+                           can_edit=user_can_edit_issue(advisories),
+                           can_delete=user_can_delete_issue(advisories))
 
 
 def get_group_data(avg):
@@ -182,13 +189,12 @@ def get_group_data(avg):
         if advisory:
             advisories.add(advisory)
 
-    published_advisories = list(filter(lambda advisory: advisory.publication == Publication.published, advisories))
-    published_advisories = sorted(published_advisories, key=lambda item: item.id, reverse=True)
+    advisories = sorted(advisories, key=lambda item: item.id, reverse=True)
     issue_types = list(issue_types)
     issues = sorted(issues, key=lambda item: item.id, reverse=True)
     packages = sorted(packages, key=lambda item: item.pkgname)
     versions = filter_duplicate_packages(sort_packages(list(versions)), True)
-    advisory_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
+    advisories_pending = group.status == Status.fixed and group.advisory_qualified and len(advisories) <= 0
 
     return {
         'group': group,
@@ -196,8 +202,8 @@ def get_group_data(avg):
         'versions': versions,
         'issues': issues,
         'issue_types': issue_types,
-        'advisories': published_advisories,
-        'advisory_pending': advisory_pending
+        'advisories': advisories,
+        'advisories_pending': advisories_pending
     }
 
 
@@ -212,6 +218,8 @@ def show_group_json(avg, postfix=None):
 
     group = data['group']
     advisories = data['advisories']
+    if not current_user.role.is_reporter:
+        advisories = list(filter(lambda advisory: advisory.publication == Publication.published, advisories))
     issues = data['issues']
     packages = data['packages']
     issue_types = data['issue_types']
@@ -244,6 +252,8 @@ def show_group(avg):
 
     group = data['group']
     advisories = data['advisories']
+    if not current_user.role.is_reporter:
+        advisories = list(filter(lambda advisory: advisory.publication == Publication.published, advisories))
     issues = data['issues']
     packages = data['packages']
     issue_types = data['issue_types']
@@ -265,7 +275,7 @@ def show_group(avg):
                            Status=Status,
                            issue_type=issue_type,
                            bug_data=get_bug_data(issues, packages, versions, group),
-                           advisory_pending=data['advisory_pending'],
+                           advisories_pending=data['advisories_pending'],
                            can_edit=user_can_edit_group(advisories),
                            can_delete=user_can_delete_group(advisories),
                            can_handle_advisory=user_can_handle_advisory())
