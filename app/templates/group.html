@@ -68,7 +68,7 @@
 							<form action="/AVG-{{ group.id }}/schedule" method="post" name="schedule">
 								{{ form.hidden_tag() }}
 								{{ form.advisory_type(class='no-margin input-compact') }}
-								{{ form.submit(class='button button-table button-primary') }}
+								{{ form.submit(class='button button-table button-primary', accesskey='s') }}
 							</form>
 						</td>
 						{%- else %}
