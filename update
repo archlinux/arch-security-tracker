@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
-from app.pacman import update as update_pacman_db, search, get_configpath, archs, primary_arch
+from app.pacman import update as update_pacman_db, search
 from app import db
 from app.model import CVEGroup, CVEGroupPackage, CVE, CVEGroupEntry, Package
 from app.model.user import User, username_regex
@@ -61,37 +61,18 @@ def recalc_group_severity():
 def update_package_cache():
     print('    --> Querying alpm database...')
     packages = search('', filter_duplicate_packages=False, sort_results=False)
-    pkgbases = {}
-    packages_by_arch = defaultdict(set)
-    # assign packages per arch list (unify any into 64bit)
-    for package in packages:
-        arch = package.arch if package.arch != 'any' else primary_arch
-        packages_by_arch[arch].add(package.name)
 
-    print('    --> Collecting pkgbases...')
-    # query all pkgbases per arch
-    for arch in archs:
-        cmd = ['expac', '-t', '%s', '-S', '--config', get_configpath(arch), '%n %e %v %b']
-        cmd.extend(list(packages_by_arch[arch]))
-        bases = check_output(cmd).decode().split('\n')[:-1]
-        latest = None
-        for base in bases:
-            pkgname, pkgbase, version, builddate = (base.split(' '))
-            pkgbaseorname = pkgbase if pkgbase != '(null)' else pkgname
-            pkgbases[pkgname] = pkgbaseorname
-            if not latest or builddate > latest['builddate']:
-                latest = dict(pkg=pkgbaseorname, version=version, builddate=builddate)
-    latest_package = 'None' if not latest else \
-                     '{} {} {}'.format(latest['pkg'], latest['version'],
-                                       datetime.fromtimestamp(int(latest['builddate'])).strftime('%c'))
-    print('    --> Latest package: {}'.format(latest_package))
+    if packages:
+        latest = max(packages, key=lambda pkg: pkg.builddate)
+        print('    --> Latest package: {} {} {}'.format(
+            latest.name, latest.version, datetime.fromtimestamp(latest.builddate).strftime('%c')))
 
     print('    --> Updating database cache...')
     new_packages = []
     for package in packages:
         new_packages.append({
             'name': package.name,
-            'base': pkgbases[package.name],
+            'base': package.base if package.base else package.name,
             'version': package.version,
             'description': package.desc,
             'url': package.url,
