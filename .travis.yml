@@ -20,7 +20,6 @@ arch:
     - python-scrypt
     - pyalpm
     - sqlite
-    - expac
 
   script:
     - python3 -m py_compile $(git ls-files '*.py')

@@ -28,7 +28,6 @@ vulnerability details and generating security advisories.
 * python-scrypt
 * pyalpm
 * sqlite
-* expac
 
 ### Tests
 
