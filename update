@@ -62,12 +62,15 @@ def update_package_cache():
     print('    --> Querying alpm database...')
     packages = search('', filter_duplicate_packages=False, sort_results=False)
 
+    latest = max(packages, key=lambda pkg: pkg.builddate)
+    print('    --> Latest package: {} {} {}'.format(latest.name, latest.version, latest.builddate))
+
     print('    --> Updating database cache...')
     new_packages = []
     for package in packages:
         new_packages.append({
             'name': package.name,
-            'base': package.base if package.base else '',
+            'base': package.base if package.base else package.name,
             'version': package.version,
             'description': package.desc,
             'url': package.url,
