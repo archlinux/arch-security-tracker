@@ -6,10 +6,9 @@ from operator import attrgetter
 from os import chdir
 from time import time
 
-archs = ['i686', 'x86_64']
+archs = ['x86_64']
 primary_arch = 'x86_64'
-repos = {'i686': ['core', 'extra', 'community', 'testing', 'community-testing'],
-         'x86_64': ['core', 'extra', 'community', 'multilib', 'testing', 'community-testing', 'multilib-testing']}
+repos = {'x86_64': ['core', 'extra', 'community', 'multilib', 'testing', 'community-testing', 'multilib-testing']}
 configpath = './pacman/arch/{}/pacman.conf'
 handles = {}
 chdir(basedir)

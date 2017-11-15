@@ -9,7 +9,7 @@ all: update
 
 setup: submodule
 	mkdir -p ./pacman/{cache,log}
-	mkdir -p ./pacman/arch/{i686,x86_64}/db
+	mkdir -p ./pacman/arch/{x86_64}/db
 	./db_create
 
 submodule:
@@ -26,4 +26,4 @@ open-coverage: coverage
 
 clean:
 	rm -rf ./pacman/{cache,log}
-	rm -rf ./pacman/arch/{i686,x86_64}/db
+	rm -rf ./pacman/arch/{x86_64}/db
