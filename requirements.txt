@@ -5,4 +5,4 @@ Flask-WTF
 flask-talisman
 requests
 scrypt
-https://git.archlinux.org/users/remy/pyalpm.git/snapshot/pyalpm-0.8.tar.xz
+https://github.com/jelly/pyalpm/archive/0.8.2.tar.gz
