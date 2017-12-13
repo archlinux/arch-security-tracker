@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app, db
+from app import main, db
 from app.util import json_response
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
 from app.model.enum import Publication, Status
@@ -40,7 +40,7 @@ def get_index_data(only_vulnerable=False, only_in_repo=True):
     return groups
 
 
-@app.route('/', defaults={'path': '', 'only_vulnerable': True}, methods=['GET'])
+@main.route('/', defaults={'path': '', 'only_vulnerable': True}, methods=['GET'])
 def index(only_vulnerable=True, path=None):
     groups = get_index_data(only_vulnerable)
     return render_template('index.html',
@@ -49,19 +49,19 @@ def index(only_vulnerable=True, path=None):
                            only_vulnerable=only_vulnerable)
 
 
-@app.route('/<regex("(issues?/)?(open|vulnerable)?"):path>', defaults={'path': ''}, methods=['GET'])
+@main.route('/<regex("(issues?/)?(open|vulnerable)?"):path>', defaults={'path': ''}, methods=['GET'])
 def index_vulnerable(path=None):
     return index(only_vulnerable=True)
 
 
-@app.route('/<regex("(issues/)?(all)?"):path>', defaults={'path': ''}, methods=['GET'])
+@main.route('/<regex("(issues/)?(all)?"):path>', defaults={'path': ''}, methods=['GET'])
 def index_all(path=None):
     return index(only_vulnerable=False)
 
 
 # TODO: temporarily keep /json this way until tools adopted new endpoint
-@app.route('/json', defaults={'path': 'json', 'only_vulnerable': False}, methods=['GET'])
-@app.route('/<regex("(issues/?)?(all)?.json"):path>', defaults={'path': 'all.json', 'only_vulnerable': False}, methods=['GET'])
+@main.route('/json', defaults={'path': 'json', 'only_vulnerable': False}, methods=['GET'])
+@main.route('/<regex("(issues/?)?(all)?.json"):path>', defaults={'path': 'all.json', 'only_vulnerable': False}, methods=['GET'])
 @json_response
 def index_json(only_vulnerable=False, path=None):
     entries = get_index_data(only_vulnerable)
@@ -85,6 +85,6 @@ def index_json(only_vulnerable=False, path=None):
     return json_data
 
 
-@app.route('/<regex("(issues/?)?(open|vulnerable).json"):path>', methods=['GET'])
+@main.route('/<regex("(issues/?)?(open|vulnerable).json"):path>', methods=['GET'])
 def index_vulnerable_json(path=None):
     return index_json(only_vulnerable=True)

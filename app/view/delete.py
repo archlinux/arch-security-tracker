@@ -1,5 +1,5 @@
 from flask import render_template, flash, redirect
-from app import app, db
+from app import main, db
 from app.user import reporter_required, security_team_required, user_can_delete_group, user_can_delete_issue
 from app.form.confirm import ConfirmForm
 from app.model import CVEGroup, CVE, CVEGroupPackage, CVEGroupEntry, Advisory
@@ -11,8 +11,8 @@ from app.view.error import not_found, forbidden
 from collections import defaultdict
 
 
-@app.route('/group/<regex("{}"):avg>/delete'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/<regex("{}"):avg>/delete'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/group/<regex("{}"):avg>/delete'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/<regex("{}"):avg>/delete'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
 @reporter_required
 def delete_group(avg):
     avg_id = avg.replace('AVG-', '')
@@ -61,8 +61,8 @@ def delete_group(avg):
     return redirect('/')
 
 
-@app.route('/issue/<regex("{}"):issue>/delete'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/<regex("{}"):issue>/delete'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/issue/<regex("{}"):issue>/delete'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/<regex("{}"):issue>/delete'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
 @reporter_required
 def delete_issue(issue):
     entries = (db.session.query(CVE, CVEGroup, CVEGroupPackage, Advisory)
@@ -131,8 +131,8 @@ def delete_issue(issue):
     return redirect('/')
 
 
-@app.route('/advisory/<regex("{}"):advisory_id>/delete'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/<regex("{}"):advisory_id>/delete'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/advisory/<regex("{}"):advisory_id>/delete'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/<regex("{}"):advisory_id>/delete'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
 @security_team_required
 def delete_advisory(advisory_id):
     advisory, pkg, group = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)

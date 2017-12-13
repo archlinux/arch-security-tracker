@@ -1,5 +1,4 @@
 from flask import Blueprint
-from app import app
 
 blueprint = Blueprint('filters', __name__)
 
@@ -21,5 +20,3 @@ def smartindent(s, width=1, indentfirst=False, indentchar=u'\t'):
     if indentfirst:
         rv = indention + rv
     return rv
-
-app.register_blueprint(blueprint)

@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app, db
+from app import main, db
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, User
 from app.model.cve import issue_types
 from app.model.enum import UserRole, Severity, Status, Remote
@@ -198,13 +198,13 @@ def get_stats_data():
     return data
 
 
-@app.route('/stats<regex("[./]json"):suffix>', methods=['GET'])
+@main.route('/stats<regex("[./]json"):suffix>', methods=['GET'])
 @json_response
 def stats_json(suffix=None):
     return get_stats_data(), ImATeapot.code
 
 
-@app.route('/stats', methods=['GET'])
+@main.route('/stats', methods=['GET'])
 def stats():
     data = get_stats_data()
     return render_template('stats.html',

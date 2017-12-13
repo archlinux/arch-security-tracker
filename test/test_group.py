@@ -52,7 +52,7 @@ def set_and_assert_group_data(db, client, route, pkgnames=['foo'], issues=['CVE-
 @create_package(name='foo')
 @logged_in(role=UserRole.reporter)
 def test_reporter_can_add(db, client):
-    resp = client.post(url_for('add_group'), follow_redirects=True,
+    resp = client.post(url_for('main.add_group'), follow_redirects=True,
                        data=default_group_dict(dict(pkgnames='foo')))
     assert 200 == resp.status_code
 
@@ -64,7 +64,7 @@ def test_reporter_can_add(db, client):
 @create_group(packages=['foo'])
 @logged_in(role=UserRole.reporter)
 def test_reporter_can_copy(db, client):
-    resp = client.get(url_for('copy_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    resp = client.get(url_for('main.copy_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert 200 == resp.status_code
     assert ERROR_LOGIN_REQUIRED not in resp.data.decode()
 
@@ -73,7 +73,7 @@ def test_reporter_can_copy(db, client):
 @logged_in
 def test_add_implicit_issue_creation(db, client):
     issue_id = 'CVE-4242-4242'
-    resp = client.post(url_for('add_group'), follow_redirects=True,
+    resp = client.post(url_for('main.add_group'), follow_redirects=True,
                        data=default_group_dict(dict(pkgnames='foo', cve=issue_id)))
     assert 200 == resp.status_code
 
@@ -84,67 +84,67 @@ def test_add_implicit_issue_creation(db, client):
 @create_package(name='foo', version='1.2.3-4')
 @logged_in
 def test_add_group(db, client):
-    set_and_assert_group_data(db, client, url_for('add_group'))
+    set_and_assert_group_data(db, client, url_for('main.add_group'))
 
 
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
 @logged_in
 def test_edit_group(db, client):
-    set_and_assert_group_data(db, client, url_for('edit_group', avg=DEFAULT_GROUP_NAME))
+    set_and_assert_group_data(db, client, url_for('main.edit_group', avg=DEFAULT_GROUP_NAME))
 
 
 @create_package(name='foo', version='1.2.3-4')
 @logged_in
 def test_edit_group_bug_url_core(db, client):
-    set_and_assert_group_data(db, client, url_for('add_group'), bug_ticket='')
+    set_and_assert_group_data(db, client, url_for('main.add_group'), bug_ticket='')
 
 
 @create_package(name='foo', version='1.2.3-4', database='community')
 @logged_in
 def test_edit_group_bug_url_community(db, client):
-    set_and_assert_group_data(db, client, url_for('add_group'), bug_ticket='', database='community')
+    set_and_assert_group_data(db, client, url_for('main.add_group'), bug_ticket='', database='community')
 
 
 def test_add_needs_login(db, client):
-    resp = client.get(url_for('add_group'), follow_redirects=True)
+    resp = client.get(url_for('main.add_group'), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
 @create_group
 def test_edit_needs_login(db, client):
-    resp = client.get(url_for('edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    resp = client.get(url_for('main.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
 @create_group
 def test_copy_needs_login(db, client):
-    resp = client.get(url_for('copy_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    resp = client.get(url_for('main.copy_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
 @logged_in
 def test_show_group_not_found(db, client):
-    resp = client.get(url_for('show_group', avg='AVG-42'), follow_redirects=True)
+    resp = client.get(url_for('main.show_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
 @logged_in
 def test_edit_group_not_found(db, client):
-    resp = client.get(url_for('edit_group', avg='AVG-42'), follow_redirects=True)
+    resp = client.get(url_for('main.edit_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
 @logged_in
 def test_copy_group_not_found(db, client):
-    resp = client.get(url_for('copy_group', avg='AVG-42'), follow_redirects=True)
+    resp = client.get(url_for('main.copy_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
 @logged_in
 def test_group_packge_dropped_from_repo(db, client):
-    resp = client.get(url_for('show_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    resp = client.get(url_for('main.show_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert 200 == resp.status_code
 
 
@@ -158,7 +158,7 @@ def test_warn_on_add_group_with_existing_issue(db, client):
         cve='\n'.join(issues),
         pkgnames='\n'.join(pkgnames)))
 
-    resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_group'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_GROUP_WITH_ISSUE_EXISTS.format(DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, pkgnames[0]) in resp.data.decode()
 
@@ -173,7 +173,7 @@ def test_dont_warn_on_add_group_without_existing_issue(db, client):
         cve='\n'.join(issues),
         pkgnames='\n'.join(pkgnames)))
 
-    resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_group'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_GROUP_WITH_ISSUE_EXISTS.format(DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, pkgnames[0]) not in resp.data.decode()
 
@@ -188,7 +188,7 @@ def test_warn_on_add_group_with_package_already_having_open_group(db, client):
         cve='\n'.join(issues),
         pkgnames='\n'.join(pkgnames)))
 
-    resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_group'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_GROUP_WITH_ISSUE_EXISTS.format(DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, pkgnames[0]) in resp.data.decode()
 
@@ -196,7 +196,7 @@ def test_warn_on_add_group_with_package_already_having_open_group(db, client):
 @create_package(name='foo')
 @logged_in
 def test_add_group_with_dot_in_pkgrel(db, client):
-    set_and_assert_group_data(db, client, url_for('add_group'), affected='1.2-3.4')
+    set_and_assert_group_data(db, client, url_for('main.add_group'), affected='1.2-3.4')
 
 
 @create_package(name='foo')
@@ -210,7 +210,7 @@ def test_dont_add_group_with_dot_at_beginning_of_pkgrel(db, client):
         pkgnames='\n'.join(pkgnames),
         affected=affected))
 
-    resp = client.post(url_for('add_group'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_group'), follow_redirects=True, data=data)
     assert 'Invalid input.' in resp.data.decode()
 
 
@@ -218,7 +218,7 @@ def test_dont_add_group_with_dot_at_beginning_of_pkgrel(db, client):
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
 @logged_in(role=UserRole.reporter)
 def test_reporter_can_delete(db, client):
-    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True,
+    resp = client.post(url_for('main.delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True,
                        data=dict(confirm=True))
     assert 200 == resp.status_code
     avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
@@ -229,7 +229,7 @@ def test_reporter_can_delete(db, client):
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
 @logged_in(role=UserRole.reporter)
 def test_abort_delete(db, client):
-    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True,
+    resp = client.post(url_for('main.delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True,
                        data=dict(abort=True))
     assert 200 == resp.status_code
     avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
@@ -239,13 +239,13 @@ def test_abort_delete(db, client):
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'])
 def test_delete_needs_login(db, client):
-    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    resp = client.post(url_for('main.delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
 @logged_in
 def test_delete_issue_not_found(db, client):
-    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    resp = client.post(url_for('main.delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
@@ -254,5 +254,5 @@ def test_delete_issue_not_found(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 @logged_in
 def test_forbid_delete_with_advisory(db, client):
-    resp = client.post(url_for('delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    resp = client.post(url_for('main.delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert Forbidden.code == resp.status_code

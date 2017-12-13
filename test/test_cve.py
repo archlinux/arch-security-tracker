@@ -39,12 +39,12 @@ def set_and_assert_cve_data(db, client, cve_id, route):
 
 @logged_in
 def test_add_cve(db, client):
-    set_and_assert_cve_data(db, client, 'CVE-1122-0042', url_for('add_cve'))
+    set_and_assert_cve_data(db, client, 'CVE-1122-0042', url_for('main.add_cve'))
 
 
 @logged_in(role=UserRole.reporter)
 def test_reporter_can_add(db, client):
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=default_issue_dict())
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=default_issue_dict())
     assert 200 == resp.status_code
     cve = CVE.query.get(DEFAULT_ISSUE_ID)
     assert DEFAULT_ISSUE_ID == cve.id
@@ -52,7 +52,7 @@ def test_reporter_can_add(db, client):
 
 @create_issue
 def test_add_needs_login(db, client):
-    resp = client.post(url_for('add_cve'), follow_redirects=True,
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True,
                        data=default_issue_dict())
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
@@ -62,7 +62,7 @@ def test_add_invalid_cve_id(db, client):
     cve_id = 'LOL'
     data = default_issue_dict()
     data.update(dict(cve=cve_id))
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_ISSUE_ID_INVALID in resp.data.decode()
 
@@ -72,7 +72,7 @@ def test_cve_id_suffix_too_short(db, client):
     cve_id = 'CVE-1234-123'
     data = default_issue_dict()
     data.update(dict(cve=cve_id))
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_ISSUE_ID_INVALID in resp.data.decode()
 
@@ -82,7 +82,7 @@ def test_cve_id_suffix_long(db, client):
     cve_id = 'CVE-1234-12345678'
     data = default_issue_dict()
     data.update(dict(cve=cve_id))
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_ISSUE_ID_INVALID not in resp.data.decode()
 
@@ -92,7 +92,7 @@ def test_add_invalid_reference(db, client):
     reference = 'OMG'
     data = default_issue_dict()
     data.update(dict(reference=reference))
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_INVALID_URL.format(reference) in resp.data.decode()
 
@@ -101,7 +101,7 @@ def test_add_invalid_reference(db, client):
 def test_add_invalid_severity(db, client):
     data = default_issue_dict()
     data.update(dict(severity='OMG'))
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_INVALID_CHOICE in resp.data.decode()
     assert 1 == resp.data.decode().count(ERROR_INVALID_CHOICE)
@@ -111,7 +111,7 @@ def test_add_invalid_severity(db, client):
 def test_add_invalid_remote(db, client):
     data = default_issue_dict()
     data.update(dict(remote='OMG'))
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_INVALID_CHOICE in resp.data.decode()
     assert 1 == resp.data.decode().count(ERROR_INVALID_CHOICE)
@@ -121,7 +121,7 @@ def test_add_invalid_remote(db, client):
 def test_add_invalid_type(db, client):
     data = default_issue_dict()
     data.update(dict(issue_type='OMG'))
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert ERROR_INVALID_CHOICE in resp.data.decode()
     assert 1 == resp.data.decode().count(ERROR_INVALID_CHOICE)
@@ -130,7 +130,7 @@ def test_add_invalid_type(db, client):
 @create_issue
 @logged_in
 def test_edit_cve(db, client):
-    set_and_assert_cve_data(db, client, DEFAULT_ISSUE_ID, url_for('edit_cve', cve=DEFAULT_ISSUE_ID))
+    set_and_assert_cve_data(db, client, DEFAULT_ISSUE_ID, url_for('main.edit_cve', cve=DEFAULT_ISSUE_ID))
 
 
 @create_issue
@@ -139,7 +139,7 @@ def test_reporter_can_edit(db, client):
     description = 'LOLWUT'
     data = default_issue_dict()
     data.update(dict(description=description))
-    resp = client.post(url_for('edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True, data=data)
+    resp = client.post(url_for('main.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     cve = CVE.query.get(DEFAULT_ISSUE_ID)
     assert description == cve.description
@@ -148,7 +148,7 @@ def test_reporter_can_edit(db, client):
 @create_issue
 @logged_in(role=UserRole.reporter)
 def test_reporter_can_delete(db, client):
-    resp = client.post(url_for('delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True,
+    resp = client.post(url_for('main.delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True,
                        data=dict(confirm=True))
     assert 200 == resp.status_code
     cve = CVE.query.get(DEFAULT_ISSUE_ID)
@@ -158,7 +158,7 @@ def test_reporter_can_delete(db, client):
 @create_issue
 @logged_in(role=UserRole.reporter)
 def test_reporter_can_copy(db, client):
-    resp = client.get(url_for('copy_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
+    resp = client.get(url_for('main.copy_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
     assert 200 == resp.status_code
     assert ERROR_LOGIN_REQUIRED not in resp.data.decode()
 
@@ -166,7 +166,7 @@ def test_reporter_can_copy(db, client):
 @create_issue
 @logged_in(role=UserRole.reporter)
 def test_abort_delete(db, client):
-    resp = client.post(url_for('delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True,
+    resp = client.post(url_for('main.delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True,
                        data=dict(abort=True))
     assert 200 == resp.status_code
     cve = CVE.query.get(DEFAULT_ISSUE_ID)
@@ -175,13 +175,13 @@ def test_abort_delete(db, client):
 
 @create_issue
 def test_edit_needs_login(db, client):
-    resp = client.post(url_for('edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True)
+    resp = client.post(url_for('main.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
 @create_issue
 def test_delete_needs_login(db, client):
-    resp = client.post(url_for('delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
+    resp = client.post(url_for('main.delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
@@ -190,51 +190,51 @@ def test_delete_needs_login(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 @logged_in
 def test_forbid_delete_with_advisory(db, client):
-    resp = client.post(url_for('delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
+    resp = client.post(url_for('main.delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
     assert Forbidden.code == resp.status_code
 
 
 @create_issue
 def test_copy_needs_login(db, client):
-    resp = client.get(url_for('copy_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
+    resp = client.get(url_for('main.copy_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True)
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
 
 
 @create_issue
 def test_show_issue(db, client):
-    resp = client.get(url_for('show_cve', cve=DEFAULT_ISSUE_ID, path=''))
+    resp = client.get(url_for('main.show_cve', cve=DEFAULT_ISSUE_ID, path=''))
     assert 200 == resp.status_code
     assert DEFAULT_ISSUE_ID in resp.data.decode()
 
 
 @logged_in
 def test_show_issue_not_found(db, client):
-    resp = client.get(url_for('show_cve', cve='CVE-2011-0000', path=''), follow_redirects=True)
+    resp = client.get(url_for('main.show_cve', cve='CVE-2011-0000', path=''), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
 @logged_in
 def test_edit_issue_not_found(db, client):
-    resp = client.post(url_for('edit_cve', cve='CVE-2011-0000'), follow_redirects=True,
+    resp = client.post(url_for('main.edit_cve', cve='CVE-2011-0000'), follow_redirects=True,
                        data=default_issue_dict())
     assert resp.status_code == NotFound.code
 
 
 @logged_in
 def test_copy_issue_not_found(db, client):
-    resp = client.get(url_for('copy_issue', issue='CVE-2011-0000', path=''), follow_redirects=True)
+    resp = client.get(url_for('main.copy_issue', issue='CVE-2011-0000', path=''), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
 @logged_in
 def test_delete_issue_not_found(db, client):
-    resp = client.post(url_for('delete_issue', issue='CVE-2011-0000'), follow_redirects=True)
+    resp = client.post(url_for('main.delete_issue', issue='CVE-2011-0000'), follow_redirects=True)
     assert resp.status_code == NotFound.code
 
 
 @create_issue
 def test_issue_json(db, client):
-    resp = client.get(url_for('show_cve_json', cve=DEFAULT_ISSUE_ID, path='', suffix='.json'), follow_redirects=True)
+    resp = client.get(url_for('main.show_cve_json', cve=DEFAULT_ISSUE_ID, path='', suffix='.json'), follow_redirects=True)
     assert 200 == resp.status_code
 
     data = json.loads(resp.data)
@@ -250,7 +250,7 @@ def test_add_cve_overwrites_existing_but_empty_cve(db, client):
     description = 'much wow'
     reference = 'https://security.archlinux.org'
     notes = 'very secret'
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=default_issue_dict(dict(
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=default_issue_dict(dict(
                        cve=DEFAULT_ISSUE_ID,
                        issue_type=issue_type,
                        severity=severity.name,
@@ -276,7 +276,7 @@ def test_add_cve_overwrites_existing_but_empty_cve(db, client):
               description='foobar', reference='https://archlinux.org', notes='the cake is a lie')
 @logged_in
 def test_add_cve_does_not_overwrite_existing_cve(db, client):
-    resp = client.post(url_for('add_cve'), follow_redirects=True, data=default_issue_dict(dict(
+    resp = client.post(url_for('main.add_cve'), follow_redirects=True, data=default_issue_dict(dict(
                        cve=DEFAULT_ISSUE_ID,
                        issue_type=issue_types[1],
                        severity=Severity.critical.name,

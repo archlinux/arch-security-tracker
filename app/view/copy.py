@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app, db
+from app import main, db
 from app.user import reporter_required
 from app.form import CVEForm, GroupForm
 from app.model import CVE, CVEGroup, CVEGroupPackage, CVEGroupEntry
@@ -11,9 +11,9 @@ from itertools import chain
 from sqlalchemy import func
 
 
-@app.route('/issue/<regex("{}"):issue>/copy'.format(cve_id_regex[1:-1]), methods=['GET'])
-@app.route('/cve/<regex("{}"):issue>/copy'.format(cve_id_regex[1:-1]), methods=['GET'])
-@app.route('/<regex("{}"):issue>/copy'.format(cve_id_regex[1:-1]), methods=['GET'])
+@main.route('/issue/<regex("{}"):issue>/copy'.format(cve_id_regex[1:-1]), methods=['GET'])
+@main.route('/cve/<regex("{}"):issue>/copy'.format(cve_id_regex[1:-1]), methods=['GET'])
+@main.route('/<regex("{}"):issue>/copy'.format(cve_id_regex[1:-1]), methods=['GET'])
 @reporter_required
 def copy_issue(issue):
     cve = db.get(CVE, id=issue)
@@ -36,9 +36,9 @@ def copy_issue(issue):
                            action='/cve/add')
 
 
-@app.route('/group/<regex("{}"):avg>/copy'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
-@app.route('/avg/<regex("{}"):avg>/copy'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
-@app.route('/<regex("{}"):avg>/copy'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@main.route('/group/<regex("{}"):avg>/copy'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@main.route('/avg/<regex("{}"):avg>/copy'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@main.route('/<regex("{}"):avg>/copy'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
 @reporter_required
 def copy_group(avg):
     group_id = avg.replace('AVG-', '')

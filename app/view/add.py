@@ -1,5 +1,5 @@
 from flask import render_template, flash, redirect
-from app import app, db
+from app import main, db
 from app.user import reporter_required
 from app.form import CVEForm, GroupForm
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
@@ -14,7 +14,7 @@ CVE_MERGED_PARTIALLY = 'Failed to fully merge {}, check the following fields: {}
 ERROR_UNMERGEABLE = 'Unmergeable field, old value shown'
 
 
-@app.route('/cve/add', methods=['GET', 'POST'])
+@main.route('/cve/add', methods=['GET', 'POST'])
 @reporter_required
 def add_cve():
     form = CVEForm()
@@ -120,7 +120,7 @@ def add_cve():
     return redirect('/{}'.format(cve.id))
 
 
-@app.route('/avg/add', methods=['GET', 'POST'])
+@main.route('/avg/add', methods=['GET', 'POST'])
 @reporter_required
 def add_group():
     form = GroupForm()

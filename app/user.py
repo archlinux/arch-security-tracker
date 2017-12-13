@@ -3,7 +3,6 @@ from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
 from app import login_manager, db
 from app.model.user import User, Guest
-from app.view.error import forbidden
 from functools import wraps
 from scrypt import hash as shash
 from base64 import b85encode
@@ -39,6 +38,7 @@ def reporter_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.role.is_reporter:
+            from app.view.error import forbidden
             return forbidden()
         return func(*args, **kwargs)
     return login_required(decorated_view)
@@ -48,6 +48,7 @@ def security_team_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.role.is_security_team:
+            from app.view.error import forbidden
             return forbidden()
         return func(*args, **kwargs)
     return login_required(decorated_view)
@@ -57,6 +58,7 @@ def administrator_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
         if not current_user.role.is_administrator:
+            from app.view.error import forbidden
             return forbidden()
         return func(*args, **kwargs)
     return login_required(decorated_view)

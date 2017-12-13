@@ -1,5 +1,5 @@
 from flask import render_template, flash, redirect
-from app import app, db
+from app import main, db
 from app.user import security_team_required, reporter_required, user_can_edit_group, user_can_edit_issue
 from app.form import CVEForm, GroupForm
 from app.form.advisory import AdvisoryEditForm
@@ -19,8 +19,8 @@ from collections import defaultdict
 WARNING_ADVISORY_ALREADY_PUBLISHED = 'WARNING: This advisory is already published!'
 
 
-@app.route('/advisory/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/advisory/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
 @security_team_required
 def edit_advisory(advisory_id):
     advisory = db.get(Advisory, id=advisory_id)
@@ -54,9 +54,9 @@ def edit_advisory(advisory_id):
     return redirect('/{}'.format(advisory.id))
 
 
-@app.route('/issue/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/cve/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/issue/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/cve/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/<regex("{}"):cve>/edit'.format(cve_id_regex[1:-1]), methods=['GET', 'POST'])
 @reporter_required
 def edit_cve(cve):
     entries = (db.session.query(CVE, CVEGroup, Advisory)
@@ -135,9 +135,9 @@ def edit_cve(cve):
     return redirect('/{}'.format(cve.id))
 
 
-@app.route('/group/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/avg/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
-@app.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/group/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/avg/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/<regex("{}"):avg>/edit'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])
 @reporter_required
 def edit_group(avg):
     group_id = avg.replace('AVG-', '')

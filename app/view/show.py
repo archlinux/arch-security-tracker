@@ -2,7 +2,7 @@ from flask import render_template, redirect
 from flask_login import current_user
 from sqlalchemy import and_
 from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL, TRACKER_SUMMARY_LENGTH_MAX
-from app import app, db
+from app import main, db
 from app.util import json_response
 from app.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group, user_can_handle_advisory
 from app.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
@@ -110,7 +110,7 @@ def get_cve_data(cve):
             'advisories': advisories}
 
 
-@app.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve><regex("[./]json"):suffix>'.format(cve_id_regex[1:-1]), methods=['GET'])
+@main.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve><regex("[./]json"):suffix>'.format(cve_id_regex[1:-1]), methods=['GET'])
 @json_response
 def show_cve_json(cve, path=None, suffix=None):
     data = get_cve_data(cve)
@@ -138,7 +138,7 @@ def show_cve_json(cve, path=None, suffix=None):
     return json_data
 
 
-@app.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
+@main.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
 def show_cve(cve, path=None):
     data = get_cve_data(cve)
     if not data:
@@ -207,9 +207,9 @@ def get_group_data(avg):
     }
 
 
-@app.route('/group/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
-@app.route('/avg/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
-@app.route('/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@main.route('/group/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@main.route('/avg/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@main.route('/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
 @json_response
 def show_group_json(avg, postfix=None):
     data = get_group_data(avg)
@@ -242,9 +242,9 @@ def show_group_json(avg, postfix=None):
     return json_data
 
 
-@app.route('/group/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
-@app.route('/avg/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
-@app.route('/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
+@main.route('/group/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
+@main.route('/avg/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
+@main.route('/<regex("{}"):avg>'.format(vulnerability_group_regex[1:]), methods=['GET'])
 def show_group(avg):
     data = get_group_data(avg)
     if not data:
@@ -339,7 +339,7 @@ def get_package_data(pkgname):
     }
 
 
-@app.route('/package/<regex("{}"):pkgname><regex("[./]json"):suffix>'.format(pkgname_regex[1:-1]), methods=['GET'])
+@main.route('/package/<regex("{}"):pkgname><regex("[./]json"):suffix>'.format(pkgname_regex[1:-1]), methods=['GET'])
 @json_response
 def show_package_json(pkgname, suffix=None):
     data = get_package_data(pkgname)
@@ -396,7 +396,7 @@ def show_package_json(pkgname, suffix=None):
     return json_data
 
 
-@app.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
+@main.route('/package/<regex("{}"):pkgname>'.format(pkgname_regex[1:]), methods=['GET'])
 def show_package(pkgname):
     data = get_package_data(pkgname)
     if not data:
@@ -426,8 +426,8 @@ def render_html_advisory(advisory, package, group, raw_asa, generated):
                            Publication=Publication)
 
 
-@app.route('/advisory/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
-@app.route('/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
+@main.route('/advisory/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
+@main.route('/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
 def show_advisory_raw(advisory_id):
     result = show_advisory(advisory_id, raw=True)
     if isinstance(result, tuple):
@@ -437,8 +437,8 @@ def show_advisory_raw(advisory_id):
     return result, 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 
-@app.route('/advisory/<regex("{}"):advisory_id>/generate/raw'.format(advisory_regex[1:-1]), methods=['GET'])
-@app.route('/<regex("{}"):advisory_id>/generate/raw'.format(advisory_regex[1:-1]), methods=['GET'])
+@main.route('/advisory/<regex("{}"):advisory_id>/generate/raw'.format(advisory_regex[1:-1]), methods=['GET'])
+@main.route('/<regex("{}"):advisory_id>/generate/raw'.format(advisory_regex[1:-1]), methods=['GET'])
 def show_generated_advisory_raw(advisory_id):
     result = show_generated_advisory(advisory_id, raw=True)
     if isinstance(result, tuple):
@@ -448,8 +448,8 @@ def show_generated_advisory_raw(advisory_id):
     return result, 200, {'Content-Type': 'text/plain; charset=utf-8'}
 
 
-@app.route('/advisory/<regex("{}"):advisory_id>'.format(advisory_regex[1:]), methods=['GET'])
-@app.route('/<regex("{}"):advisory_id>'.format(advisory_regex[1:]), methods=['GET'])
+@main.route('/advisory/<regex("{}"):advisory_id>'.format(advisory_regex[1:]), methods=['GET'])
+@main.route('/<regex("{}"):advisory_id>'.format(advisory_regex[1:]), methods=['GET'])
 def show_advisory(advisory_id, raw=False):
     entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage, CVE)
                .filter(Advisory.id == advisory_id)
@@ -475,8 +475,8 @@ def show_advisory(advisory_id, raw=False):
     return render_html_advisory(advisory=advisory, package=package, group=group, raw_asa=asa, generated=False)
 
 
-@app.route('/advisory/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
-@app.route('/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
+@main.route('/advisory/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
+@main.route('/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
 def show_generated_advisory(advisory_id, raw=False):
     entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage, CVE)
                .filter(Advisory.id == advisory_id)

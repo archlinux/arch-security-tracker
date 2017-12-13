@@ -58,13 +58,13 @@ make
 run debug mode:
 
 ```
-./run.py
+make run
 ```
 
 adding a new user:
 
 ```
-./update --create-user
+make user
 ```
 
 run tests:
@@ -74,6 +74,13 @@ make test
 ```
 
 For production run it through ```uwsgi```
+
+## Command line interface
+
+The ```trackerctl``` script provides access to the command line interface
+that controls and operates different parts of the tracker. All commands
+and subcommands provide a ```--help``` option that describes the operation
+and all its available options.
 
 ## Configuration
 

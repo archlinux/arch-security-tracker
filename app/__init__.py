@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_talisman import Talisman
@@ -25,6 +25,12 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     dbapi_connection.isolation_level = isolation_level
 
 
+class RegexConverter(BaseConverter):
+    def __init__(self, url_map, *items):
+        super(RegexConverter, self).__init__(url_map)
+        self.regex = items[0]
+
+
 csp = {
     'default-src': '\'self\'',
     'style-src': '\'self\'',
@@ -32,32 +38,43 @@ csp = {
     'form-action': '\'self\''
 }
 
-app = Flask(__name__)
-app.config.from_object('config')
-db = SQLAlchemy(app)
-talisman = Talisman(app,
-                    force_https=False,
-                    session_cookie_secure=False,
-                    content_security_policy=csp,
-                    referrer_policy='no-referrer')
-
+db = SQLAlchemy()
+talisman = Talisman()
 login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.session_protection = FLASK_SESSION_PROTECTION
-login_manager.login_view = 'login'
+main = Blueprint('main', __name__)
 
 
-class RegexConverter(BaseConverter):
-    def __init__(self, url_map, *items):
-        super(RegexConverter, self).__init__(url_map)
-        self.regex = items[0]
+def create_app(script_info=None):
+    app = Flask(__name__)
+    app.config.from_object('config')
 
+    db.init_app(app)
 
-app.url_map.converters['regex'] = RegexConverter
-app.jinja_env.globals['ATOM_FEEDS'] = atom_feeds
+    talisman.init_app(app,
+                      force_https=False,
+                      session_cookie_secure=False,
+                      content_security_policy=csp,
+                      referrer_policy='no-referrer')
 
-from app.view import *
-from app.model import *
+    login_manager.init_app(app)
+    login_manager.session_protection = FLASK_SESSION_PROTECTION
+    login_manager.login_view = 'main.login'
+
+    app.url_map.converters['regex'] = RegexConverter
+    app.jinja_env.globals['ATOM_FEEDS'] = atom_feeds
+
+    from app.view.error import error_handlers
+    for error_handler in error_handlers:
+        app.register_error_handler(error_handler['code_or_exception'], error_handler['func'])
+
+    from app.view.blueprint import blueprint
+    app.register_blueprint(main)
+    app.register_blueprint(blueprint)
+
+    import app.view
+    import app.model
+
+    return app
 
 
 def get(self, model, defaults=None, **kwargs):

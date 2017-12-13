@@ -8,12 +8,12 @@ from .conftest import create_user, create_issue, create_package, create_group, c
 
 
 def test_stats_page(db, client):
-    resp = client.get(url_for('stats'))
+    resp = client.get(url_for('main.stats'))
     assert ImATeapot.code == resp.status_code
 
 
 def test_stats_data_status_empty(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
@@ -28,13 +28,13 @@ def test_stats_data_status_empty(db, client):
 
 
 def test_stats_data_type_empty(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
     assert data
 
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     for issue_type in issue_types:
         for status in [Status.vulnerable.name, Status.fixed.name, 'total']:
             assert 0 == data['issues']['type'][status][issue_type]
@@ -42,7 +42,7 @@ def test_stats_data_type_empty(db, client):
 
 
 def test_stats_data_misc_empty(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
@@ -58,7 +58,7 @@ def test_stats_data_misc_empty(db, client):
 @create_user(role=UserRole.security_team, username='SasukeUchiha')
 @create_user(role=UserRole.reporter, username='Alucard')
 def test_stats_data_misc_users(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
@@ -72,7 +72,7 @@ def test_stats_data_misc_users(db, client):
 @create_group(id=2, bug_ticket=1337)
 @create_group(id=3, bug_ticket=4242)
 def test_stats_data_misc_ticket(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
@@ -97,7 +97,7 @@ def test_stats_data_misc_ticket(db, client):
               list(map(lambda i: 'CVE-0005-100{}'.format(i), range(1, 11))),
               packages=['morty'], fixed='1.3-8')
 def test_stats_data_status_issues(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
@@ -144,7 +144,7 @@ def test_stats_data_status_issues(db, client):
 @create_advisory(id='203312-01', group_package_id=4)
 @create_advisory(id='203412-01', group_package_id=5)
 def test_stats_data_status_advisories(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
@@ -166,7 +166,7 @@ def test_stats_data_status_advisories(db, client):
 @create_group(id=10, issues=['CVE-0003-0001'], packages=['rick'], fixed='1.0-7')
 @create_group(id=20, issues=['CVE-0004-0001', 'CVE-0001-0002'], packages=['rick'])
 def test_stats_data_type_issues(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())
@@ -209,7 +209,7 @@ def test_stats_data_type_issues(db, client):
 @create_advisory(id='203212-01', group_package_id=3)
 @create_advisory(id='203312-01', group_package_id=4)
 def test_stats_data_type_advisories(db, client):
-    resp = client.get(url_for('stats_json', suffix='.json'))
+    resp = client.get(url_for('main.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
     data = loads(resp.data.decode())

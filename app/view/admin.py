@@ -1,6 +1,6 @@
 from flask import render_template, redirect, flash
 from flask_login import current_user, login_required
-from app import app, db
+from app import main, db
 from app.user import administrator_required, random_string, hash_password, user_invalidate
 from app.form.admin import UserForm
 from app.form.confirm import ConfirmForm
@@ -10,8 +10,8 @@ from app.view.error import not_found, forbidden
 from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
 
 
-@app.route('/admin', methods=['GET', 'POST'])
-@app.route('/user', methods=['GET', 'POST'])
+@main.route('/admin', methods=['GET', 'POST'])
+@main.route('/user', methods=['GET', 'POST'])
 @login_required
 def list_user():
     users = User.query.order_by(User.name).all()
@@ -35,7 +35,7 @@ def list_user():
                            users=users)
 
 
-@app.route('/user/create', methods=['GET', 'POST'])
+@main.route('/user/create', methods=['GET', 'POST'])
 @administrator_required
 def create_user():
     form = UserForm()
@@ -63,7 +63,7 @@ def create_user():
     return redirect('/user')
 
 
-@app.route('/user/<regex("{}"):username>/edit'.format(username_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/user/<regex("{}"):username>/edit'.format(username_regex[1:-1]), methods=['GET', 'POST'])
 @administrator_required
 def edit_user(username):
     own_user = username == current_user.name
@@ -112,7 +112,7 @@ def edit_user(username):
     return redirect('/user')
 
 
-@app.route('/user/<regex("{}"):username>/delete'.format(username_regex[1:-1]), methods=['GET', 'POST'])
+@main.route('/user/<regex("{}"):username>/delete'.format(username_regex[1:-1]), methods=['GET', 'POST'])
 @administrator_required
 def delete_user(username):
     user = User.query.filter_by(name=username).first()

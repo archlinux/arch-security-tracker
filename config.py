@@ -1,3 +1,4 @@
+from os import environ
 from os.path import abspath, dirname
 from configparser import ConfigParser
 from glob import glob
@@ -10,6 +11,18 @@ for config_file in config_files:
     config.read(config_file)
 
 atom_feeds = []
+
+
+def get_debug_flag():
+    return config_flask.getboolean('debug')
+
+
+def set_debug_flag(debug):
+    global FLASK_DEBUG
+    FLASK_DEBUG = debug
+    environ.setdefault('FLASK_DEBUG', '1' if FLASK_DEBUG else '0')
+    config_flask['debug'] = 'on' if debug else 'off'
+
 
 config_tracker = config['tracker']
 TRACKER_ADVISORY_URL = config_tracker['advisory_url']
@@ -39,8 +52,8 @@ CSRF_ENABLED = config_flask.getboolean('csrf')
 SECRET_KEY = config_flask['secret_key']
 FLASK_HOST = config_flask['host']
 FLASK_PORT = config_flask.getint('port')
-FLASK_DEBUG = config_flask.getboolean('debug')
 FLASK_SESSION_PROTECTION = None if 'none' == config_flask['session_protection'] else config_flask['session_protection']
+set_debug_flag(config_flask.getboolean('debug'))
 
 config_pacman = config['pacman']
 PACMAN_HANDLE_CACHE_TIME = config_pacman.getint('handle_cache_time')
