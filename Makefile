@@ -8,22 +8,28 @@ PYTEST_COVERAGE_OPTIONS+=--cov-report=term-missing --cov-report=html:test/covera
 all: update
 
 setup: submodule
-	mkdir -p ./pacman/{cache,log}
-	mkdir -p ./pacman/arch/x86_64/db
-	./db_create
+	./trackerctl setup bootstrap
 
 submodule:
 	git submodule update --recursive --init --rebase
 
 update: setup
-	./update
+	./trackerctl update env
+
+user: setup
+	./trackerctl setup user
+
+run: setup
+	./trackerctl run
+
+shell: setup
+	./trackerctl shell
+
+check: setup
+	./trackerctl setup check
 
 test coverage: setup
 	PYTHONPATH=".:${PYTHONPATH}" ${PYTEST} ${PYTEST_INPUT} ${PYTEST_OPTIONS} ${PYTEST_COVERAGE_OPTIONS}
 
 open-coverage: coverage
 	${BROWSER} test/coverage/index.html
-
-clean:
-	rm -rf ./pacman/{cache,log}
-	rm -rf ./pacman/arch/x86_64/db

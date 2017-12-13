@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import url_for
 from flask_login import current_user
 
-from app import app as flask_app, db as flask_db
+from app import create_app, db as flask_db
 from app.user import random_string, hash_password
 from app.advisory import advisory_get_label
 from app.model.user import User
@@ -24,6 +24,7 @@ ERROR_INVALID_CHOICE = 'Not a valid choice'
 
 @pytest.fixture(scope="session")
 def app(request):
+    flask_app = create_app()
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     flask_app.config['TESTING'] = True
     flask_app.config['WTF_CSRF_ENABLED'] = False
@@ -84,7 +85,7 @@ def logged_in(func=None, role=UserRole.administrator, username=DEFAULT_USERNAME,
         @create_user(role=role, username=username, password=password)
         @wraps(func)
         def wrapper(db, client, *args, **kwargs):
-            resp = client.post(url_for('login'), follow_redirects=True,
+            resp = client.post(url_for('main.login'), follow_redirects=True,
                                data=dict(username=username, password=password if password else username))
             assert_logged_in(resp)
             func(db=db, client=client, *args, **kwargs)

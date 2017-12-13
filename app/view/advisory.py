@@ -1,5 +1,5 @@
 from flask import render_template, flash, redirect, request
-from app import app, db
+from app import main, db
 from app.user import security_team_required
 from app.advisory import advisory_get_label, advisory_get_date_label
 from app.util import json_response, atom_feed
@@ -41,8 +41,8 @@ def get_advisory_data():
 
 
 @atom_feed('Recent advisories')
-@app.route('/advisories/feed.atom', methods=['GET'])
-@app.route('/advisory/feed.atom', methods=['GET'])
+@main.route('/advisories/feed.atom', methods=['GET'])
+@main.route('/advisory/feed.atom', methods=['GET'])
 def advisory_atom():
     last_recent_entries = 15
     data = get_advisory_data()['published'][:last_recent_entries]
@@ -66,8 +66,8 @@ def advisory_atom():
     return feed.get_response()
 
 
-@app.route('/advisory<regex("[./]json"):postfix>', methods=['GET'])
-@app.route('/advisories<regex("[./]json"):postfix>', methods=['GET'])
+@main.route('/advisory<regex("[./]json"):postfix>', methods=['GET'])
+@main.route('/advisories<regex("[./]json"):postfix>', methods=['GET'])
 @json_response
 def advisory_json(postfix=None):
     data = get_advisory_data()
@@ -90,8 +90,8 @@ def advisory_json(postfix=None):
     return list(map(to_json_data, data['published']))
 
 
-@app.route('/advisory', methods=['GET'])
-@app.route('/advisories', methods=['GET'])
+@main.route('/advisory', methods=['GET'])
+@main.route('/advisories', methods=['GET'])
 def advisory():
     data = get_advisory_data()
 
@@ -109,8 +109,8 @@ def advisory():
                            published=monthly_published)
 
 
-@app.route('/group/<regex("{}"):avg>/schedule'.format(vulnerability_group_regex[1:-1]), methods=['PUT', 'POST'])
-@app.route('/<regex("{}"):avg>/schedule'.format(vulnerability_group_regex[1:-1]), methods=['PUT', 'POST'])
+@main.route('/group/<regex("{}"):avg>/schedule'.format(vulnerability_group_regex[1:-1]), methods=['PUT', 'POST'])
+@main.route('/<regex("{}"):avg>/schedule'.format(vulnerability_group_regex[1:-1]), methods=['PUT', 'POST'])
 @security_team_required
 def schedule_advisory(avg):
     avg_id = avg.replace('AVG-', '')
@@ -165,8 +165,8 @@ def schedule_advisory(avg):
     return redirect('/{}'.format(asa))
 
 
-@app.route('/advisory/<regex("{}"):avg>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST', 'GET'])
-@app.route('/<regex("{}"):asa>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST', 'GET'])
+@main.route('/advisory/<regex("{}"):avg>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST', 'GET'])
+@main.route('/<regex("{}"):asa>/publish'.format(advisory_regex[1:-1]), methods=['PUT', 'POST', 'GET'])
 @security_team_required
 def publish_advisory(asa):
     advisory = (db.session.query(Advisory)

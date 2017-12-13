@@ -71,7 +71,7 @@ def json_response(func):
 
 def atom_feed(title):
     def decorator(func):
-        atom_feeds.append({'func': func.__name__, 'title': title})
+        atom_feeds.append({'func': 'main.{}'.format(func.__name__), 'title': title})
 
         @wraps(func)
         def wrapped(*args, **kwargs):

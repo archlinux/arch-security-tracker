@@ -1,5 +1,5 @@
 from flask import render_template
-from app import app, db
+from app import main, db
 from app.user import user_can_handle_advisory, user_can_edit_group, user_can_edit_issue
 from app.model import CVE, CVEGroup, CVEGroupPackage, CVEGroupEntry, Advisory, Package
 from app.model.enum import Status, Remote, Severity, Publication
@@ -13,7 +13,7 @@ from app.util import cmp_to_key
 from operator import attrgetter
 
 
-@app.route('/todo', methods=['GET'])
+@main.route('/todo', methods=['GET'])
 def todo():
     incomplete_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
                              .join(CVEGroupPackage).join(CVEGroup)
