@@ -3,6 +3,7 @@ from types import MethodType
 from flask import Blueprint
 from flask import Flask
 from flask_login import LoginManager
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from sqlalchemy import event
@@ -11,6 +12,7 @@ from sqlalchemy.sql.expression import ClauseElement
 from werkzeug.routing import BaseConverter
 
 from config import FLASK_SESSION_PROTECTION
+from config import SQLALCHEMY_MIGRATE_REPO
 from config import SQLITE_CACHE_SIZE
 from config import SQLITE_JOURNAL_MODE
 from config import SQLITE_MMAP_SIZE
@@ -72,6 +74,7 @@ db.get = MethodType(db_get, db)
 db.create = MethodType(db_create, db)
 db.get_or_create = MethodType(db_get_or_create, db)
 
+migrate = Migrate(db=db, directory=SQLALCHEMY_MIGRATE_REPO)
 talisman = Talisman()
 login_manager = LoginManager()
 tracker = Blueprint('tracker', __name__)
@@ -82,6 +85,7 @@ def create_app(script_info=None):
     app.config.from_object('config')
 
     db.init_app(app)
+    migrate.init_app(app)
 
     talisman.init_app(app,
                       force_https=False,
@@ -107,7 +111,7 @@ def create_app(script_info=None):
     @app.shell_context_processor
     def make_shell_context():
         from tracker.model import Advisory, CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, User, Package
-        return dict(db=db, talisman=talisman, login_manager=login_manager, tracker=tracker,
+        return dict(db=db, migrate=migrate, talisman=talisman, login_manager=login_manager, tracker=tracker,
                     Advisory=Advisory, CVE=CVE, CVEGroup=CVEGroup, CVEGroupEntry=CVEGroupEntry,
                     CVEGroupPackage=CVEGroupPackage, User=User, Package=Package)
 

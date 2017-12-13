@@ -24,6 +24,7 @@ vulnerability details and generating security advisories.
 * python-flask-talisman
 * python-flask-wtf
 * python-flask-login
+* python-flask-migrate
 * python-requests
 * python-scrypt
 * pyalpm
