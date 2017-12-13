@@ -1,5 +1,7 @@
 from alembic import context
 from sqlalchemy import engine_from_config
+from sqlalchemy import event
+from sqlalchemy import Engine
 from sqlalchemy import pool
 from logging.config import fileConfig
 import logging
@@ -12,6 +14,17 @@ config = context.config
 # This line sets up loggers basically.
 fileConfig(config.config_file_name)
 logger = logging.getLogger('alembic.env')
+
+
+@event.listens_for(Engine, 'connect')
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    isolation_level = dbapi_connection.isolation_level
+    dbapi_connection.isolation_level = None
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=OFF")
+    cursor.close()
+    dbapi_connection.isolation_level = isolation_level
+
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -73,6 +86,7 @@ def run_migrations_online():
     context.configure(connection=connection,
                       target_metadata=target_metadata,
                       process_revision_directives=process_revision_directives,
+                      render_as_batch=True,
                       **current_app.extensions['migrate'].configure_args)
 
     try:
