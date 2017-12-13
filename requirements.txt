@@ -1,6 +1,7 @@
 Flask
 Flask-Login
 Flask-SQLAlchemy
+Flask-Migrate
 Flask-WTF
 flask-talisman
 requests
