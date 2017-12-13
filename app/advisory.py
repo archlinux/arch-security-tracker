@@ -3,6 +3,7 @@ from re import sub, search, IGNORECASE
 from requests import get
 from html import unescape
 from datetime import date, datetime
+from functools import cmp_to_key
 
 
 def advisory_fetch_from_mailman(url):
@@ -67,6 +68,8 @@ def advisory_get_workaround_from_text(advisory):
 
 
 def advisory_extend_html(advisory, issues, package):
+    # sort issues by length to avoid clashes
+    issues = sorted(issues, key=cmp_to_key(lambda a, b: len(a.id) - len(b.id)), reverse=True)
     for issue in issues:
         advisory = advisory.replace(' {}'.format(issue.id), ' <a href="/{0}">{0}</a>'.format(issue.id))
     advisory = sub('({}) '.format(package.pkgname), '<a href="/package/{0}">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
