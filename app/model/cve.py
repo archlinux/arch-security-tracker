@@ -55,3 +55,14 @@ class CVE(db.Model):
 
     def __repr__(self):
         return '{}'.format(self.id)
+
+    @property
+    def numerical_repr(self):
+        self_parts = self.id.split('-')
+        return int(self_parts[1] + self_parts[2].rjust(7, '0'))
+
+    def __gt__(self, other):
+        return self.numerical_repr > other.numerical_repr
+
+    def __lt__(self, other):
+        return self.numerical_repr < other.numerical_repr

@@ -226,3 +226,19 @@ def test_advisory_html_overlapping_cve_link(db, client):
     data = resp.data.decode()
     assert '<a href="/{0}">{0}</a>'.format('CVE-1234-1234') in data
     assert '<a href="/{0}">{0}</a>'.format('CVE-1234-12345') in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_issue(id='CVE-1234-1234')
+@create_issue(id='CVE-1234-12345')
+@create_issue(id='CVE-1111-12345')
+@create_issue(id='CVE-1234-11111')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4',
+              issues=['CVE-1234-1234', 'CVE-1234-12345', 'CVE-1111-12345', 'CVE-1234-11111'])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_cve_listing_sorted_numerically(db, client):
+    resp = client.get(url_for('show_generated_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '\n'.join(['CVE-1111-12345', 'CVE-1234-1234', 'CVE-1234-11111', 'CVE-1234-12345']) in data.replace('https://security.archlinux.org/', '')

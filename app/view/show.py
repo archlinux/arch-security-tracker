@@ -489,7 +489,7 @@ def show_generated_advisory(advisory_id, raw=False):
     advisory = entries[0][0]
     group = entries[0][1]
     package = entries[0][2]
-    issues = [issue for (advisory, group, package, issue) in entries]
+    issues = sorted([issue for (advisory, group, package, issue) in entries])
     severity_sorted_issues = sorted(issues, key=lambda issue: issue.issue_type)
     severity_sorted_issues = sorted(severity_sorted_issues, key=lambda issue: issue.severity)
 
