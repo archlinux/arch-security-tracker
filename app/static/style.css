@@ -42,24 +42,25 @@ select {
 #archnavbar {
 	background: #333 none repeat scroll 0 0 !important;
 	border-bottom: 5px solid #08c !important;
-	height: 40px !important;
+	min-height: 40px !important;
 	padding: 10px 15px !important;
 }
 
 #archnavbar ul {
-	display: inline;
-	float: right;
+	display: block;
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	text-align: right;
 }
 
 #archnavbar ul li {
-	float: left;
+	display: inline-block;
 	font-size: 14px;
 	font-family: sans-serif !important;
-	line-height: 45px;
+	line-height: 14px;
 	letter-spacing: 0;
+	padding-top: 14px;
 	padding-right: 15px;
 	padding-left: 15px;
 }
