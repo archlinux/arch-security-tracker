@@ -1,7 +1,8 @@
 from click import echo, option, pass_context, password_option, Choice, BadParameter
 from re import match, IGNORECASE
 from pathlib import Path
-from os.path import join
+from os.path import exists, join
+from os import rename
 from sys import exit
 
 from config import basedir, TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
@@ -37,6 +38,14 @@ def bootstrap(ctx, purge=False):
     mkdir(join(basedir, 'pacman/log'))
     mkdir(join(basedir, 'pacman/arch/x86_64/db'))
     echo('done')
+
+    # Auto rename old database for compatibility
+    db_old = join(basedir, 'app.db')
+    db_new = join(basedir, 'tracker.db')
+    if exists(db_old) and not exists(db_new):
+        echo('Renaming old database file...', nl=False)
+        rename(db_old, db_new)
+        echo('done')
 
     if purge:
         echo('Purging the database...', nl=False)
