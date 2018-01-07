@@ -2,7 +2,7 @@ from config import TRACKER_PASSWORD_LENGTH_MIN
 from flask_login import current_user, login_required
 from sqlalchemy.exc import IntegrityError
 from tracker import login_manager, db
-from tracker.model.user import User, Guest
+from tracker.model.user import User, Guest, UserRole
 from functools import wraps
 from scrypt import hash as shash
 from base64 import b85encode
@@ -34,34 +34,28 @@ def load_user(session_token):
     return user
 
 
+def permission_required(permission):
+    def decorator(func):
+        @wraps(func)
+        def decorated_view(*args, **kwargs):
+            if not permission.fget(current_user.role):
+                from tracker.view.error import forbidden
+                return forbidden()
+            return func(*args, **kwargs)
+        return login_required(decorated_view)
+    return decorator
+
+
 def reporter_required(func):
-    @wraps(func)
-    def decorated_view(*args, **kwargs):
-        if not current_user.role.is_reporter:
-            from tracker.view.error import forbidden
-            return forbidden()
-        return func(*args, **kwargs)
-    return login_required(decorated_view)
+    return permission_required(UserRole.is_reporter)(func)
 
 
 def security_team_required(func):
-    @wraps(func)
-    def decorated_view(*args, **kwargs):
-        if not current_user.role.is_security_team:
-            from tracker.view.error import forbidden
-            return forbidden()
-        return func(*args, **kwargs)
-    return login_required(decorated_view)
+    return permission_required(UserRole.is_security_team)(func)
 
 
 def administrator_required(func):
-    @wraps(func)
-    def decorated_view(*args, **kwargs):
-        if not current_user.role.is_administrator:
-            from tracker.view.error import forbidden
-            return forbidden()
-        return func(*args, **kwargs)
-    return login_required(decorated_view)
+    return permission_required(UserRole.is_administrator)(func)
 
 
 def user_can_edit_issue(advisories=[]):
