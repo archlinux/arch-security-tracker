@@ -95,7 +95,11 @@ def create_app(script_info=None):
     app.register_blueprint(tracker)
     app.register_blueprint(blueprint)
 
-    import tracker.view
-    import tracker.model
+    @app.shell_context_processor
+    def make_shell_context():
+        from tracker.model import Advisory, CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, User, Package
+        return dict(db=db, talisman=talisman, login_manager=login_manager, tracker=tracker,
+                    Advisory=Advisory, CVE=CVE, CVEGroup=CVEGroup, CVEGroupEntry=CVEGroupEntry,
+                    CVEGroupPackage=CVEGroupPackage, User=User, Package=Package)
 
     return app
