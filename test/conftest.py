@@ -5,17 +5,17 @@ from datetime import datetime
 from flask import url_for
 from flask_login import current_user
 
-from app import create_app, db as flask_db
-from app.user import random_string, hash_password
-from app.advisory import advisory_get_label
-from app.model.user import User
-from app.model.enum import UserRole, Severity, Remote, Affected, Publication, affected_to_status, highest_severity
-from app.model.advisory import Advisory
-from app.model.cve import CVE, issue_types
-from app.model.cvegroup import CVEGroup
-from app.model.cvegroupentry import CVEGroupEntry
-from app.model.cvegrouppackage import CVEGroupPackage
-from app.model.package import Package
+from tracker import create_app, db as flask_db
+from tracker.user import random_string, hash_password
+from tracker.advisory import advisory_get_label
+from tracker.model.user import User
+from tracker.model.enum import UserRole, Severity, Remote, Affected, Publication, affected_to_status, highest_severity
+from tracker.model.advisory import Advisory
+from tracker.model.cve import CVE, issue_types
+from tracker.model.cvegroup import CVEGroup
+from tracker.model.cvegroupentry import CVEGroupEntry
+from tracker.model.cvegrouppackage import CVEGroupPackage
+from tracker.model.package import Package
 
 DEFAULT_USERNAME = 'cyberwehr12345678'
 ERROR_LOGIN_REQUIRED = 'Please log in to access this page.'
@@ -85,7 +85,7 @@ def logged_in(func=None, role=UserRole.administrator, username=DEFAULT_USERNAME,
         @create_user(role=role, username=username, password=password)
         @wraps(func)
         def wrapper(db, client, *args, **kwargs):
-            resp = client.post(url_for('main.login'), follow_redirects=True,
+            resp = client.post(url_for('tracker.login'), follow_redirects=True,
                                data=dict(username=username, password=password if password else username))
             assert_logged_in(resp)
             func(db=db, client=client, *args, **kwargs)

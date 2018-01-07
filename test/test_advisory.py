@@ -2,13 +2,13 @@ from werkzeug.exceptions import NotFound, Forbidden
 from flask import url_for
 
 from .conftest import logged_in, create_issue, create_package, create_group, create_advisory, advisory_count, get_advisory, DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED, default_issue_dict, DEFAULT_ADVISORY_CONTENT
-from app.advisory import advisory_get_label, advisory_get_impact_from_text, advisory_get_workaround_from_text
-from app.model.enum import UserRole, Publication
-from app.model.cve import issue_types
-from app.model.cvegroup import CVEGroup
-from app.model.advisory import Advisory
-from app.view.advisory import ERROR_ADVISORY_GROUP_NOT_FIXED, ERROR_ADVISORY_ALREADY_EXISTS
-from app.view.edit import WARNING_ADVISORY_ALREADY_PUBLISHED
+from tracker.advisory import advisory_get_label, advisory_get_impact_from_text, advisory_get_workaround_from_text
+from tracker.model.enum import UserRole, Publication
+from tracker.model.cve import issue_types
+from tracker.model.cvegroup import CVEGroup
+from tracker.model.advisory import Advisory
+from tracker.view.advisory import ERROR_ADVISORY_GROUP_NOT_FIXED, ERROR_ADVISORY_ALREADY_EXISTS
+from tracker.view.edit import WARNING_ADVISORY_ALREADY_PUBLISHED
 
 
 def assert_advisory_data(advisory_id=DEFAULT_ADVISORY_ID, group_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1],
@@ -28,7 +28,7 @@ def assert_advisory_data(advisory_id=DEFAULT_ADVISORY_ID, group_id=DEFAULT_GROUP
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 @logged_in
 def test_schedule_advisory(db, client):
-    resp = client.post(url_for('main.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
     assert 200 == resp.status_code
     assert_advisory_data(DEFAULT_ADVISORY_ID)
     assert 1 == advisory_count()
@@ -39,7 +39,7 @@ def test_schedule_advisory(db, client):
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo', 'foo2'], affected='1.2.3-3', fixed='1.2.3-4')
 @logged_in
 def test_schedule_multiple_pkgs_advisory(db, client):
-    resp = client.post(url_for('main.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
     assert 200 == resp.status_code
     assert_advisory_data(advisory_get_label(number=1))
     assert_advisory_data(advisory_get_label(number=2))
@@ -48,7 +48,7 @@ def test_schedule_multiple_pkgs_advisory(db, client):
 
 @logged_in
 def test_cant_schedule_advisory_with_missing_group(db, client):
-    resp = client.post(url_for('main.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
     assert NotFound.code == resp.status_code
     assert 0 == advisory_count()
 
@@ -56,7 +56,7 @@ def test_cant_schedule_advisory_with_missing_group(db, client):
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 def test_schedule_advisory_needs_login(db, client):
-    resp = client.post(url_for('main.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
     assert 200 == resp.status_code
     assert ERROR_LOGIN_REQUIRED in resp.data.decode()
     assert 0 == advisory_count()
@@ -66,7 +66,7 @@ def test_schedule_advisory_needs_login(db, client):
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 @logged_in(role=UserRole.reporter)
 def test_cant_schedule_advisory_as_reporter(db, client):
-    resp = client.post(url_for('main.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
     assert Forbidden.code == resp.status_code
     assert 0 == advisory_count()
 
@@ -75,7 +75,7 @@ def test_cant_schedule_advisory_as_reporter(db, client):
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'], affected='1.2.3-3', fixed='1.2.3-5')
 @logged_in
 def test_cant_schedule_advisory_if_not_fixed(db, client):
-    resp = client.post(url_for('main.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
     assert 200 == resp.status_code
     assert ERROR_ADVISORY_GROUP_NOT_FIXED in resp.data.decode()
     assert 0 == advisory_count()
@@ -89,7 +89,7 @@ def test_cant_schedule_advisory_if_not_fixed(db, client):
 @logged_in
 def test_switch_issue_type_changes_multiple_issues_advisory_to_single(db, client):
     data = default_issue_dict(dict(issue_type=issue_types[1]))
-    resp = client.post(url_for('main.edit_cve', cve='CVE-1111-2222'), follow_redirects=True, data=data)
+    resp = client.post(url_for('tracker.edit_cve', cve='CVE-1111-2222'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert_advisory_data(DEFAULT_ADVISORY_ID, advisory_type=issue_types[1])
     assert 1 == advisory_count()
@@ -103,7 +103,7 @@ def test_switch_issue_type_changes_multiple_issues_advisory_to_single(db, client
 @logged_in
 def test_switch_issue_type_changes_single_issue_advisory_to_multiple(db, client):
     data = default_issue_dict(dict(issue_type=issue_types[2]))
-    resp = client.post(url_for('main.edit_cve', cve='CVE-1111-2222'), follow_redirects=True, data=data)
+    resp = client.post(url_for('tracker.edit_cve', cve='CVE-1111-2222'), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert_advisory_data(DEFAULT_ADVISORY_ID, advisory_type='multiple issues')
     assert 1 == advisory_count()
@@ -114,7 +114,7 @@ def test_switch_issue_type_changes_single_issue_advisory_to_multiple(db, client)
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 @logged_in
 def test_cant_schedule_already_existing_advisory(db, client):
-    resp = client.post(url_for('main.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data={'advisory_type': issue_types[1]})
     assert 200 == resp.status_code
     assert ERROR_ADVISORY_ALREADY_EXISTS in resp.data.decode()
     assert None is get_advisory(advisory_get_label(number=2))
@@ -128,7 +128,7 @@ def test_cant_schedule_already_existing_advisory(db, client):
 def test_edit_advisory(db, client):
     workaround = 'the cake is a lie'
     impact = 'Big shit and deep trouble!'
-    resp = client.post(url_for('main.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
+    resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
                        data={'workaround': workaround, 'impact': impact})
     assert 200 == resp.status_code
     assert_advisory_data(DEFAULT_ADVISORY_ID, workaround=workaround, impact=impact)
@@ -140,7 +140,7 @@ def test_edit_advisory(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.published)
 @logged_in
 def test_warn_if_advisory_already_published(db, client):
-    resp = client.get(url_for('main.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    resp = client.get(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     assert WARNING_ADVISORY_ALREADY_PUBLISHED in resp.data.decode()
     assert 1 == advisory_count()
@@ -153,7 +153,7 @@ def test_warn_if_advisory_already_published(db, client):
 def test_reporter_cant_edit_advisory(db, client):
     workaround = 'the cake is a lie'
     impact = 'Big shit and deep trouble!'
-    resp = client.post(url_for('main.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
+    resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
                        data={'workaround': workaround, 'impact': impact})
     assert Forbidden.code == resp.status_code
     assert_advisory_data(DEFAULT_ADVISORY_ID, workaround='yay', impact='meh')
@@ -194,7 +194,7 @@ def test_advisory_get_workaround_from_text_invalid(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 @logged_in
 def test_advisory_html_replace_package_name(db, client):
-    resp = client.get(url_for('main.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert '<a href="/package/foo">foo</a> is broken' in data
@@ -207,7 +207,7 @@ def test_advisory_html_replace_package_name(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 @logged_in
 def test_advisory_html_replace_package_name_case_insensitive(db, client):
-    resp = client.get(url_for('main.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert '<a href="/package/foo">FoO</a> is broken' in data
@@ -221,7 +221,7 @@ def test_advisory_html_replace_package_name_case_insensitive(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 @logged_in
 def test_advisory_html_overlapping_cve_link(db, client):
-    resp = client.get(url_for('main.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert '<a href="/{0}">{0}</a>'.format('CVE-1234-1234') in data
@@ -238,7 +238,7 @@ def test_advisory_html_overlapping_cve_link(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 @logged_in
 def test_advisory_cve_listing_sorted_numerically(db, client):
-    resp = client.get(url_for('main.show_generated_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    resp = client.get(url_for('tracker.show_generated_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert '\n'.join(['CVE-1111-12345', 'CVE-1234-1234', 'CVE-1234-11111', 'CVE-1234-12345']) in data.replace('https://security.archlinux.org/', '')
