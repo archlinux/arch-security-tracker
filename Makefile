@@ -1,7 +1,7 @@
 PYTEST?=py.test
 PYTEST_OPTIONS+=-v -s
 PYTEST_INPUT?=test
-PYTEST_COVERAGE_OPTIONS+=--cov-report=term-missing --cov-report=html:test/coverage --cov=app
+PYTEST_COVERAGE_OPTIONS+=--cov-report=term-missing --cov-report=html:test/coverage --cov=tracker
 
 .PHONY: update test
 
