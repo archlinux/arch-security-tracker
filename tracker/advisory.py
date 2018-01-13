@@ -1,9 +1,14 @@
-from config import TRACKER_MAILMAN_URL
-from re import sub, search, IGNORECASE
-from requests import get
-from html import unescape
-from datetime import date, datetime
+from datetime import date
+from datetime import datetime
 from functools import cmp_to_key
+from html import unescape
+from re import IGNORECASE
+from re import search
+from re import sub
+
+from requests import get
+
+from config import TRACKER_MAILMAN_URL
 
 
 def advisory_fetch_from_mailman(url):

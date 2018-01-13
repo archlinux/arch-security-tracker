@@ -1,5 +1,6 @@
-from .base import BaseForm
 from wtforms import SubmitField
+
+from .base import BaseForm
 
 
 class ConfirmForm(BaseForm):

@@ -1,10 +1,19 @@
-from tracker import db
-from tracker.model import CVE, CVEGroupEntry, CVEGroup, CVEGroupPackage, Package
-from tracker.model.enum import Status, affected_to_status, status_to_affected, highest_severity
-from tracker.pacman import search
-from sqlalchemy import func
 from collections import defaultdict
 from datetime import datetime
+
+from sqlalchemy import func
+
+from tracker import db
+from tracker.model import CVE
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model import Package
+from tracker.model.enum import Status
+from tracker.model.enum import affected_to_status
+from tracker.model.enum import highest_severity
+from tracker.model.enum import status_to_affected
+from tracker.pacman import search
 
 
 def update_group_status():

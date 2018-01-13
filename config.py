@@ -1,7 +1,8 @@
-from os import environ
-from os.path import abspath, dirname
 from configparser import ConfigParser
 from glob import glob
+from os import environ
+from os.path import abspath
+from os.path import dirname
 
 basedir = abspath(dirname(__file__))
 

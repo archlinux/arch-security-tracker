@@ -1,11 +1,18 @@
-from flask import render_template, redirect, url_for
-from flask_login import login_user, logout_user, current_user
+from flask import redirect
+from flask import render_template
+from flask import url_for
+from flask_login import current_user
+from flask_login import login_user
+from flask_login import logout_user
+from werkzeug.exceptions import Unauthorized
+
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
 from tracker import tracker
-from tracker.user import user_assign_new_token, user_invalidate
 from tracker.form import LoginForm
 from tracker.model.user import User
-from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
-from werkzeug.exceptions import Unauthorized
+from tracker.user import user_assign_new_token
+from tracker.user import user_invalidate
 
 
 @tracker.route('/login', methods=['GET', 'POST'])

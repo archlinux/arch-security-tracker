@@ -1,13 +1,31 @@
 import json
-from werkzeug.exceptions import NotFound, Forbidden
-from flask import url_for
 
-from .conftest import logged_in, create_issue, create_package, create_group, create_advisory, DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED, ERROR_INVALID_CHOICE, default_issue_dict
-from tracker.model.enum import Remote, Severity, UserRole
-from tracker.model.cve import issue_types, CVE
+from flask import url_for
+from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import NotFound
+
 from tracker.form import CVEForm
-from tracker.form.validators import ERROR_ISSUE_ID_INVALID, ERROR_INVALID_URL
-from tracker.view.add import CVE_MERGED, CVE_MERGED_PARTIALLY
+from tracker.form.validators import ERROR_INVALID_URL
+from tracker.form.validators import ERROR_ISSUE_ID_INVALID
+from tracker.model.cve import CVE
+from tracker.model.cve import issue_types
+from tracker.model.enum import Remote
+from tracker.model.enum import Severity
+from tracker.model.enum import UserRole
+from tracker.view.add import CVE_MERGED
+from tracker.view.add import CVE_MERGED_PARTIALLY
+
+from .conftest import DEFAULT_ADVISORY_ID
+from .conftest import DEFAULT_GROUP_ID
+from .conftest import DEFAULT_ISSUE_ID
+from .conftest import ERROR_INVALID_CHOICE
+from .conftest import ERROR_LOGIN_REQUIRED
+from .conftest import create_advisory
+from .conftest import create_group
+from .conftest import create_issue
+from .conftest import create_package
+from .conftest import default_issue_dict
+from .conftest import logged_in
 
 
 def set_and_assert_cve_data(db, client, cve_id, route):

@@ -1,10 +1,16 @@
-from werkzeug.exceptions import Unauthorized
 from flask import url_for
 from flask_login import current_user
+from werkzeug.exceptions import Unauthorized
 
-from .conftest import assert_logged_in, assert_not_logged_in, logged_in, create_user, DEFAULT_USERNAME
 from config import TRACKER_PASSWORD_LENGTH_MIN
-from tracker.form.login import ERROR_INVALID_USERNAME_PASSWORD, ERROR_ACCOUNT_DISABLED
+from tracker.form.login import ERROR_ACCOUNT_DISABLED
+from tracker.form.login import ERROR_INVALID_USERNAME_PASSWORD
+
+from .conftest import DEFAULT_USERNAME
+from .conftest import assert_logged_in
+from .conftest import assert_not_logged_in
+from .conftest import create_user
+from .conftest import logged_in
 
 
 def test_login_view(db, client):

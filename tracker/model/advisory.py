@@ -1,8 +1,8 @@
+from datetime import datetime
+
 from tracker import db
 from tracker.model.cve import issue_types
 from tracker.model.enum import Publication
-from datetime import datetime
-
 
 advisory_regex = r'^(ASA\-(\d{6})\-(\d+))$'
 advisory_types = list(filter(lambda e: e is not 'unknown', issue_types))

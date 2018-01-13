@@ -1,11 +1,18 @@
-from .base import BaseForm
-from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
-from tracker.model.user import User
-from tracker.user import hash_password, random_string
-from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length
 from hmac import compare_digest
 
+from wtforms import PasswordField
+from wtforms import StringField
+from wtforms import SubmitField
+from wtforms.validators import DataRequired
+from wtforms.validators import Length
+
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from tracker.model.user import User
+from tracker.user import hash_password
+from tracker.user import random_string
+
+from .base import BaseForm
 
 ERROR_INVALID_USERNAME_PASSWORD = 'Invalid username or password.'
 ERROR_ACCOUNT_DISABLED = 'Account is disabled.'

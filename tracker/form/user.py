@@ -1,11 +1,16 @@
-from flask_login import current_user
-from .base import BaseForm
-from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
-from tracker.user import hash_password
-from wtforms import PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length
 from hmac import compare_digest
 
+from flask_login import current_user
+from wtforms import PasswordField
+from wtforms import SubmitField
+from wtforms.validators import DataRequired
+from wtforms.validators import Length
+
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from tracker.user import hash_password
+
+from .base import BaseForm
 
 ERROR_PASSWORD_CONTAINS_USERNAME = 'Password must not contain the username.'
 ERROR_PASSWORD_REPEAT_MISMATCHES = 'Repeated password mismatches.'

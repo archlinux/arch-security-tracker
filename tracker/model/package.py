@@ -1,7 +1,8 @@
-from tracker import db
-from pyalpm import vercmp
-from tracker.util import cmp_to_key
 from operator import attrgetter
+
+from pyalpm import vercmp
+from tracker import db
+from tracker.util import cmp_to_key
 
 
 class Package(db.Model):

@@ -1,14 +1,27 @@
-from flask import render_template, flash, redirect
-from tracker import tracker, db
-from tracker.user import reporter_required, security_team_required, user_can_delete_group, user_can_delete_issue
+from collections import defaultdict
+
+from flask import flash
+from flask import redirect
+from flask import render_template
+
+from tracker import db
+from tracker import tracker
 from tracker.form.confirm import ConfirmForm
-from tracker.model import CVEGroup, CVE, CVEGroupPackage, CVEGroupEntry, Advisory
-from tracker.model.cvegroup import vulnerability_group_regex
+from tracker.model import CVE
+from tracker.model import Advisory
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
 from tracker.model.advisory import advisory_regex
 from tracker.model.cve import cve_id_regex
+from tracker.model.cvegroup import vulnerability_group_regex
 from tracker.model.enum import Publication
-from tracker.view.error import not_found, forbidden
-from collections import defaultdict
+from tracker.user import reporter_required
+from tracker.user import security_team_required
+from tracker.user import user_can_delete_group
+from tracker.user import user_can_delete_issue
+from tracker.view.error import forbidden
+from tracker.view.error import not_found
 
 
 @tracker.route('/group/<regex("{}"):avg>/delete'.format(vulnerability_group_regex[1:-1]), methods=['GET', 'POST'])

@@ -1,9 +1,14 @@
-from .package import Package, sort_packages
-from tracker import db
 from enum import Enum
-from sqlalchemy.types import SchemaType, TypeDecorator
+
 from sqlalchemy.types import Enum as SQLAlchemyEnum
+from sqlalchemy.types import SchemaType
+from sqlalchemy.types import TypeDecorator
+
 from pyalpm import vercmp
+from tracker import db
+
+from .package import Package
+from .package import sort_packages
 
 
 class EnumType(SchemaType, TypeDecorator):

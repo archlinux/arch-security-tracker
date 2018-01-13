@@ -1,14 +1,33 @@
-from werkzeug.exceptions import NotFound, Forbidden
 from flask import url_for
+from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import NotFound
 
-from .conftest import logged_in, create_issue, create_package, create_group, create_advisory, advisory_count, get_advisory, DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED, default_issue_dict, DEFAULT_ADVISORY_CONTENT
-from tracker.advisory import advisory_get_label, advisory_get_impact_from_text, advisory_get_workaround_from_text
-from tracker.model.enum import UserRole, Publication
+from tracker.advisory import advisory_get_impact_from_text
+from tracker.advisory import advisory_get_label
+from tracker.advisory import advisory_get_workaround_from_text
+from tracker.model.advisory import Advisory
 from tracker.model.cve import issue_types
 from tracker.model.cvegroup import CVEGroup
-from tracker.model.advisory import Advisory
-from tracker.view.advisory import ERROR_ADVISORY_GROUP_NOT_FIXED, ERROR_ADVISORY_ALREADY_EXISTS
+from tracker.model.enum import Publication
+from tracker.model.enum import UserRole
+from tracker.view.advisory import ERROR_ADVISORY_ALREADY_EXISTS
+from tracker.view.advisory import ERROR_ADVISORY_GROUP_NOT_FIXED
 from tracker.view.edit import WARNING_ADVISORY_ALREADY_PUBLISHED
+
+from .conftest import DEFAULT_ADVISORY_CONTENT
+from .conftest import DEFAULT_ADVISORY_ID
+from .conftest import DEFAULT_GROUP_ID
+from .conftest import DEFAULT_GROUP_NAME
+from .conftest import DEFAULT_ISSUE_ID
+from .conftest import ERROR_LOGIN_REQUIRED
+from .conftest import advisory_count
+from .conftest import create_advisory
+from .conftest import create_group
+from .conftest import create_issue
+from .conftest import create_package
+from .conftest import default_issue_dict
+from .conftest import get_advisory
+from .conftest import logged_in
 
 
 def assert_advisory_data(advisory_id=DEFAULT_ADVISORY_ID, group_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1],

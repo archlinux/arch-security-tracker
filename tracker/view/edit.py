@@ -1,20 +1,41 @@
-from flask import render_template, flash, redirect
-from tracker import tracker, db
-from tracker.user import security_team_required, reporter_required, user_can_edit_group, user_can_edit_issue
-from tracker.form import CVEForm, GroupForm
+from collections import defaultdict
+from itertools import chain
+
+from flask import flash
+from flask import redirect
+from flask import render_template
+from sqlalchemy import func
+
+from tracker import db
+from tracker import tracker
+from tracker.advisory import advisory_extend_model_from_advisory_text
+from tracker.advisory import advisory_fetch_reference_url_from_mailman
+from tracker.form import CVEForm
+from tracker.form import GroupForm
 from tracker.form.advisory import AdvisoryEditForm
-from tracker.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
-from tracker.model.enum import Remote, Severity, Affected, Status, Publication, status_to_affected, affected_to_status, highest_severity
+from tracker.model import CVE
+from tracker.model import Advisory
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model.advisory import advisory_regex
 from tracker.model.cve import cve_id_regex
 from tracker.model.cvegroup import vulnerability_group_regex
-from tracker.model.advisory import advisory_regex
-from tracker.view.error import not_found, forbidden
-from tracker.advisory import advisory_extend_model_from_advisory_text, advisory_fetch_reference_url_from_mailman
+from tracker.model.enum import Affected
+from tracker.model.enum import Publication
+from tracker.model.enum import Remote
+from tracker.model.enum import Severity
+from tracker.model.enum import Status
+from tracker.model.enum import affected_to_status
+from tracker.model.enum import highest_severity
+from tracker.model.enum import status_to_affected
+from tracker.user import reporter_required
+from tracker.user import security_team_required
+from tracker.user import user_can_edit_group
+from tracker.user import user_can_edit_issue
 from tracker.util import multiline_to_list
-from sqlalchemy import func
-from itertools import chain
-from collections import defaultdict
-
+from tracker.view.error import forbidden
+from tracker.view.error import not_found
 
 WARNING_ADVISORY_ALREADY_PUBLISHED = 'WARNING: This advisory is already published!'
 

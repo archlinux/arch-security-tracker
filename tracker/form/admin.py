@@ -1,12 +1,23 @@
-from .base import BaseForm
-from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
-from tracker.model.user import User, username_regex
-from tracker.model.enum import UserRole
-from wtforms import StringField, SelectField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Optional, Length, Email, Regexp
-from wtforms.fields.html5 import EmailField
 from sqlalchemy import or_
+from wtforms import BooleanField
+from wtforms import PasswordField
+from wtforms import SelectField
+from wtforms import StringField
+from wtforms import SubmitField
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import DataRequired
+from wtforms.validators import Email
+from wtforms.validators import Length
+from wtforms.validators import Optional
+from wtforms.validators import Regexp
 
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from tracker.model.enum import UserRole
+from tracker.model.user import User
+from tracker.model.user import username_regex
+
+from .base import BaseForm
 
 ERROR_USERNAME_EXISTS = 'Username already exists.'
 ERROR_EMAIL_EXISTS = 'E-Mail already exists.'

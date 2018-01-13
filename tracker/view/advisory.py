@@ -1,21 +1,35 @@
-from flask import render_template, flash, redirect, request
-from tracker import tracker, db
-from tracker.user import security_team_required
-from tracker.advisory import advisory_get_label, advisory_get_date_label
-from tracker.util import json_response, atom_feed
-from tracker.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory
-from tracker.model.cvegroup import vulnerability_group_regex
-from tracker.model.advisory import advisory_regex
-from tracker.model.enum import Publication, Status
-from tracker.view.error import not_found
-from tracker.advisory import advisory_extend_model_from_advisory_text, advisory_fetch_reference_url_from_mailman
-from tracker.form.advisory import AdvisoryForm, AdvisoryPublishForm
 from collections import OrderedDict
-from sqlalchemy import and_
 from re import match
-from werkzeug.contrib.atom import AtomFeed
-from config import TRACKER_ISSUE_URL
 
+from flask import flash
+from flask import redirect
+from flask import render_template
+from flask import request
+from sqlalchemy import and_
+from werkzeug.contrib.atom import AtomFeed
+
+from config import TRACKER_ISSUE_URL
+from tracker import db
+from tracker import tracker
+from tracker.advisory import advisory_extend_model_from_advisory_text
+from tracker.advisory import advisory_fetch_reference_url_from_mailman
+from tracker.advisory import advisory_get_date_label
+from tracker.advisory import advisory_get_label
+from tracker.form.advisory import AdvisoryForm
+from tracker.form.advisory import AdvisoryPublishForm
+from tracker.model import CVE
+from tracker.model import Advisory
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model.advisory import advisory_regex
+from tracker.model.cvegroup import vulnerability_group_regex
+from tracker.model.enum import Publication
+from tracker.model.enum import Status
+from tracker.user import security_team_required
+from tracker.util import atom_feed
+from tracker.util import json_response
+from tracker.view.error import not_found
 
 ERROR_ADVISORY_GROUP_NOT_FIXED = 'AVG is not fixed yet.'
 ERROR_ADVISORY_ALREADY_EXISTS = 'Advisory already exists.'

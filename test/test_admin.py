@@ -1,13 +1,19 @@
-from werkzeug.exceptions import Unauthorized, Forbidden
 from flask import url_for
 from flask_login import current_user
+from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Unauthorized
 
-from .conftest import logged_in, assert_logged_in, assert_not_logged_in, create_user, DEFAULT_USERNAME
-from tracker.user import random_string
+from tracker.form.admin import ERROR_EMAIL_EXISTS
+from tracker.form.admin import ERROR_USERNAME_EXISTS
 from tracker.form.login import ERROR_ACCOUNT_DISABLED
-from tracker.form.admin import ERROR_USERNAME_EXISTS, ERROR_EMAIL_EXISTS
 from tracker.model.enum import UserRole
+from tracker.user import random_string
 
+from .conftest import DEFAULT_USERNAME
+from .conftest import assert_logged_in
+from .conftest import assert_not_logged_in
+from .conftest import create_user
+from .conftest import logged_in
 
 USERNAME = 'cyberwehr87654321'
 PASSWORD = random_string()

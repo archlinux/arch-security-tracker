@@ -1,10 +1,13 @@
-from config import basedir, PACMAN_HANDLE_CACHE_TIME
-from pycman.config import init_with_config
-from pyalpm import vercmp
-from tracker.util import cmp_to_key
 from operator import attrgetter
 from os import chdir
 from time import time
+
+from pycman.config import init_with_config
+
+from config import PACMAN_HANDLE_CACHE_TIME
+from config import basedir
+from pyalpm import vercmp
+from tracker.util import cmp_to_key
 
 archs = ['x86_64']
 primary_arch = 'x86_64'

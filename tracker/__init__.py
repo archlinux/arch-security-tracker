@@ -1,13 +1,22 @@
-from flask import Flask, Blueprint
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_talisman import Talisman
-from werkzeug.routing import BaseConverter
 from types import MethodType
-from sqlalchemy.engine import Engine
+
+from flask import Blueprint
+from flask import Flask
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
+from flask_talisman import Talisman
 from sqlalchemy import event
+from sqlalchemy.engine import Engine
 from sqlalchemy.sql.expression import ClauseElement
-from config import atom_feeds, SQLITE_JOURNAL_MODE, SQLITE_TEMP_STORE, SQLITE_SYNCHRONOUS, SQLITE_MMAP_SIZE, SQLITE_CACHE_SIZE, FLASK_SESSION_PROTECTION
+from werkzeug.routing import BaseConverter
+
+from config import FLASK_SESSION_PROTECTION
+from config import SQLITE_CACHE_SIZE
+from config import SQLITE_JOURNAL_MODE
+from config import SQLITE_MMAP_SIZE
+from config import SQLITE_SYNCHRONOUS
+from config import SQLITE_TEMP_STORE
+from config import atom_feeds
 
 
 @event.listens_for(Engine, 'connect')
