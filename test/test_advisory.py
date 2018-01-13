@@ -27,6 +27,7 @@ from .conftest import create_advisory
 from .conftest import create_group
 from .conftest import create_issue
 from .conftest import create_package
+from .conftest import default_group_dict
 from .conftest import default_issue_dict
 from .conftest import get_advisory
 from .conftest import logged_in
@@ -128,6 +129,46 @@ def test_switch_issue_type_changes_single_issue_advisory_to_multiple(db, client)
     assert 200 == resp.status_code
     assert_advisory_data(DEFAULT_ADVISORY_ID, advisory_type='multiple issues')
     assert 1 == advisory_count()
+
+
+@create_issue(id='CVE-1111-1111', issue_type=issue_types[2])
+@create_issue(id='CVE-1111-2222', issue_type=issue_types[3])
+@create_package(name='foo', base='lol', version='1.2.3-4')
+@create_package(name='bar', base='lol', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=['CVE-1111-1111'], packages=['foo', 'bar'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=advisory_get_label(number=1), group_package_id=1, advisory_type=issue_types[2])
+@create_advisory(id=advisory_get_label(number=2), group_package_id=2, advisory_type=issue_types[2])
+@logged_in
+def test_switch_issue_type_changes_multi_package_advisory_to_multiple(db, client):
+    data = default_group_dict(dict(
+        cve='\n'.join(['CVE-1111-1111', 'CVE-1111-2222']),
+        pkgnames='\n'.join(['foo', 'bar']),
+    ))
+    resp = client.post(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert_advisory_data(advisory_get_label(number=1), advisory_type='multiple issues')
+    assert_advisory_data(advisory_get_label(number=2), advisory_type='multiple issues')
+    assert 2 == advisory_count()
+
+
+@create_issue(id='CVE-1111-1111', issue_type=issue_types[2])
+@create_issue(id='CVE-1111-2222', issue_type=issue_types[3])
+@create_package(name='foo', base='lol', version='1.2.3-4')
+@create_package(name='bar', base='lol', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=['CVE-1111-1111', 'CVE-1111-2222'], packages=['foo', 'bar'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=advisory_get_label(number=1), group_package_id=1, advisory_type='multiple issues')
+@create_advisory(id=advisory_get_label(number=2), group_package_id=2, advisory_type='multiple issues')
+@logged_in
+def test_switch_issue_type_changes_multi_package_advisory_to_single_type(db, client):
+    data = default_group_dict(dict(
+        cve='\n'.join(['CVE-1111-1111']),
+        pkgnames='\n'.join(['foo', 'bar']),
+    ))
+    resp = client.post(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert_advisory_data(advisory_get_label(number=1), advisory_type=issue_types[2])
+    assert_advisory_data(advisory_get_label(number=2), advisory_type=issue_types[2])
+    assert 2 == advisory_count()
 
 
 @create_package(name='foo', version='1.2.3-4')

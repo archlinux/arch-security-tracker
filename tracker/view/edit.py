@@ -166,14 +166,14 @@ def edit_group(avg):
                   .filter(CVEGroup.id == group_id)
                   .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
                   .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
-                  .group_by(CVEGroup.id).group_by(CVE.id)
+                  .group_by(CVEGroup.id).group_by(CVE.id).group_by(CVEGroupPackage.pkgname)
                   .order_by(CVE.id)).all()
     if not group_data:
         return not_found()
 
     group = group_data[0][0]
-    issues = [cve for (group, cve, pkg, advisory) in group_data]
-    issue_ids = [cve.id for cve in issues]
+    issues = set([cve for (group, cve, pkg, advisory) in group_data])
+    issue_ids = set([cve.id for cve in issues])
     pkgnames = set(chain.from_iterable([pkg.split(' ') for (group, cve, pkg, advisory) in group_data]))
     advisories = set(advisory for (group, cve, pkg, advisory) in group_data if advisory)
 
