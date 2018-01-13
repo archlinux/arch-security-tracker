@@ -1,3 +1,4 @@
+import json
 from werkzeug.exceptions import NotFound, Forbidden
 from flask import url_for
 
@@ -242,3 +243,39 @@ def test_advisory_cve_listing_sorted_numerically(db, client):
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert '\n'.join(['CVE-1111-12345', 'CVE-1234-1234', 'CVE-1234-11111', 'CVE-1234-12345']) in data.replace('https://security.archlinux.org/', '')
+
+
+def test_advisory_atom_no_data(db, client):
+    resp = client.get(url_for('tracker.advisory_atom'), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert DEFAULT_ADVISORY_ID not in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.published)
+def test_advisory_atom(db, client):
+    resp = client.get(url_for('tracker.advisory_atom'), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert DEFAULT_ADVISORY_ID in data
+
+
+def test_advisory_json_no_data(db, client):
+    resp = client.get(url_for('tracker.advisory_json', postfix='/json'), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = json.loads(resp.data.decode())
+    assert data == []
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.published)
+def test_advisory_json(db, client):
+    resp = client.get(url_for('tracker.advisory_json', postfix='/json'), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = json.loads(resp.data.decode())
+    assert len(data) == 1
+    assert data[0]['name'] == DEFAULT_ADVISORY_ID
+    assert data[0]['group'] == DEFAULT_GROUP_NAME
