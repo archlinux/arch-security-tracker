@@ -13,8 +13,7 @@ from tracker.util import cmp_to_key
 from operator import attrgetter
 
 
-@tracker.route('/todo', methods=['GET'])
-def todo():
+def get_todo_data():
     incomplete_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
                              .join(CVEGroupPackage).join(CVEGroup)
                              .filter(and_(
@@ -95,7 +94,7 @@ def todo():
                        .having(func.count(CVEGroupEntry.id) == 0)
                        .order_by(CVE.id)).all()
 
-    entries = {
+    return {
         'scheduled_advisories': scheduled_advisories,
         'incomplete_advisories': incomplete_advisories,
         'unhandled_advisories': unhandled_advisories,
@@ -104,6 +103,11 @@ def todo():
         'bumped_groups': bumped_groups,
         'orphan_issues': orphan_issues
     }
+
+
+@tracker.route('/todo', methods=['GET'])
+def todo():
+    entries = get_todo_data()
     return render_template('todo.html',
                            title='Todo Lists',
                            entries=entries,
