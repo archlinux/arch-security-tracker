@@ -171,15 +171,20 @@ def todo_json():
         return not_found(json=True)
 
     json_data = OrderedDict()
-    json_data['scheduled_advisories'] = [advisory_json(d) for d in data['scheduled_advisories']]
-    json_data['incomplete_advisories'] = [advisory_json(d) for d in data['incomplete_advisories']]
-    json_data['unhandled_advisories'] = [group_packages_json(d) for d in data['unhandled_advisories']]
+    json_data['advisories'] = {
+        'scheduled': [advisory_json(d) for d in data['scheduled_advisories']],
+        'incomplete': [advisory_json(d) for d in data['incomplete_advisories']],
+        'unhandled': [group_packages_json(d) for d in data['unhandled_advisories']]
+    }
 
-    json_data['unknown_groups'] = [group_packages_json(g) for g in data['unknown_groups']]
+    json_data['groups'] = {
+        'unknown': [group_packages_json(g) for g in data['unknown_groups']],
+        'bumped':  [bumped_groups_json(g) for g in data['bumped_groups']]
+    }
 
-    json_data['bumped_groups'] = [bumped_groups_json(g) for g in data['bumped_groups']]
-
-    json_data['orphan_issues'] = [cve_json(cve) for cve in data['orphan_issues']]
-    json_data['unknown_issues'] = [cve_json(cve) for cve in data['unknown_issues']]
+    json_data['issues'] = {
+        'orphan_issues': [cve_json(cve) for cve in data['orphan_issues']],
+        'unknown_issues': [cve_json(cve) for cve in data['unknown_issues']]
+    }
 
     return json_data
