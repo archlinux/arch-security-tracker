@@ -5,10 +5,12 @@ from tracker.model import CVE, CVEGroup, CVEGroupPackage, CVEGroupEntry, Advisor
 from tracker.model.enum import Status, Remote, Severity, Publication
 from tracker.model.package import filter_duplicate_packages
 from tracker.symbol import smileys_happy
+from tracker.view.error import not_found
+from tracker.util import json_response
 from sqlalchemy import func, or_, and_
 from pyalpm import vercmp
 from random import randint
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from tracker.util import cmp_to_key
 from operator import attrgetter
 
@@ -115,3 +117,69 @@ def todo():
                            can_handle_advisory=user_can_handle_advisory(),
                            can_edit_group=user_can_edit_group(),
                            can_edit_issue=user_can_edit_issue())
+
+def advisory_json(data):
+    advisory, package, group = data
+    entry = OrderedDict()
+    entry['name'] = advisory.id
+    entry['date'] = advisory.created.strftime('%Y-%m-%d')
+    entry['severity'] = advisory.group_package.group.severity.label
+    entry['type'] = advisory.advisory_type
+    entry['fixed'] = group.fixed
+    entry['affected'] = group.affected
+    entry['package'] = package.pkgname
+    return entry
+
+
+def group_packages_json(item):
+    group, packages = item
+    entry = OrderedDict()
+    entry['name'] = group.name
+    entry['status'] = group.status.label
+    entry['severity'] = group.severity.label
+    entry['affected'] = group.affected
+    entry['packages'] = list(packages)
+    return entry
+
+
+def bumped_groups_json(item):
+    group, pkgnames, versions = item
+    entry = OrderedDict()
+    entry['name'] = group.name
+    entry['status'] = group.status.label
+    entry['severity'] = group.severity.label
+    entry['affected'] = group.affected
+    entry['current'] = ['{} [{}]'.format(pkg.version, pkg.database) for pkg in versions]
+    entry['packages'] = list(pkgnames)
+    return entry
+
+def cve_json(cve):
+    entry = OrderedDict()
+    entry['description'] = cve.description
+    entry['name'] = cve.id
+    entry['label'] = cve.severity.label
+    entry['remote'] = cve.remote.name
+    entry['type'] = cve.issue_type
+    return entry
+
+
+@tracker.route('/todo.json', methods=['GET'])
+@json_response
+def todo_json():
+    data = get_todo_data()
+    if not data:
+        return not_found(json=True)
+
+    json_data = OrderedDict()
+    json_data['scheduled_advisories'] = [advisory_json(d) for d in data['scheduled_advisories']]
+    json_data['incomplete_advisories'] = [advisory_json(d) for d in data['incomplete_advisories']]
+    json_data['unhandled_advisories'] = [group_packages_json(d) for d in data['unhandled_advisories']]
+
+    json_data['unknown_groups'] = [group_packages_json(g) for g in data['unknown_groups']]
+
+    json_data['bumped_groups'] = [bumped_groups_json(g) for g in data['bumped_groups']]
+
+    json_data['orphan_issues'] = [cve_json(cve) for cve in data['orphan_issues']]
+    json_data['unknown_issues'] = [cve_json(cve) for cve in data['unknown_issues']]
+
+    return json_data
