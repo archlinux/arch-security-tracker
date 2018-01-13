@@ -1,4 +1,15 @@
+from re import sub
+
 from flask import Blueprint
+from jinja2.filters import do_urlize
+from jinja2.filters import evalcontextfilter
+from jinja2.utils import Markup
+from jinja2.utils import _punctuation_re
+from jinja2.utils import _word_split_re
+from jinja2.utils import escape
+
+from tracker.model.cve import cve_id_regex
+from tracker.model.cvegroup import vulnerability_group_regex
 
 blueprint = Blueprint('filters', __name__)
 
@@ -20,3 +31,39 @@ def smartindent(s, width=1, indentfirst=False, indentchar=u'\t'):
     if indentfirst:
         rv = indention + rv
     return rv
+
+
+@evalcontextfilter
+@blueprint.app_template_filter()
+def urlize(ctx, text, trim_url_limit=None, rel=None, target=None):
+    """Converts any URLs in text into clickable links. Works on http://,
+    https:// and www. links. Links can have trailing punctuation (periods,
+    commas, close-parens) and leading punctuation (opening parens) and
+    it'll still do the right thing.
+    Aditionally it will populate the input with application context related
+    links linke issues and groups.
+
+    If trim_url_limit is not None, the URLs in link text will be limited
+    to trim_url_limit characters.
+
+    If nofollow is True, the URLs in link text will get a rel="nofollow"
+    attribute.
+
+    If target is not None, a target attribute will be added to the link.
+    """
+
+    words = _word_split_re.split(escape(text))
+    for i, word in enumerate(words):
+        match = _punctuation_re.match(word)
+        if match:
+            lead, word, trail = match.groups()
+            word = sub('({})'.format(cve_id_regex), '<a href="/\\1">\\1</a>', word)
+            word = sub('({})'.format(vulnerability_group_regex), '<a href="/\\1">\\1</a>', word)
+            words[i] = '{}{}{}'.format(lead, word, trail)
+
+    text = ''.join(words)
+    if ctx.autoescape:
+        text = Markup(text)
+
+    text = do_urlize(ctx, text, trim_url_limit=trim_url_limit, target=target, rel=rel)
+    return text

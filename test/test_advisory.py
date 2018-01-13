@@ -340,3 +340,18 @@ def test_advisory_json(db, client):
     assert len(data) == 1
     assert data[0]['name'] == DEFAULT_ADVISORY_ID
     assert data[0]['group'] == DEFAULT_GROUP_NAME
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_issue(id='CVE-1234-1234', description='qux AVG-1 is broken and foo.')
+@create_issue(id='CVE-1234-12345', description='bar https://foo.bar is broken and lol CVE-1111-2222.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=['CVE-1234-1234', 'CVE-1234-12345'])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_html_urlize_description(db, client):
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert 'qux <a href="/{0}">{0}</a> is'.format('AVG-1') in data
+    assert 'bar <a href="{0}" rel="noopener">{0}</a> is'.format('https://foo.bar') in data
+    assert 'lol <a href="/{0}">{0}</a>.'.format('CVE-1111-2222') in data
