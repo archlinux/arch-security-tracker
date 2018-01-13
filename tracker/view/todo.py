@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from collections import defaultdict
 from operator import attrgetter
 from random import randint
@@ -26,10 +27,11 @@ from tracker.user import user_can_edit_group
 from tracker.user import user_can_edit_issue
 from tracker.user import user_can_handle_advisory
 from tracker.util import cmp_to_key
+from tracker.util import json_response
+from tracker.view.error import not_found
 
 
-@tracker.route('/todo', methods=['GET'])
-def todo():
+def get_todo_data():
     incomplete_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
                              .join(CVEGroupPackage).join(CVEGroup)
                              .filter(and_(
@@ -110,7 +112,7 @@ def todo():
                        .having(func.count(CVEGroupEntry.id) == 0)
                        .order_by(CVE.id)).all()
 
-    entries = {
+    return {
         'scheduled_advisories': scheduled_advisories,
         'incomplete_advisories': incomplete_advisories,
         'unhandled_advisories': unhandled_advisories,
@@ -119,6 +121,11 @@ def todo():
         'bumped_groups': bumped_groups,
         'orphan_issues': orphan_issues
     }
+
+
+@tracker.route('/todo', methods=['GET'])
+def todo():
+    entries = get_todo_data()
     return render_template('todo.html',
                            title='Todo Lists',
                            entries=entries,
@@ -126,3 +133,76 @@ def todo():
                            can_handle_advisory=user_can_handle_advisory(),
                            can_edit_group=user_can_edit_group(),
                            can_edit_issue=user_can_edit_issue())
+
+
+def advisory_json(data):
+    advisory, package, group = data
+    entry = OrderedDict()
+    entry['name'] = advisory.id
+    entry['date'] = advisory.created.strftime('%Y-%m-%d')
+    entry['severity'] = advisory.group_package.group.severity.label
+    entry['type'] = advisory.advisory_type
+    entry['fixed'] = group.fixed
+    entry['affected'] = group.affected
+    entry['package'] = package.pkgname
+    return entry
+
+
+def group_packages_json(item):
+    group, packages = item
+    entry = OrderedDict()
+    entry['name'] = group.name
+    entry['status'] = group.status.label
+    entry['severity'] = group.severity.label
+    entry['affected'] = group.affected
+    entry['packages'] = list(packages)
+    return entry
+
+
+def bumped_groups_json(item):
+    group, pkgnames, versions = item
+    entry = OrderedDict()
+    entry['name'] = group.name
+    entry['status'] = group.status.label
+    entry['severity'] = group.severity.label
+    entry['affected'] = group.affected
+    entry['current'] = ['{} [{}]'.format(pkg.version, pkg.database) for pkg in versions]
+    entry['packages'] = list(pkgnames)
+    return entry
+
+
+def cve_json(cve):
+    entry = OrderedDict()
+    entry['description'] = cve.description
+    entry['name'] = cve.id
+    entry['label'] = cve.severity.label
+    entry['remote'] = cve.remote.name
+    entry['type'] = cve.issue_type
+    return entry
+
+
+@tracker.route('/todo<regex("[./]json"):postfix>', methods=['GET'])
+@json_response
+def todo_json(postfix=None):
+    data = get_todo_data()
+    if not data:
+        return not_found(json=True)
+
+    json_data = OrderedDict()
+    json_data['advisories'] = {
+        'scheduled': [advisory_json(d) for d in data['scheduled_advisories']],
+        'incomplete': [advisory_json(d) for d in data['incomplete_advisories']],
+        'unhandled': [group_packages_json(d) for d in data['unhandled_advisories']]
+    }
+
+    json_data['groups'] = {
+        'unknown': [group_packages_json(g) for g in data['unknown_groups']],
+        'bumped': [bumped_groups_json(g) for g in data['bumped_groups']]
+    }
+
+    json_data['issues'] = {
+        'orphan_issues': [cve_json(cve) for cve in data['orphan_issues']],
+        'unknown_issues': [cve_json(cve) for cve in data['unknown_issues']]
+    }
+
+    return json_data
