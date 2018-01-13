@@ -1,11 +1,23 @@
+from collections import OrderedDict
+from collections import defaultdict
+
 from flask import render_template
-from tracker import tracker, db
-from tracker.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, User
-from tracker.model.cve import issue_types
-from tracker.model.enum import UserRole, Severity, Status, Remote
-from tracker.util import json_response
-from collections import defaultdict, OrderedDict
 from werkzeug.exceptions import ImATeapot
+
+from tracker import db
+from tracker import tracker
+from tracker.model import CVE
+from tracker.model import Advisory
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model import User
+from tracker.model.cve import issue_types
+from tracker.model.enum import Remote
+from tracker.model.enum import Severity
+from tracker.model.enum import Status
+from tracker.model.enum import UserRole
+from tracker.util import json_response
 
 
 def get_stats_data():

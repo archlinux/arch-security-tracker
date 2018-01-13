@@ -1,14 +1,21 @@
+from itertools import chain
+
 from flask import render_template
-from tracker import tracker, db
-from tracker.user import reporter_required
-from tracker.form import CVEForm, GroupForm
-from tracker.model import CVE, CVEGroup, CVEGroupPackage, CVEGroupEntry
+from sqlalchemy import func
+
+from tracker import db
+from tracker import tracker
+from tracker.form import CVEForm
+from tracker.form import GroupForm
+from tracker.model import CVE
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
 from tracker.model.cve import cve_id_regex
 from tracker.model.cvegroup import vulnerability_group_regex
 from tracker.model.enum import status_to_affected
+from tracker.user import reporter_required
 from tracker.view.error import not_found
-from itertools import chain
-from sqlalchemy import func
 
 
 @tracker.route('/issue/<regex("{}"):issue>/copy'.format(cve_id_regex[1:-1]), methods=['GET'])

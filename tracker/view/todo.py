@@ -1,16 +1,31 @@
+from collections import defaultdict
+from operator import attrgetter
+from random import randint
+
 from flask import render_template
-from tracker import tracker, db
-from tracker.user import user_can_handle_advisory, user_can_edit_group, user_can_edit_issue
-from tracker.model import CVE, CVEGroup, CVEGroupPackage, CVEGroupEntry, Advisory, Package
-from tracker.model.enum import Status, Remote, Severity, Publication
+from sqlalchemy import and_
+from sqlalchemy import func
+from sqlalchemy import or_
+
+from pyalpm import vercmp
+from tracker import db
+from tracker import tracker
+from tracker.model import CVE
+from tracker.model import Advisory
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model import Package
+from tracker.model.enum import Publication
+from tracker.model.enum import Remote
+from tracker.model.enum import Severity
+from tracker.model.enum import Status
 from tracker.model.package import filter_duplicate_packages
 from tracker.symbol import smileys_happy
-from sqlalchemy import func, or_, and_
-from pyalpm import vercmp
-from random import randint
-from collections import defaultdict
+from tracker.user import user_can_edit_group
+from tracker.user import user_can_edit_issue
+from tracker.user import user_can_handle_advisory
 from tracker.util import cmp_to_key
-from operator import attrgetter
 
 
 @tracker.route('/todo', methods=['GET'])

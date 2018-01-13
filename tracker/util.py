@@ -1,5 +1,7 @@
 from functools import wraps
+
 from flask import json
+
 from config import atom_feeds
 
 

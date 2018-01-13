@@ -1,22 +1,45 @@
-from flask import render_template, redirect
+from collections import OrderedDict
+from collections import defaultdict
+
+from flask import redirect
+from flask import render_template
 from flask_login import current_user
-from sqlalchemy import and_
-from config import TRACKER_ADVISORY_URL, TRACKER_BUGTRACKER_URL, TRACKER_GROUP_URL, TRACKER_ISSUE_URL, TRACKER_SUMMARY_LENGTH_MAX
-from tracker import tracker, db
-from tracker.util import json_response
-from tracker.user import user_can_edit_issue, user_can_delete_issue, user_can_edit_group, user_can_delete_group, user_can_handle_advisory
-from tracker.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
-from tracker.model.enum import Publication, Status, Remote
-from tracker.model.cve import cve_id_regex
-from tracker.model.cvegroup import vulnerability_group_regex, pkgname_regex
-from tracker.model.advisory import advisory_regex
-from tracker.model.package import filter_duplicate_packages, sort_packages
-from tracker.form.advisory import AdvisoryForm
-from tracker.view.error import not_found
-from tracker.advisory import advisory_extend_html
-from tracker.util import chunks, multiline_to_list
-from collections import defaultdict, OrderedDict
 from jinja2.utils import escape
+from sqlalchemy import and_
+
+from config import TRACKER_ADVISORY_URL
+from config import TRACKER_BUGTRACKER_URL
+from config import TRACKER_GROUP_URL
+from config import TRACKER_ISSUE_URL
+from config import TRACKER_SUMMARY_LENGTH_MAX
+from tracker import db
+from tracker import tracker
+from tracker.advisory import advisory_extend_html
+from tracker.form.advisory import AdvisoryForm
+from tracker.model import CVE
+from tracker.model import Advisory
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model import Package
+from tracker.model.advisory import advisory_regex
+from tracker.model.cve import cve_id_regex
+from tracker.model.cvegroup import pkgname_regex
+from tracker.model.cvegroup import vulnerability_group_regex
+from tracker.model.enum import Publication
+from tracker.model.enum import Remote
+from tracker.model.enum import Status
+from tracker.model.package import filter_duplicate_packages
+from tracker.model.package import sort_packages
+from tracker.user import user_can_delete_group
+from tracker.user import user_can_delete_issue
+from tracker.user import user_can_edit_group
+from tracker.user import user_can_edit_issue
+from tracker.user import user_can_handle_advisory
+from tracker.util import chunks
+from tracker.util import json_response
+from tracker.util import multiline_to_list
+from tracker.view.error import not_found
 
 
 def get_bug_project(databases):

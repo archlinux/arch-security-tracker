@@ -1,6 +1,7 @@
 from tracker import db
-from .enum import Severity, Remote
 
+from .enum import Remote
+from .enum import Severity
 
 cve_id_regex = r'^(CVE\-\d{4}\-\d{4,})$'
 issue_types = [

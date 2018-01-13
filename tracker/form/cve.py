@@ -1,9 +1,19 @@
+from wtforms import SelectField
+from wtforms import StringField
+from wtforms import SubmitField
+from wtforms import TextAreaField
+from wtforms.validators import DataRequired
+from wtforms.validators import Length
+from wtforms.validators import Optional
+
+from tracker.form.validators import ValidIssue
+from tracker.form.validators import ValidURLs
+from tracker.model.cve import CVE
+from tracker.model.cve import issue_types
+from tracker.model.enum import Remote
+from tracker.model.enum import Severity
+
 from .base import BaseForm
-from wtforms import StringField, SelectField, TextAreaField, SubmitField
-from wtforms.validators import DataRequired, Length, Optional
-from tracker.form.validators import ValidIssue, ValidURLs
-from tracker.model.cve import CVE, issue_types
-from tracker.model.enum import Severity, Remote
 
 
 class CVEForm(BaseForm):

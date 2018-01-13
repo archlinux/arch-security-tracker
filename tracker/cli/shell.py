@@ -1,6 +1,8 @@
+from click import UNPROCESSED
+from click import argument
 from flask.cli import with_appcontext
-from click import argument, UNPROCESSED
-from . import cli
+
+from .util import cli
 
 
 @cli.command(context_settings=dict(ignore_unknown_options=True))

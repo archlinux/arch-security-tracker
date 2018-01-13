@@ -1,13 +1,27 @@
-from werkzeug.exceptions import NotFound, Forbidden
 from flask import url_for
+from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import NotFound
 
-from .conftest import logged_in, create_package, create_group, create_advisory, default_group_dict, DEFAULT_GROUP_ID, DEFAULT_GROUP_NAME, DEFAULT_ISSUE_ID, DEFAULT_ADVISORY_ID, ERROR_LOGIN_REQUIRED
 from config import TRACKER_BUGTRACKER_URL
-from tracker.model.enum import UserRole, Affected, Status
-from tracker.model.cve import issue_types, CVE
+from tracker.model.cve import CVE
+from tracker.model.cve import issue_types
 from tracker.model.cvegroup import CVEGroup
+from tracker.model.enum import Affected
+from tracker.model.enum import Status
+from tracker.model.enum import UserRole
 from tracker.view.add import ERROR_GROUP_WITH_ISSUE_EXISTS
 from tracker.view.show import get_bug_project
+
+from .conftest import DEFAULT_ADVISORY_ID
+from .conftest import DEFAULT_GROUP_ID
+from .conftest import DEFAULT_GROUP_NAME
+from .conftest import DEFAULT_ISSUE_ID
+from .conftest import ERROR_LOGIN_REQUIRED
+from .conftest import create_advisory
+from .conftest import create_group
+from .conftest import create_package
+from .conftest import default_group_dict
+from .conftest import logged_in
 
 
 def set_and_assert_group_data(db, client, route, pkgnames=['foo'], issues=['CVE-1234-1234', 'CVE-2222-2222'],

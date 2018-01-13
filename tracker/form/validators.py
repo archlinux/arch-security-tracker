@@ -1,12 +1,16 @@
-from wtforms.validators import ValidationError, URL as URLValidator
-from tracker.util import multiline_to_list
-from tracker.model.cvegroup import pkgname_regex
-from tracker.model.cve import cve_id_regex
+from re import match
+from re import search
+
+from wtforms.validators import URL as URLValidator
+from wtforms.validators import ValidationError
+
+from tracker import db
+from tracker.advisory import advisory_fetch_from_mailman
 from tracker.model import Package
 from tracker.model.advisory import advisory_regex
-from tracker.advisory import advisory_fetch_from_mailman
-from tracker import db
-from re import match, search
+from tracker.model.cve import cve_id_regex
+from tracker.model.cvegroup import pkgname_regex
+from tracker.util import multiline_to_list
 
 ERROR_ISSUE_ID_INVALID = u'Invalid issue.'
 ERROR_INVALID_URL = u'Invalid URL {}.'

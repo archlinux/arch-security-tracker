@@ -1,4 +1,5 @@
 from tracker import db
+
 from .enum import UserRole
 
 username_regex = r'^([\w]+)$'

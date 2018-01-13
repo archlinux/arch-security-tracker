@@ -1,10 +1,21 @@
+from collections import OrderedDict
+from collections import defaultdict
+
 from flask import render_template
-from tracker import tracker, db
+from sqlalchemy import and_
+from sqlalchemy import func
+
+from tracker import db
+from tracker import tracker
+from tracker.model import CVE
+from tracker.model import Advisory
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model import Package
+from tracker.model.enum import Publication
+from tracker.model.enum import Status
 from tracker.util import json_response
-from tracker.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, Advisory, Package
-from tracker.model.enum import Publication, Status
-from collections import defaultdict, OrderedDict
-from sqlalchemy import func, and_
 
 
 def get_index_data(only_vulnerable=False, only_in_repo=True):

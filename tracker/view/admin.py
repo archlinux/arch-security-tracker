@@ -1,13 +1,25 @@
-from flask import render_template, redirect, flash
-from flask_login import current_user, login_required
-from tracker import tracker, db
-from tracker.user import administrator_required, random_string, hash_password, user_invalidate
+from flask import flash
+from flask import redirect
+from flask import render_template
+from flask_login import current_user
+from flask_login import login_required
+
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from tracker import db
+from tracker import tracker
 from tracker.form.admin import UserForm
 from tracker.form.confirm import ConfirmForm
-from tracker.model.user import User, Guest, username_regex
 from tracker.model.enum import UserRole
-from tracker.view.error import not_found, forbidden
-from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
+from tracker.model.user import Guest
+from tracker.model.user import User
+from tracker.model.user import username_regex
+from tracker.user import administrator_required
+from tracker.user import hash_password
+from tracker.user import random_string
+from tracker.user import user_invalidate
+from tracker.view.error import forbidden
+from tracker.view.error import not_found
 
 
 @tracker.route('/admin', methods=['GET', 'POST'])

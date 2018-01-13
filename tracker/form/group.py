@@ -1,10 +1,23 @@
-from .base import BaseForm
-from wtforms import StringField, SelectField, TextAreaField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Optional, Regexp, Length
-from tracker.model.cvegroup import pkgver_regex, CVEGroup
-from tracker.model.enum import Affected
-from tracker.form.validators import ValidPackageNames, SamePackageBase, ValidIssues, ValidURLs
+from wtforms import BooleanField
+from wtforms import SelectField
+from wtforms import StringField
+from wtforms import SubmitField
+from wtforms import TextAreaField
+from wtforms.validators import DataRequired
+from wtforms.validators import Length
+from wtforms.validators import Optional
+from wtforms.validators import Regexp
+
 from pyalpm import vercmp
+from tracker.form.validators import SamePackageBase
+from tracker.form.validators import ValidIssues
+from tracker.form.validators import ValidPackageNames
+from tracker.form.validators import ValidURLs
+from tracker.model.cvegroup import CVEGroup
+from tracker.model.cvegroup import pkgver_regex
+from tracker.model.enum import Affected
+
+from .base import BaseForm
 
 
 class GroupForm(BaseForm):

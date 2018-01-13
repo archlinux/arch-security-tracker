@@ -1,10 +1,19 @@
-from flask import url_for
-from werkzeug.exceptions import ImATeapot
 from json import loads
 
+from flask import url_for
+from werkzeug.exceptions import ImATeapot
+
 from tracker.model.cve import issue_types
-from tracker.model.enum import Severity, Status, UserRole, Remote
-from .conftest import create_user, create_issue, create_package, create_group, create_advisory
+from tracker.model.enum import Remote
+from tracker.model.enum import Severity
+from tracker.model.enum import Status
+from tracker.model.enum import UserRole
+
+from .conftest import create_advisory
+from .conftest import create_group
+from .conftest import create_issue
+from .conftest import create_package
+from .conftest import create_user
 
 
 def test_stats_page(db, client):

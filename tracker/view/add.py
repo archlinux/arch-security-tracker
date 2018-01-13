@@ -1,11 +1,23 @@
-from flask import render_template, flash, redirect
-from tracker import tracker, db
-from tracker.user import reporter_required
-from tracker.form import CVEForm, GroupForm
-from tracker.model import CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage
-from tracker.model.enum import Remote, Status, Severity, Affected, affected_to_status, highest_severity
-from tracker.util import multiline_to_list
+from flask import flash
+from flask import redirect
+from flask import render_template
 
+from tracker import db
+from tracker import tracker
+from tracker.form import CVEForm
+from tracker.form import GroupForm
+from tracker.model import CVE
+from tracker.model import CVEGroup
+from tracker.model import CVEGroupEntry
+from tracker.model import CVEGroupPackage
+from tracker.model.enum import Affected
+from tracker.model.enum import Remote
+from tracker.model.enum import Severity
+from tracker.model.enum import Status
+from tracker.model.enum import affected_to_status
+from tracker.model.enum import highest_severity
+from tracker.user import reporter_required
+from tracker.util import multiline_to_list
 
 ERROR_GROUP_WITH_ISSUE_EXISTS = 'The group AVG-{} already contains {} for the package {}'
 ERROR_OPEN_GROUP_EXISTS = 'The group AVG-{} already has open issues for the package {}'

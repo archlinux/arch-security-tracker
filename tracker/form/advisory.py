@@ -1,9 +1,17 @@
-from .base import BaseForm
-from wtforms import SelectField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Optional, URL, Length
+from wtforms import SelectField
+from wtforms import SubmitField
+from wtforms import TextAreaField
 from wtforms.fields.html5 import URLField
-from tracker.model.advisory import advisory_types, Advisory
+from wtforms.validators import URL
+from wtforms.validators import DataRequired
+from wtforms.validators import Length
+from wtforms.validators import Optional
+
 from tracker.form.validators import ValidAdvisoryReference
+from tracker.model.advisory import Advisory
+from tracker.model.advisory import advisory_types
+
+from .base import BaseForm
 
 
 class AdvisoryForm(BaseForm):

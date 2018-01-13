@@ -1,10 +1,17 @@
 from flask import url_for
 from flask_login import current_user
 
-from .conftest import logged_in, assert_logged_in, assert_not_logged_in, DEFAULT_USERNAME
-from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
-from tracker.form.user import ERROR_PASSWORD_CONTAINS_USERNAME, ERROR_PASSWORD_REPEAT_MISMATCHES, ERROR_PASSWORD_INCORRECT
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from tracker.form.user import ERROR_PASSWORD_CONTAINS_USERNAME
+from tracker.form.user import ERROR_PASSWORD_INCORRECT
+from tracker.form.user import ERROR_PASSWORD_REPEAT_MISMATCHES
 from tracker.user import random_string
+
+from .conftest import DEFAULT_USERNAME
+from .conftest import assert_logged_in
+from .conftest import assert_not_logged_in
+from .conftest import logged_in
 
 
 @logged_in

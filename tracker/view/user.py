@@ -1,9 +1,16 @@
-from flask import render_template, redirect, flash
-from flask_login import login_required, current_user
-from tracker import tracker, db
+from flask import flash
+from flask import redirect
+from flask import render_template
+from flask_login import current_user
+from flask_login import login_required
+
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from tracker import db
+from tracker import tracker
 from tracker.form.user import UserPasswordForm
-from tracker.user import random_string, hash_password
-from config import TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
+from tracker.user import hash_password
+from tracker.user import random_string
 
 
 @tracker.route('/profile', methods=['GET', 'POST'])

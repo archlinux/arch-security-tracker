@@ -1,7 +1,9 @@
 from datetime import datetime
-from tracker import db
-from .enum import Status, Severity
 
+from tracker import db
+
+from .enum import Severity
+from .enum import Status
 
 pkgname_regex = r'^([a-z\d@\.\_\+-]+)$'
 pkgver_regex = r'^(\d+:)?([\w]+[\._+]*)+\-\d+(\.\d+)?$'

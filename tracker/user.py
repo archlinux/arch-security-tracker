@@ -1,13 +1,18 @@
-from config import TRACKER_PASSWORD_LENGTH_MIN
-from flask_login import current_user, login_required
-from sqlalchemy.exc import IntegrityError
-from tracker import login_manager, db
-from tracker.model.user import User, Guest, UserRole
-from functools import wraps
-from scrypt import hash as shash
 from base64 import b85encode
+from functools import wraps
 from os import urandom
 
+from flask_login import current_user
+from flask_login import login_required
+from scrypt import hash as shash
+from sqlalchemy.exc import IntegrityError
+
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from tracker import db
+from tracker import login_manager
+from tracker.model.user import Guest
+from tracker.model.user import User
+from tracker.model.user import UserRole
 
 login_manager.anonymous_user = Guest
 

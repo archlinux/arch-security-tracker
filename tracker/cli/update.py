@@ -1,5 +1,8 @@
-from click import echo, option, pass_context
-from . import cli
+from click import echo
+from click import option
+from click import pass_context
+
+from .util import cli
 
 
 @cli.group()

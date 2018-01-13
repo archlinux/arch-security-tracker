@@ -1,14 +1,26 @@
-from click import echo, option, pass_context, password_option, Choice, BadParameter
-from re import match, IGNORECASE
-from pathlib import Path
-from os.path import exists, join
 from os import rename
+from os.path import exists
+from os.path import join
+from pathlib import Path
+from re import IGNORECASE
+from re import match
 from sys import exit
 
-from config import basedir, TRACKER_PASSWORD_LENGTH_MIN, TRACKER_PASSWORD_LENGTH_MAX
-from tracker.model.user import User, username_regex
+from click import BadParameter
+from click import Choice
+from click import echo
+from click import option
+from click import pass_context
+from click import password_option
+
+from config import TRACKER_PASSWORD_LENGTH_MAX
+from config import TRACKER_PASSWORD_LENGTH_MIN
+from config import basedir
 from tracker.model.enum import UserRole
-from . import cli
+from tracker.model.user import User
+from tracker.model.user import username_regex
+
+from .util import cli
 
 
 @cli.group()

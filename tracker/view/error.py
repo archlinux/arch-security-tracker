@@ -1,14 +1,19 @@
-from tracker import tracker
-from flask import render_template
-from random import randint
+from binascii import hexlify
+from functools import wraps
 from logging import error
 from os import urandom
-from binascii import hexlify
-from tracker.symbol import smileys_sad
-from werkzeug.exceptions import NotFound, Forbidden, MethodNotAllowed, Gone, InternalServerError
-from functools import wraps
-from config import get_debug_flag
+from random import randint
 
+from flask import render_template
+from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Gone
+from werkzeug.exceptions import InternalServerError
+from werkzeug.exceptions import MethodNotAllowed
+from werkzeug.exceptions import NotFound
+
+from config import get_debug_flag
+from tracker import tracker
+from tracker.symbol import smileys_sad
 
 error_handlers = []
 
