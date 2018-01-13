@@ -31,6 +31,7 @@ vulnerability details and generating security advisories.
 
 ### Tests
 
+* python-isort
 * python-pytest
 * python-pytest-cov
 
