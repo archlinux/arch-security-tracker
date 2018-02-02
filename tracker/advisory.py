@@ -2,6 +2,7 @@ from datetime import date
 from datetime import datetime
 from html import unescape
 from re import IGNORECASE
+from re import escape
 from re import search
 from re import sub
 
@@ -72,9 +73,9 @@ def advisory_get_workaround_from_text(advisory):
 
 
 def advisory_extend_html(advisory, issues, package):
-    advisory = sub('({}) '.format(package.pkgname), '<a href="/package/{0}">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(' ({})'.format(package.pkgname), ' <a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(';({})'.format(package.pkgname), ';<a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub('({}) '.format(escape(package.pkgname)), '<a href="/package/{0}">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(' ({})'.format(escape(package.pkgname)), ' <a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(';({})'.format(escape(package.pkgname)), ';<a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
     return advisory
 
 
