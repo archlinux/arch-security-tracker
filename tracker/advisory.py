@@ -3,6 +3,7 @@ from datetime import datetime
 from functools import cmp_to_key
 from html import unescape
 from re import IGNORECASE
+from re import escape
 from re import search
 from re import sub
 
@@ -77,9 +78,10 @@ def advisory_extend_html(advisory, issues, package):
     issues = sorted(issues, key=cmp_to_key(lambda a, b: len(a.id) - len(b.id)), reverse=True)
     for issue in issues:
         advisory = advisory.replace(' {}'.format(issue.id), ' <a href="/{0}">{0}</a>'.format(issue.id))
-    advisory = sub('({}) '.format(package.pkgname), '<a href="/package/{0}">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(' ({})'.format(package.pkgname), ' <a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(';({})'.format(package.pkgname), ';<a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+
+    advisory = sub('({}) '.format(escape(package.pkgname)), '<a href="/package/{0}">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(' ({})'.format(escape(package.pkgname)), ' <a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(';({})'.format(escape(package.pkgname)), ';<a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
     return advisory
 
 
