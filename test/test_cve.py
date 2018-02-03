@@ -17,6 +17,7 @@ from tracker.view.add import CVE_MERGED_PARTIALLY
 
 from .conftest import DEFAULT_ADVISORY_ID
 from .conftest import DEFAULT_GROUP_ID
+from .conftest import DEFAULT_GROUP_NAME
 from .conftest import DEFAULT_ISSUE_ID
 from .conftest import ERROR_INVALID_CHOICE
 from .conftest import ERROR_LOGIN_REQUIRED
@@ -229,6 +230,16 @@ def test_show_issue(db, client):
 def test_show_issue_not_found(db, client):
     resp = client.get(url_for('tracker.show_cve', cve='CVE-2011-0000', path=''), follow_redirects=True)
     assert resp.status_code == NotFound.code
+
+
+@create_issue
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', issues=[DEFAULT_ISSUE_ID])
+def test_show_issue_group_links(db, client):
+    resp = client.get(url_for('tracker.show_cve', cve=DEFAULT_ISSUE_ID, path=''))
+    assert 200 == resp.status_code
+    data = resp.data.decode('utf-8')
+    assert '<a href="/{0}">{0}</a>'.format(DEFAULT_GROUP_NAME) in data
+    assert '<a href="/package/{0}">{0}</a>'.format('foo') in data
 
 
 @logged_in
