@@ -290,6 +290,19 @@ def test_advisory_html_overlapping_cve_link(db, client):
     assert '<a href="/{0}">{0}</a>'.format('CVE-1234-12345') in data
 
 
+@create_package(name='crypto++', version='1.2.3-4')
+@create_issue(description='crypto++ is broken and crypto++.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['crypto++'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_html_regex_keyword_in_package_name(db, client):
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '<a href="/package/crypto++">crypto++</a> is broken' in data
+    assert 'and <a href="/package/crypto++">crypto++</a>' in data
+
+
 @create_package(name='foo', version='1.2.3-4')
 @create_issue(id='CVE-1234-1234')
 @create_issue(id='CVE-1234-12345')
