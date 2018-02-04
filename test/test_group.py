@@ -207,6 +207,22 @@ def test_warn_on_add_group_with_package_already_having_open_group(db, client):
     assert ERROR_GROUP_WITH_ISSUE_EXISTS.format(DEFAULT_GROUP_ID, DEFAULT_ISSUE_ID, pkgnames[0]) in resp.data.decode()
 
 
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'], affected='1.0-1')
+@logged_in
+def test_add_group_fixed_version_older_then_affected(db, client):
+    pkgnames = ['foo']
+    issues = ['CVE-1234-1234', 'CVE-2222-2222']
+    data = default_group_dict(dict(
+        cve='\n'.join(issues),
+        pkgnames='\n'.join(pkgnames),
+        fixed='0.8-1'))
+
+    resp = client.post(url_for('tracker.add_group'), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert 'Version must be newer.' in resp.data.decode()
+
+
 @create_package(name='foo')
 @logged_in
 def test_add_group_with_dot_in_pkgrel(db, client):
