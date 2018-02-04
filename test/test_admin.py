@@ -1,6 +1,7 @@
 from flask import url_for
 from flask_login import current_user
 from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import NotFound
 from werkzeug.exceptions import Unauthorized
 
 from tracker.form.admin import ERROR_EMAIL_EXISTS
@@ -40,6 +41,13 @@ def test_delete_last_admin_fails(db, client):
     resp = client.post(url_for('tracker.delete_user', username=DEFAULT_USERNAME), follow_redirects=True,
                        data=dict(confirm='confirm'))
     assert resp.status_code == Forbidden.code
+
+
+@logged_in
+def test_delete_user_not_found(db, client):
+    resp = client.post(url_for('tracker.delete_user', username='nobody'), follow_redirects=True,
+                       data=dict(confirm='confirm'))
+    assert resp.status_code == NotFound.code
 
 
 @logged_in
