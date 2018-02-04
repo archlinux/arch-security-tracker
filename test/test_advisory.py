@@ -197,6 +197,13 @@ def test_edit_advisory(db, client):
     assert 1 == advisory_count()
 
 
+@logged_in
+def test_edit_advisory_not_found(db, client):
+    resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
+                       data={'workaround': 'nothing', 'impact': 'nothing'})
+    assert resp.status_code == NotFound.code
+
+
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.published)
