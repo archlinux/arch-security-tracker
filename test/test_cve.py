@@ -269,6 +269,11 @@ def test_issue_json(db, client):
     assert DEFAULT_ISSUE_ID == data['name']
 
 
+def test_issue_json_not_found(db, client):
+    resp = client.get(url_for('tracker.show_cve_json', cve=DEFAULT_ISSUE_ID, path='', suffix='.json'), follow_redirects=True)
+    assert resp.status_code == NotFound.code
+
+
 @create_issue
 @logged_in
 def test_add_cve_overwrites_existing_but_empty_cve(db, client):
