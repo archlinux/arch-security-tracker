@@ -158,3 +158,11 @@ def test_edit_requires_admin(db, client):
     resp = client.post(url_for('tracker.edit_user', username=USERNAME), follow_redirects=True,
                        data=dict(username=USERNAME, email=EMAIL, password=PASSWORD))
     assert resp.status_code == Forbidden.code
+
+
+@create_user(username=USERNAME, password=PASSWORD)
+@logged_in(role=UserRole.security_team)
+def test_list_user(db, client):
+    resp = client.get(url_for('tracker.list_user'), follow_redirects=True)
+    assert resp.status_code == 200
+    assert USERNAME in resp.data.decode()
