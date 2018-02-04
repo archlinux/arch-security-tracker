@@ -34,6 +34,12 @@ def test_login_invalid_credentials(db, client):
     assert ERROR_INVALID_USERNAME_PASSWORD in resp.data.decode()
 
 
+def test_login_invalid_form(db, client):
+    resp = client.post(url_for('tracker.login'), data={'username': DEFAULT_USERNAME})
+    assert_not_logged_in(resp, status_code=Unauthorized.code)
+    assert 'This field is required.' in resp.data.decode()
+
+
 @create_user(active=False)
 def test_login_disabled(db, client):
     resp = client.post(url_for('tracker.login'), data={'username': DEFAULT_USERNAME, 'password': DEFAULT_USERNAME})
