@@ -79,6 +79,14 @@ def test_create_duplicate_email_fails(db, client):
     assert ERROR_EMAIL_EXISTS in resp.data.decode()
 
 
+@logged_in
+def test_create_incomplete_form(db, client):
+    resp = client.post(url_for('tracker.create_user'), follow_redirects=True,
+                       data=dict(email=EMAIL, active=True))
+    assert resp.status_code == 200
+    assert 'This field is required.' in resp.data.decode()
+
+
 @create_user(username=USERNAME, password=PASSWORD)
 @logged_in
 def test_edit_user(db, client):
