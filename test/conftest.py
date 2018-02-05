@@ -6,6 +6,7 @@ from flask import url_for
 from flask_login import current_user
 
 from tracker import db as flask_db
+from tracker import advisory
 from tracker import create_app
 from tracker.advisory import advisory_get_label
 from tracker.model.advisory import Advisory
@@ -73,6 +74,21 @@ def run_scoped(app, db, client, request):
         transaction.rollback()
         connection.close()
         session.remove()
+
+
+@pytest.fixture(scope='function')
+def patch_get(monkeypatch, request):
+    status_code = 200
+    text = '<PRE>Arch Linux Security Advisory {}\n=====\nTEST\n-------------- next part --------------</PRE>'.format(DEFAULT_ADVISORY_ID)
+    if hasattr(request, 'param'):
+        if isinstance(request.param, str):
+            text = request.param
+        else:
+            status_code = request.param
+
+    def mocked_get(uri, *args, **kwargs):
+        return type('MockedReq', (), {'status_code': status_code, 'text': text})()
+    monkeypatch.setattr(advisory, 'get', mocked_get)
 
 
 def assert_logged_in(response, status_code=200):
