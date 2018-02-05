@@ -362,3 +362,9 @@ def test_advisory_html_urlize_description(db, client):
     assert 'qux <a href="/{0}">{0}</a> is'.format('AVG-1') in data
     assert 'bar <a href="{0}" rel="noopener">{0}</a> is'.format('https://foo.bar') in data
     assert 'lol <a href="/{0}">{0}</a>.'.format('CVE-1111-2222') in data
+
+
+@logged_in
+def test_advisory_delete_not_found(db, client):
+    resp = client.post(url_for('tracker.delete_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True, data=dict(confirm=True))
+    assert resp.status_code == NotFound.code
