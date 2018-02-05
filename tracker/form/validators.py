@@ -25,7 +25,6 @@ class ValidAdvisoryReference(object):
         if not form.advisory_content:
             raise ValidationError('Failed to fetch advisory')
 
-        print(advisory_regex[1:-1])
         m = search(advisory_regex[1:-1], form.advisory_content)
         if not m:
             raise ValidationError('Failed to fetch advisory')
