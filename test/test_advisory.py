@@ -254,7 +254,6 @@ def test_advisory_get_workaround_from_text_invalid(db, client):
 @create_issue(description='foo is broken and foo.')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
-@logged_in
 def test_advisory_html_replace_package_name(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
@@ -267,7 +266,6 @@ def test_advisory_html_replace_package_name(db, client):
 @create_issue(description='FoO is broken and fOO.')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
-@logged_in
 def test_advisory_html_replace_package_name_case_insensitive(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
@@ -281,7 +279,6 @@ def test_advisory_html_replace_package_name_case_insensitive(db, client):
 @create_issue(id='CVE-1234-12345', description='foo is broken and foo.')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=['CVE-1234-1234', 'CVE-1234-12345'])
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
-@logged_in
 def test_advisory_html_overlapping_cve_link(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
@@ -294,7 +291,6 @@ def test_advisory_html_overlapping_cve_link(db, client):
 @create_issue(description='crypto++ is broken and crypto++.')
 @create_group(id=DEFAULT_GROUP_ID, packages=['crypto++'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
-@logged_in
 def test_advisory_html_regex_keyword_in_package_name(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
@@ -311,7 +307,6 @@ def test_advisory_html_regex_keyword_in_package_name(db, client):
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4',
               issues=['CVE-1234-1234', 'CVE-1234-12345', 'CVE-1111-12345', 'CVE-1234-11111'])
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
-@logged_in
 def test_advisory_cve_listing_sorted_numerically(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
@@ -360,7 +355,6 @@ def test_advisory_json(db, client):
 @create_issue(id='CVE-1234-12345', description='bar https://foo.bar is broken and lol CVE-1111-2222.')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=['CVE-1234-1234', 'CVE-1234-12345'])
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
-@logged_in
 def test_advisory_html_urlize_description(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
