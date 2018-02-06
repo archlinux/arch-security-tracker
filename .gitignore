@@ -4,3 +4,4 @@ tracker.db
 .virtualenv
 .coverage
 test/coverage
+Makefile.local
