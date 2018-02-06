@@ -80,3 +80,8 @@ def atom_feed(title):
             return func(*args, **kwargs)
         return wrapped
     return decorator
+
+
+def issue_to_numeric(issue_label):
+    self_parts = issue_label.split('-')
+    return int(self_parts[1] + self_parts[2].rjust(7, '0'))

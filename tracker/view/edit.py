@@ -33,6 +33,7 @@ from tracker.user import reporter_required
 from tracker.user import security_team_required
 from tracker.user import user_can_edit_group
 from tracker.user import user_can_edit_issue
+from tracker.util import issue_to_numeric
 from tracker.util import multiline_to_list
 from tracker.view.error import forbidden
 from tracker.view.error import not_found
@@ -191,6 +192,7 @@ def edit_group(avg):
         form.bug_ticket.data = group.bug_ticket
         form.advisory_qualified.data = group.advisory_qualified and group.status is not Status.not_affected
 
+        issue_ids = sorted(issue_ids, key=issue_to_numeric)
         form.cve.data = "\n".join(issue_ids)
     if not form.validate_on_submit():
         if advisories:

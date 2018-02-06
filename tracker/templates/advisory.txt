@@ -7,7 +7,7 @@ Subject: [{{ advisory.id }}] {{ package.pkgname }}: {{ advisory.advisory_type }}
 
 Severity: {{ group.severity }}
 Date    : {{ advisory.created.strftime('%Y-%m-%d') }}
-CVE-ID  : {{ issues_listing_formatted }}
+CVE-ID  : {{ issue_listing_formatted }}
 Package : {{ package.pkgname }}
 Type    : {{ advisory.advisory_type }}
 Remote  : {%if not remote %}No{% else %}Yes{% endif %}

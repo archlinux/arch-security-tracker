@@ -9,6 +9,8 @@ from re import sub
 from requests import get
 
 from config import TRACKER_MAILMAN_URL
+from tracker.util import chunks
+from tracker.util import issue_to_numeric
 
 
 def advisory_fetch_from_mailman(url):
@@ -95,3 +97,27 @@ def advisory_get_date_label(utctimetuple=None):
 def advisory_get_label(date_label=None, number=1):
     date_label = date_label if date_label else advisory_get_date_label()
     return 'ASA-{}-{}'.format(date_label, number)
+
+
+def advisory_format_issue_listing(issues, columns=4, rjust_left=len('CVE-ID  : ')):
+    # split sorted issues into chunks
+    issue_chunks = list(chunks(sorted(issues, key=issue_to_numeric), columns))
+    # insert padding to make last chunk have uniform size
+    issue_chunks[-1].extend([None] * (len(issue_chunks[0]) - len(issue_chunks[-1])))
+    # zip all row chunks to columns
+    issue_columns = list(zip(*issue_chunks))
+    # calc max length of each column
+    issue_column_length = list(map(lambda column: max(map(len, filter(lambda e: e, column))),
+                                   issue_columns))
+    # ljust elements per column to longest element
+    issue_columns = [[element.ljust(issue_column_length[index])
+                     if element and index < len(issue_column_length) - 1
+                     else element
+                     for element in chunk]
+                     for index, chunk in enumerate(issue_columns)]
+    # zip all column chunks to rows
+    issue_chunks = zip(*issue_columns)
+    # filter out empty padding elements
+    issue_chunks = map(lambda column: filter(lambda e: e, column), issue_chunks)
+    # join each row into an own line and rjust left sides
+    return '\n{}'.format(' ' * rjust_left).join(list(map(' '.join, issue_chunks)))
