@@ -1,3 +1,5 @@
+-include Makefile.local
+
 PYTEST?=py.test
 PYTEST_OPTIONS+=-v -s
 PYTEST_INPUT?=test
