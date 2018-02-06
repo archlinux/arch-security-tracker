@@ -4,6 +4,7 @@ from flask import url_for
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
 
+from tracker.advisory import advisory_format_issue_listing
 from tracker.advisory import advisory_get_impact_from_text
 from tracker.advisory import advisory_get_label
 from tracker.advisory import advisory_get_workaround_from_text
@@ -362,3 +363,37 @@ def test_advisory_html_urlize_description(db, client):
     assert 'qux <a href="/{0}">{0}</a> is'.format('AVG-1') in data
     assert 'bar <a href="{0}" rel="noopener">{0}</a> is'.format('https://foo.bar') in data
     assert 'lol <a href="/{0}">{0}</a>.'.format('CVE-1111-2222') in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4',
+              issues=['CVE-1111-1234', 'CVE-1234-12345', 'CVE-1111-12345', 'CVE-1234-11111',
+                      'CVE-1234-11112', 'CVE-1234-123456'])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+def test_advisory_format_issue_listing_raw(db, client):
+    resp = client.get(url_for('tracker.show_generated_advisory_raw',
+                              advisory_id=DEFAULT_ADVISORY_ID),
+                      follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert 'CVE-ID  : CVE-1111-1234  CVE-1111-12345  CVE-1234-11111 CVE-1234-11112\n' + \
+           '          CVE-1234-12345 CVE-1234-123456\n' in data
+
+
+def test_advisory_format_issue_listing():
+    listing = advisory_format_issue_listing(
+        ['CVE-1111-1234', 'CVE-1111-12345', 'CVE-1234-11111', 'CVE-1234-11112',
+         'CVE-1234-12345', 'CVE-1234-123456'])
+    assert 'CVE-1111-1234  CVE-1111-12345  CVE-1234-11111 CVE-1234-11112\n          ' + \
+           'CVE-1234-12345 CVE-1234-123456' == listing
+
+
+def test_advisory_format_issue_listing_single_row():
+    listing = advisory_format_issue_listing(
+        ['CVE-1111-1234', 'CVE-1111-12345', 'CVE-1234-11111', 'CVE-1234-11112'])
+    assert 'CVE-1111-1234 CVE-1111-12345 CVE-1234-11111 CVE-1234-11112' == listing
+
+
+def test_advisory_format_issue_listing_single_issue():
+    listing = advisory_format_issue_listing(['CVE-1111-1234'])
+    assert 'CVE-1111-1234' == listing

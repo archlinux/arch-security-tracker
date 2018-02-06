@@ -15,6 +15,7 @@ from config import TRACKER_SUMMARY_LENGTH_MAX
 from tracker import db
 from tracker import tracker
 from tracker.advisory import advisory_extend_html
+from tracker.advisory import advisory_format_issue_listing
 from tracker.form.advisory import AdvisoryForm
 from tracker.model import CVE
 from tracker.model import Advisory
@@ -36,7 +37,6 @@ from tracker.user import user_can_delete_issue
 from tracker.user import user_can_edit_group
 from tracker.user import user_can_edit_issue
 from tracker.user import user_can_handle_advisory
-from tracker.util import chunks
 from tracker.util import json_response
 from tracker.util import multiline_to_list
 from tracker.view.error import not_found
@@ -515,10 +515,9 @@ def show_generated_advisory(advisory_id, raw=False):
     issues = sorted([issue for (advisory, group, package, issue) in entries])
     severity_sorted_issues = sorted(issues, key=lambda issue: issue.issue_type)
     severity_sorted_issues = sorted(severity_sorted_issues, key=lambda issue: issue.severity)
-
     remote = any([issue.remote is Remote.remote for issue in issues])
-    issues_listing_formatted = (('\n{}'.format(' ' * len('CVE-ID  : ')))
-                                .join(list(map(' '.join, chunks([issue.id for issue in issues], 4)))))
+    issue_listing_formatted = advisory_format_issue_listing([issue.id for issue in issues])
+
     link = TRACKER_ADVISORY_URL.format(advisory.id, group.id)
     upstream_released = group.affected.split('-')[0].split('+')[0] != group.fixed.split('-')[0].split('+')[0]
     upstream_version = group.fixed.split('-')[0].split('+')[0]
@@ -543,7 +542,7 @@ def show_generated_advisory(advisory_id, raw=False):
                               package=package,
                               issues=issues,
                               remote=remote,
-                              issues_listing_formatted=issues_listing_formatted,
+                              issue_listing_formatted=issue_listing_formatted,
                               link=link,
                               workaround=advisory.workaround,
                               impact=advisory.impact,

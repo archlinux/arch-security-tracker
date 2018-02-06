@@ -1,4 +1,5 @@
 from tracker import db
+from tracker.util import issue_to_numeric
 
 from .enum import Remote
 from .enum import Severity
@@ -59,8 +60,7 @@ class CVE(db.Model):
 
     @property
     def numerical_repr(self):
-        self_parts = self.id.split('-')
-        return int(self_parts[1] + self_parts[2].rjust(7, '0'))
+        return issue_to_numeric(self.id)
 
     def __gt__(self, other):
         return self.numerical_repr > other.numerical_repr
