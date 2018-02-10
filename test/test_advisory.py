@@ -439,3 +439,14 @@ def test_advisory_publish_advisory(db, client, patch_get):
                        data=dict(reference='https://archlinux.org', confirm=True))
     assert 200 == resp.status_code
     assert 'Published {}'.format(DEFAULT_ADVISORY_ID) in resp.data.decode()
+
+
+@create_issue(id='CVE-1234-1234', description='qux AVG-1 is broken and foo.')
+@create_issue(id='CVE-1234-12345', description='bar https://foo.bar is broken and lol CVE-1111-2222.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=['CVE-1234-1234', 'CVE-1234-12345'])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+def test_advisory_raw(db, client):
+    resp = client.get(url_for('tracker.show_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert 'Arch Linux Security Advisory {}'.format(DEFAULT_ADVISORY_ID) in data
