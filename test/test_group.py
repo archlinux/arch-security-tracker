@@ -1,5 +1,3 @@
-import json
-
 from flask import url_for
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
@@ -314,8 +312,9 @@ def test_forbid_delete_with_advisory(db, client):
 def test_show_group_json(db, client):
     resp = client.get(url_for('tracker.show_group_json', avg=DEFAULT_GROUP_NAME, postfix='/json'), follow_redirects=True)
     assert 200 == resp.status_code
-    data = json.loads(resp.data.decode())
+    data = resp.get_json()
     assert data['name'] == DEFAULT_GROUP_NAME
+    assert data['issues'] == [DEFAULT_ISSUE_ID]
     assert data['packages'] == ['foo']
     assert data['affected'] == '1.2.3-3'
     assert data['fixed'] == '1.2.3-4'
