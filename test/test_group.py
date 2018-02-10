@@ -1,3 +1,5 @@
+import json
+
 from flask import url_for
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
@@ -305,3 +307,19 @@ def test_delete_issue_not_found(db, client):
 def test_forbid_delete_with_advisory(db, client):
     resp = client.post(url_for('tracker.delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert Forbidden.code == resp.status_code
+
+
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+def test_show_group_json(db, client):
+    resp = client.get(url_for('tracker.show_group_json', avg=DEFAULT_GROUP_NAME, postfix='/json'), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = json.loads(resp.data.decode())
+    assert data['name'] == DEFAULT_GROUP_NAME
+    assert data['packages'] == ['foo']
+    assert data['affected'] == '1.2.3-3'
+    assert data['fixed'] == '1.2.3-4'
+
+def test_show_group_json_not_found(db, client):
+    resp = client.get(url_for('tracker.show_group_json', avg=DEFAULT_GROUP_NAME, postfix='/json'), follow_redirects=True)
+    assert NotFound.code == resp.status_code
