@@ -1,6 +1,7 @@
 from json import loads
 
 from flask import url_for
+from pytest import mark
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
 
@@ -362,3 +363,38 @@ def test_advisory_html_urlize_description(db, client):
     assert 'qux <a href="/{0}">{0}</a> is'.format('AVG-1') in data
     assert 'bar <a href="{0}" rel="noopener">{0}</a> is'.format('https://foo.bar') in data
     assert 'lol <a href="/{0}">{0}</a>.'.format('CVE-1111-2222') in data
+
+
+@mark.parametrize('patch_get', [404], indirect=True)
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_publish_advisory_not_found(db, client, patch_get):
+    resp = client.post(url_for('tracker.publish_advisory', asa=DEFAULT_ADVISORY_ID), follow_redirects=True,
+                       data=dict(reference='https://archlinux.org', confirm=True))
+    assert 200 == resp.status_code
+    assert 'Failed to fetch advisory' in resp.data.decode()
+
+
+@mark.parametrize('patch_get', ['No advisory'], indirect=True)
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_publish_advisory_text_wrong(db, client, patch_get):
+    resp = client.post(url_for('tracker.publish_advisory', asa=DEFAULT_ADVISORY_ID), follow_redirects=True,
+                       data=dict(reference='https://archlinux.org', confirm=True))
+    assert 200 == resp.status_code
+    assert 'Failed to fetch advisory' in resp.data.decode()
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_publish_advisory(db, client, patch_get):
+    resp = client.post(url_for('tracker.publish_advisory', asa=DEFAULT_ADVISORY_ID), follow_redirects=True,
+                       data=dict(reference='https://archlinux.org', confirm=True))
+    assert 200 == resp.status_code
+    assert 'Published {}'.format(DEFAULT_ADVISORY_ID) in resp.data.decode()
