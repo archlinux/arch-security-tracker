@@ -93,3 +93,9 @@ altered for customization. If some tweaking is required, simply create
 a new configuration file with a ```.local.conf``` suffix and some non
 zero prefix like ```20-user.local.conf```. Files using this suffix are
 on the ```.gitignore``` and not handled as untracked or dirty.
+
+## Contribution
+
+Help is appreciated, for some guidelines and recommendations check our
+[Contribution](https://github.com/archlinux/arch-security-tracker/blob/master/CONTRIBUTING.md)
+file.
