@@ -5,8 +5,8 @@ import pytest
 from flask import url_for
 from flask_login import current_user
 
-from tracker import db as flask_db
 from tracker import create_app
+from tracker import db as flask_db
 from tracker.advisory import advisory_get_label
 from tracker.model.advisory import Advisory
 from tracker.model.cve import CVE
