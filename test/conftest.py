@@ -38,7 +38,7 @@ def app(request):
     flask_app.config['TESTING'] = True
     flask_app.config['WTF_CSRF_ENABLED'] = False
     flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    flask_app.config['SERVER_NAME'] = 'localhost'
+    flask_app.config['SERVER_NAME'] = 'cyber.local'
     with flask_app.app_context():
         yield flask_app
 
