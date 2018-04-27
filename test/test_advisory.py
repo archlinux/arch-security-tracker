@@ -1,4 +1,3 @@
-from json import loads
 
 from flask import url_for
 from werkzeug.exceptions import Forbidden
@@ -335,7 +334,7 @@ def test_advisory_atom(db, client):
 def test_advisory_json_no_data(db, client):
     resp = client.get(url_for('tracker.advisory_json', postfix='/json'), follow_redirects=True)
     assert 200 == resp.status_code
-    data = loads(resp.data.decode())
+    data = resp.get_json()
     assert data == []
 
 
@@ -345,7 +344,7 @@ def test_advisory_json_no_data(db, client):
 def test_advisory_json(db, client):
     resp = client.get(url_for('tracker.advisory_json', postfix='/json'), follow_redirects=True)
     assert 200 == resp.status_code
-    data = loads(resp.data.decode())
+    data = resp.get_json()
     assert len(data) == 1
     assert data[0]['name'] == DEFAULT_ADVISORY_ID
     assert data[0]['group'] == DEFAULT_GROUP_NAME

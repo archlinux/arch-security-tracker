@@ -1,4 +1,3 @@
-import json
 
 from flask import url_for
 from werkzeug.exceptions import Forbidden
@@ -266,7 +265,7 @@ def test_issue_json(db, client):
     resp = client.get(url_for('tracker.show_cve_json', cve=DEFAULT_ISSUE_ID, path='', suffix='.json'), follow_redirects=True)
     assert 200 == resp.status_code
 
-    data = json.loads(resp.data)
+    data = resp.get_json()
     assert DEFAULT_ISSUE_ID == data['name']
 
 
