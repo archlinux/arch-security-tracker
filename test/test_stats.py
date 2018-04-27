@@ -1,4 +1,3 @@
-from json import loads
 
 from flask import url_for
 from werkzeug.exceptions import ImATeapot
@@ -25,7 +24,7 @@ def test_stats_data_status_empty(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
     assert data
 
     for status in [Status.vulnerable.name, Status.fixed.name, 'total']:
@@ -40,7 +39,7 @@ def test_stats_data_type_empty(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
     assert data
 
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
@@ -54,7 +53,7 @@ def test_stats_data_misc_empty(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
 
     assert data
     assert 0 == data['users']['team']
@@ -70,7 +69,7 @@ def test_stats_data_misc_users(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
 
     assert 2 == data['users']['team']
     assert 1 == data['users']['reporter']
@@ -84,7 +83,7 @@ def test_stats_data_misc_ticket(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
     assert 2 == data['tickets']['total']
 
 
@@ -109,7 +108,7 @@ def test_stats_data_status_issues(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
 
     assert 1 == data['issues']['severity']['fixed'][Severity.unknown.name]
     assert 2 == data['issues']['severity']['fixed'][Severity.low.name]
@@ -156,7 +155,7 @@ def test_stats_data_status_advisories(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
 
     assert 1 == data['advisories']['severity'][Severity.unknown.name]
     assert 1 == data['advisories']['severity'][Severity.low.name]
@@ -178,7 +177,7 @@ def test_stats_data_type_issues(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
 
     assert 1 == data['issues']['type']['fixed'][issue_types[0]]
     assert 1 == data['issues']['type']['vulnerable'][issue_types[0]]
@@ -221,7 +220,7 @@ def test_stats_data_type_advisories(db, client):
     resp = client.get(url_for('tracker.stats_json', suffix='.json'))
     assert ImATeapot.code == resp.status_code
 
-    data = loads(resp.data.decode())
+    data = resp.get_json()
 
     assert 1 == data['advisories']['type'][issue_types[0]]
     assert 1 == data['advisories']['type'][issue_types[1]]
