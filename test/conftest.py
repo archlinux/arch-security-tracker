@@ -49,9 +49,10 @@ def client(app):
 
 
 @pytest.fixture(scope="session")
-def db(request):
-    yield flask_db
-    flask_db.drop_all()
+def db(app, request):
+    with app.app_context():
+        yield flask_db
+        flask_db.drop_all()
 
 
 @pytest.fixture(autouse=True, scope='function')
