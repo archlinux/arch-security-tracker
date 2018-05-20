@@ -22,6 +22,7 @@ from .conftest import create_group
 from .conftest import create_package
 from .conftest import default_group_dict
 from .conftest import logged_in
+from .util import AssertionHTMLParser
 
 
 def set_and_assert_group_data(db, client, route, pkgnames=['foo'], issues=['CVE-1234-1234', 'CVE-2222-2222'],
@@ -147,6 +148,24 @@ def test_show_group_not_found(db, client):
 def test_edit_group_not_found(db, client):
     resp = client.get(url_for('tracker.edit_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4',
+              issues=['CVE-1111-1234', 'CVE-1234-12345', 'CVE-1111-12345',
+                      'CVE-1234-11112', 'CVE-1234-123456', 'CVE-1234-11111'])
+@logged_in
+def test_edit_sort_cve_entries(db, client):
+    resp = client.get(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert 200 == resp.status_code
+    html = AssertionHTMLParser()
+    html.feed(resp.data.decode())
+    assert ['CVE-1111-1234',
+            'CVE-1111-12345',
+            'CVE-1234-11111',
+            'CVE-1234-11112',
+            'CVE-1234-12345',
+            'CVE-1234-123456'] == html.get_element_by_id('cve').data.split()
 
 
 @logged_in
