@@ -3,5 +3,6 @@ tracker.db
 .cache
 .virtualenv
 .coverage
+.pytest_cache/
 test/coverage
 Makefile.local
