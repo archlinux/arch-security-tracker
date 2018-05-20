@@ -1,11 +1,9 @@
-dist: trusty
-
 sudo: required
 
-env: ARCH_TRAVIS_CLEAN_CHROOT=1
+services:
+- docker
 
 arch:
-
   packages:
     - python
     - python-isort
@@ -21,8 +19,8 @@ arch:
     - python-scrypt
     - pyalpm
     - sqlite
-
   script:
+    - sudo pacman -Syu --noconfirm --needed "${CONFIG_PACKAGES[@]}"
     - python3 -m py_compile $(git ls-files '*.py')
     - make test
 
