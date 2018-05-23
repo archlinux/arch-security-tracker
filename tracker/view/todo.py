@@ -155,7 +155,7 @@ def group_packages_json(item):
     entry['status'] = group.status.label
     entry['severity'] = group.severity.label
     entry['affected'] = group.affected
-    entry['packages'] = list(packages)
+    entry['packages'] = [pkg if type(pkg) == str else pkg.name for pkg in packages]
     return entry
 
 
