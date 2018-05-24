@@ -28,7 +28,6 @@ from tracker.user import user_can_edit_issue
 from tracker.user import user_can_handle_advisory
 from tracker.util import cmp_to_key
 from tracker.util import json_response
-from tracker.view.error import not_found
 
 
 def get_todo_data():
@@ -47,16 +46,20 @@ def get_todo_data():
                             .group_by(CVEGroupPackage.id)
                             .order_by(Advisory.created.desc())).all()
 
-    unhandled_advisories = (db.session.query(CVEGroup, func.group_concat(CVEGroupPackage.pkgname, ' '))
+    unhandled_advisories = (db.session.query(CVEGroup, Package)
                             .join(CVEGroupPackage)
+                            .join(Package, Package.name == CVEGroupPackage.pkgname)
                             .outerjoin(Advisory)
                             .filter(CVEGroup.advisory_qualified)
                             .filter(CVEGroup.status == Status.fixed)
                             .group_by(CVEGroup.id)
+                            .group_by(CVEGroupPackage.id)
                             .having(func.count(Advisory.id) == 0)
                             .order_by(CVEGroup.id)).all()
-    for index, item in enumerate(unhandled_advisories):
-        unhandled_advisories[index] = (item[0], item[1].split(' '))
+    unhandled_advisories_data = defaultdict(list)
+    for group, package in unhandled_advisories:
+        unhandled_advisories_data[group].append(package)
+    unhandled_advisories = [(group, packages) for group, packages in unhandled_advisories_data.items()]
     unhandled_advisories = sorted(unhandled_advisories, key=lambda item: item[0].id)
     unhandled_advisories = sorted(unhandled_advisories, key=lambda item: item[0].severity)
 
@@ -87,7 +90,7 @@ def get_todo_data():
     vulnerable_groups = (db.session.query(CVEGroup, Package)
                          .join(CVEGroupPackage).join(Package, Package.name == CVEGroupPackage.pkgname)
                          .filter(CVEGroup.status == Status.vulnerable)
-                         .filter(or_(CVEGroup.fixed is None, CVEGroup.fixed == ''))
+                         .filter(or_(CVEGroup.fixed.is_(None), CVEGroup.fixed == ''))
                          .group_by(CVEGroup.id).group_by(Package.name, Package.version)
                          .order_by(CVEGroup.created.desc())).all()
 
@@ -155,7 +158,7 @@ def group_packages_json(item):
     entry['status'] = group.status.label
     entry['severity'] = group.severity.label
     entry['affected'] = group.affected
-    entry['packages'] = list(packages)
+    entry['packages'] = [pkg.name for pkg in packages]
     return entry
 
 
@@ -166,7 +169,7 @@ def bumped_groups_json(item):
     entry['status'] = group.status.label
     entry['severity'] = group.severity.label
     entry['affected'] = group.affected
-    entry['current'] = ['{} [{}]'.format(pkg.version, pkg.database) for pkg in versions]
+    entry['current'] = dict((pkg.database, pkg.version) for pkg in versions)
     entry['packages'] = list(pkgnames)
     return entry
 
@@ -185,8 +188,6 @@ def cve_json(cve):
 @json_response
 def todo_json(postfix=None):
     data = get_todo_data()
-    if not data:
-        return not_found(json=True)
 
     json_data = OrderedDict()
     json_data['advisories'] = {

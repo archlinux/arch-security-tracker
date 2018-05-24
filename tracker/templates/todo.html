@@ -64,7 +64,7 @@ Yippie!</pre>
 						<td><a href="/{{ group.name }}">{{ group.name }}</a></td>
 						<td class="wrap">
 						{%- for pkg in pkgs %}
-							<a href="/package/{{ pkg }}" class="no-wrap">{{ pkg }}</a>{% if not loop.last %}, {% endif %}
+							<a href="/package/{{ pkg.name }}" class="no-wrap">{{ pkg.name }}</a>{% if not loop.last %}, {% endif %}
 						{%- endfor %}
 						</td>
 						<td>{{ colorize_severity(group.severity) }}</td>
