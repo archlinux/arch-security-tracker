@@ -50,8 +50,8 @@ def test_todo_json_success(db, client):
     assert data['groups']['unknown']
     assert data['groups']['bumped']
 
-    assert data['issues']['orphan_issues']
-    assert data['issues']['unknown_issues']
+    assert data['issues']['orphan']
+    assert data['issues']['unknown']
 
 
 def test_todo_json_empty(db, client):
@@ -66,8 +66,8 @@ def test_todo_json_empty(db, client):
     assert not data['groups']['unknown']
     assert not data['groups']['bumped']
 
-    assert not data['issues']['orphan_issues']
-    assert not data['issues']['unknown_issues']
+    assert not data['issues']['orphan']
+    assert not data['issues']['unknown']
 
 
 @create_issue(id='CVE-1111-1111', issue_type=issue_types[2])
@@ -172,7 +172,7 @@ def test_todo_group_bumped(db, client):
     group = next(iter(data['groups']['bumped']))
     assert DEFAULT_GROUP_NAME == group['name']
     assert ['foo'] == group['packages']
-    assert '1.2.3-4' in group['current'].values()
+    assert '1.2.3-4' in next(iter(group['versions']))['version']
 
 
 @create_issue(id='CVE-1111-1111', issue_type=issue_types[1])
@@ -192,9 +192,9 @@ def test_todo_issues_orphan(db, client):
     assert 200 == resp.status_code
 
     data = resp.get_json()
-    assert 1 == len(data['issues']['orphan_issues'])
+    assert 1 == len(data['issues']['orphan'])
 
-    issue = next(iter(data['issues']['orphan_issues']))
+    issue = next(iter(data['issues']['orphan']))
     assert 'CVE-1111-1111' == issue['name']
 
 
@@ -206,7 +206,7 @@ def test_todo_issues_referenced_not_orphan(db, client):
     assert 200 == resp.status_code
 
     data = resp.get_json()
-    assert not data['issues']['orphan_issues']
+    assert not data['issues']['orphan']
 
 
 @create_issue(id='CVE-1111-1111', issue_type=issue_types[2], remote=Remote.remote, severity=Severity.low, description='yay')
@@ -215,7 +215,7 @@ def test_todo_issues_not_unknown_with_data(db, client):
     assert 200 == resp.status_code
 
     data = resp.get_json()
-    assert not data['issues']['unknown_issues']
+    assert not data['issues']['unknown']
 
 
 @create_issue(id='CVE-1111-1111', issue_type=issue_types[0], remote=Remote.remote, severity=Severity.low, description='yay')
@@ -224,9 +224,9 @@ def test_todo_issues_unknown_without_type(db, client):
     assert 200 == resp.status_code
 
     data = resp.get_json()
-    assert 1 == len(data['issues']['unknown_issues'])
+    assert 1 == len(data['issues']['unknown'])
 
-    issue = next(iter(data['issues']['unknown_issues']))
+    issue = next(iter(data['issues']['unknown']))
     assert 'CVE-1111-1111' == issue['name']
 
 
@@ -236,9 +236,9 @@ def test_todo_issues_unknown_without_remote(db, client):
     assert 200 == resp.status_code
 
     data = resp.get_json()
-    assert 1 == len(data['issues']['unknown_issues'])
+    assert 1 == len(data['issues']['unknown'])
 
-    issue = next(iter(data['issues']['unknown_issues']))
+    issue = next(iter(data['issues']['unknown']))
     assert 'CVE-1111-1111' == issue['name']
 
 
@@ -248,9 +248,9 @@ def test_todo_issues_unknown_without_severity(db, client):
     assert 200 == resp.status_code
 
     data = resp.get_json()
-    assert 1 == len(data['issues']['unknown_issues'])
+    assert 1 == len(data['issues']['unknown'])
 
-    issue = next(iter(data['issues']['unknown_issues']))
+    issue = next(iter(data['issues']['unknown']))
     assert 'CVE-1111-1111' == issue['name']
 
 
@@ -260,7 +260,7 @@ def test_todo_issues_unknown_without_description(db, client):
     assert 200 == resp.status_code
 
     data = resp.get_json()
-    assert 1 == len(data['issues']['unknown_issues'])
+    assert 1 == len(data['issues']['unknown'])
 
-    issue = next(iter(data['issues']['unknown_issues']))
+    issue = next(iter(data['issues']['unknown']))
     assert 'CVE-1111-1111' == issue['name']

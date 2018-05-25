@@ -143,10 +143,10 @@ def advisory_json(data):
     entry = OrderedDict()
     entry['name'] = advisory.id
     entry['date'] = advisory.created.strftime('%Y-%m-%d')
-    entry['severity'] = advisory.group_package.group.severity.label
     entry['type'] = advisory.advisory_type
-    entry['fixed'] = group.fixed
+    entry['severity'] = advisory.group_package.group.severity.label
     entry['affected'] = group.affected
+    entry['fixed'] = group.fixed
     entry['package'] = package.pkgname
     return entry
 
@@ -169,18 +169,18 @@ def bumped_groups_json(item):
     entry['status'] = group.status.label
     entry['severity'] = group.severity.label
     entry['affected'] = group.affected
-    entry['current'] = dict((pkg.database, pkg.version) for pkg in versions)
+    entry['versions'] = [{'version': pkg.version, 'database': pkg.database} for pkg in versions]
     entry['packages'] = list(pkgnames)
     return entry
 
 
 def cve_json(cve):
     entry = OrderedDict()
-    entry['description'] = cve.description
     entry['name'] = cve.id
-    entry['label'] = cve.severity.label
-    entry['remote'] = cve.remote.name
     entry['type'] = cve.issue_type
+    entry['severity'] = cve.severity.label
+    entry['vector'] = cve.remote.label
+    entry['description'] = cve.description
     return entry
 
 
@@ -202,8 +202,8 @@ def todo_json(postfix=None):
     }
 
     json_data['issues'] = {
-        'orphan_issues': [cve_json(cve) for cve in data['orphan_issues']],
-        'unknown_issues': [cve_json(cve) for cve in data['unknown_issues']]
+        'orphan': [cve_json(cve) for cve in data['orphan_issues']],
+        'unknown': [cve_json(cve) for cve in data['unknown_issues']]
     }
 
     return json_data
