@@ -10,6 +10,7 @@ from tracker.model import CVE
 from tracker.model import CVEGroup
 from tracker.model import CVEGroupEntry
 from tracker.model import CVEGroupPackage
+from tracker.model import Package
 from tracker.model.enum import Affected
 from tracker.model.enum import Remote
 from tracker.model.enum import Severity
@@ -199,4 +200,22 @@ def add_group():
 
     db.session.commit()
     flash('Added {}'.format(group.name))
+
+    missing_lib32_variant(pkgnames, group)
+
     return redirect('/{}'.format(group.name))
+
+
+def missing_lib32_variant(pkgnames, group):
+    for pkgname in pkgnames:
+        if 'lib32' in pkgname:
+            continue
+
+        lib32pkg = f'lib32-{pkgname}'
+        if not Package.query.filter(Package.name == lib32pkg).first():
+            continue
+
+        if CVEGroupPackage.query.filter(CVEGroupPackage.pkgname == lib32pkg, CVEGroupPackage.group == group).first():
+            continue
+
+        flash('Missing AVG for {}'.format(lib32pkg))
