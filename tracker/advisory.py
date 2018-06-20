@@ -75,9 +75,7 @@ def advisory_get_workaround_from_text(advisory):
 
 
 def advisory_extend_html(advisory, issues, package):
-    advisory = sub('({}) '.format(escape(package.pkgname)), '<a href="/package/{0}">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(' ({})'.format(escape(package.pkgname)), ' <a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(';({})'.format(escape(package.pkgname)), ';<a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(r'(\b({0})\b)'.format(escape(package.pkgname)), '<a href="/package/{0}">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
     return advisory
 
 
