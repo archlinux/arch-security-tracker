@@ -201,21 +201,25 @@ def add_group():
     db.session.commit()
     flash('Added {}'.format(group.name))
 
-    missing_lib32_variant(pkgnames, group)
+    missing_variants(pkgnames, group)
 
     return redirect('/{}'.format(group.name))
 
 
-def missing_lib32_variant(pkgnames, group):
+def missing_variants(pkgnames, group, variants=['lib32']):
+    testpkgs = []
     for pkgname in pkgnames:
-        if 'lib32' in pkgname:
-            continue
+        for variant in variants:
+            if variant in pkgname:
+                pkg = pkgname.replace(f'{variant}-', '')
+                if pkg not in pkgnames:
+                    testpkgs.append(pkg)
+            else:
+                pkg = f'{variant}-{pkgname}'
+                if pkg not in pkgnames:
+                    testpkgs.append(pkg)
 
-        lib32pkg = f'lib32-{pkgname}'
-        if not Package.query.filter(Package.name == lib32pkg).first():
-            continue
-
-        if CVEGroupPackage.query.filter(CVEGroupPackage.pkgname == lib32pkg, CVEGroupPackage.group == group).first():
-            continue
-
-        flash('Missing AVG for {}'.format(lib32pkg))
+    package_data = Package.query.filter(Package.name.in_(testpkgs)).all()
+    for pkg in package_data:
+        if pkg not in group.packages:
+            flash('Missing AVG for {}'.format(pkg.name))

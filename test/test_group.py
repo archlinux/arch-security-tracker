@@ -251,7 +251,23 @@ def test_add_group_with_dot_in_pkgrel(db, client):
 @create_package(name='foo', version='1.2.3-4')
 @create_package(name='lib32-foo', version='1.2.3-4')
 @logged_in
-def test_add_group_mising_lib32(db, client):
+def test_add_group_missing_foo(db, client):
+    pkgnames = ['lib32-foo']
+    issues = ['CVE-1234-1234', 'CVE-2222-2222']
+    data = default_group_dict(dict(
+        cve='\n'.join(issues),
+        pkgnames='\n'.join(pkgnames),
+        ))
+
+    resp = client.post(url_for('tracker.add_group'), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert 'Missing AVG for foo' in resp.data.decode()
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_package(name='lib32-foo', version='1.2.3-4')
+@logged_in
+def test_add_group_missing_lib32(db, client):
     pkgnames = ['foo']
     issues = ['CVE-1234-1234', 'CVE-2222-2222']
     data = default_group_dict(dict(
@@ -265,8 +281,24 @@ def test_add_group_mising_lib32(db, client):
 
 
 @create_package(name='foo', version='1.2.3-4')
+@create_package(name='lib32-foo', version='1.2.3-4')
 @logged_in
-def test_add_group_mising_lib32_invalid(db, client):
+def test_add_group_missing_lib32_included(db, client):
+    pkgnames = ['foo', 'lib32-foo']
+    issues = ['CVE-1234-1234', 'CVE-2222-2222']
+    data = default_group_dict(dict(
+        cve='\n'.join(issues),
+        pkgnames='\n'.join(pkgnames),
+        ))
+
+    resp = client.post(url_for('tracker.add_group'), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert 'Missing AVG for lib32-foo' not in resp.data.decode()
+
+
+@create_package(name='foo', version='1.2.3-4')
+@logged_in
+def test_add_group_missing_lib32_invalid(db, client):
     pkgnames = ['foo']
     issues = ['CVE-1234-1234', 'CVE-2222-2222']
     data = default_group_dict(dict(
