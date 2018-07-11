@@ -14,6 +14,7 @@ from config import TRACKER_ISSUE_URL
 from config import TRACKER_SUMMARY_LENGTH_MAX
 from tracker import db
 from tracker import tracker
+from tracker.advisory import advisory_escape_html
 from tracker.advisory import advisory_extend_html
 from tracker.advisory import advisory_format_issue_listing
 from tracker.form.advisory import AdvisoryForm
@@ -494,7 +495,7 @@ def show_advisory(advisory_id, raw=False):
 
     if raw:
         return advisory.content
-    asa = advisory_extend_html(advisory.content, issues, package)
+    asa = advisory_extend_html(advisory_escape_html(advisory.content), issues, package)
     return render_html_advisory(advisory=advisory, package=package, group=group, raw_asa=asa, generated=False)
 
 
