@@ -25,6 +25,7 @@ from .conftest import DEFAULT_ISSUE_ID
 from .conftest import ERROR_LOGIN_REQUIRED
 from .conftest import advisory_count
 from .conftest import create_advisory
+from .conftest import create_advisory_content
 from .conftest import create_group
 from .conftest import create_issue
 from .conftest import create_package
@@ -232,7 +233,7 @@ def test_reporter_cant_edit_advisory(db, client):
 
 def test_advisory_get_impact_from_text(db, client):
     impact = advisory_get_impact_from_text(DEFAULT_ADVISORY_CONTENT)
-    assert 'Robots will take over' in impact
+    assert 'Robots will take over' == impact
     assert 'Impact' not in impact
     assert 'References' not in impact
 
@@ -249,9 +250,8 @@ def test_advisory_get_workaround_from_text(db, client):
 
 
 def test_advisory_get_workaround_from_text_no_workaround(db, client):
-    content = '\nWorkaround\n==========\n\nNone.\n\nDescription\n'
-    impact = advisory_get_workaround_from_text(content)
-    assert impact is None
+    workaround = advisory_get_workaround_from_text(create_advisory_content(workaround='None.'))
+    assert workaround is None
 
 
 def test_advisory_get_workaround_from_text_invalid(db, client):
@@ -450,3 +450,57 @@ def test_advisory_raw(db, client):
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert 'Arch Linux Security Advisory {}'.format(DEFAULT_ADVISORY_ID) in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1],
+                 content=create_advisory_content(description='<description>', impact='<impact>', workaround='<workaround>'))
+@logged_in
+def test_advisory_published_html_content_escaped(db, client, patch_get):
+    resp = client.get(url_for('tracker.show_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '<description>' not in data
+    assert '<impact>' not in data
+    assert '<workaround>' not in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1],
+                 content=create_advisory_content(description='<description>', impact='<impact>', workaround='<workaround>'))
+@logged_in
+def test_advisory_published_raw_content_unescaped(db, client, patch_get):
+    resp = client.get(url_for('tracker.show_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '<description>' in data
+    assert '<impact>' in data
+    assert '<workaround>' in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_issue(description='foo is broken and <snafu>.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], impact='<omg>', workaround='<uninstall>')
+def test_advisory_html_content_escaped(db, client):
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '<snafu>' not in data
+    assert '<img>' not in data
+    assert '<uninstall>' not in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_issue(description='foo is broken and <snafu>.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], impact='<omg>', workaround='<uninstall>')
+def test_advisory_raw_content_unescaped(db, client):
+    resp = client.get(url_for('tracker.show_generated_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert '<snafu>' in data
+    assert '<omg>' in data
+    assert '<uninstall>' in data

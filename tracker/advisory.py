@@ -6,6 +6,7 @@ from re import escape
 from re import search
 from re import sub
 
+from jinja2.utils import escape as html_escape
 from requests import get
 
 from config import TRACKER_MAILMAN_URL
@@ -49,29 +50,42 @@ def advisory_fetch_reference_url_from_mailman(advisory):
         return None
 
 
-def advisory_get_impact_from_text(advisory):
-    start = '\nImpact\n======\n\n'
-    end = '\n\nReferences\n'
+def advisory_get_section_from_text(advisory, start, end):
     if start not in advisory or end not in advisory:
         return None
     start_index = advisory.index(start)
     end_index = advisory.index(end)
-    impact = advisory[start_index + len(start):end_index]
-    impact = sub('([^.\n])\\n', '\\1 ', impact)
-    return impact
+    section = advisory[start_index + len(start):end_index]
+    return section
+
+
+def advisory_get_impact_from_text(advisory):
+    start = '\nImpact\n======\n\n'
+    end = '\n\nReferences\n==========\n\n'
+    impact = advisory_get_section_from_text(advisory, start, end)
+    if not impact:
+        return None
+    return sub('([^.\n])\\n', '\\1 ', impact)
 
 
 def advisory_get_workaround_from_text(advisory):
     start = '\nWorkaround\n==========\n\n'
-    end = '\n\nDescription\n'
-    if start not in advisory or end not in advisory:
-        return None
-    start_index = advisory.index(start)
-    end_index = advisory.index(end)
-    workaround = advisory[start_index + len(start):end_index]
+    end = '\n\nDescription\n===========\n\n'
+    workaround = advisory_get_section_from_text(advisory, start, end)
     if 'None.' == workaround:
         return None
     return workaround
+
+
+def advisory_escape_html(advisory):
+    start = '\nWorkaround\n==========\n\n'
+    end = '\n\nReferences\n==========\n\n'
+    if start not in advisory or end not in advisory:
+        return None
+    start_index = advisory.index(start) + len(start)
+    end_index = advisory.index(end)
+    advisory = advisory[:start_index] + html_escape(advisory[start_index:end_index]) + advisory[end_index:]
+    return advisory
 
 
 def advisory_extend_html(advisory, issues, package):

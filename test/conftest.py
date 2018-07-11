@@ -259,9 +259,32 @@ def create_group(func=None, id=None, status=None, severity=None,
     return decorator(func)
 
 
+def create_advisory_content(description='SNAFU', impact='Robots will take over', workaround='Update your machine', references=''):
+    return f"""
+Workaround
+==========
+
+{workaround}
+
+Description
+===========
+
+{description}
+
+Impact
+======
+
+{impact}
+
+References
+==========
+
+{references}
+"""
+
+
 DEFAULT_ADVISORY_ID = advisory_get_label()
-DEFAULT_ADVISORY_CONTENT = """\nImpact\n======\n\nRobots will take over\n\nReferences\n'
-                              \nWorkaround\n==========\n\nUpdate your machine\n\nDescription\n"""
+DEFAULT_ADVISORY_CONTENT = create_advisory_content()
 
 
 def create_advisory(func=None, id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=None,
