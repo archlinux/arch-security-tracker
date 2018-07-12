@@ -1,7 +1,7 @@
 -include Makefile.local
 
 PYTEST?=py.test
-PYTEST_OPTIONS+=-v -s
+PYTEST_OPTIONS+=-s
 PYTEST_INPUT?=test
 PYTEST_COVERAGE_OPTIONS+=--cov-report=term-missing --cov-report=html:test/coverage --cov=tracker
 PYTEST_PDB?=0
