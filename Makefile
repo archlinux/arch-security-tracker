@@ -4,10 +4,19 @@ PYTEST?=py.test
 PYTEST_OPTIONS+=-v -s
 PYTEST_INPUT?=test
 PYTEST_COVERAGE_OPTIONS+=--cov-report=term-missing --cov-report=html:test/coverage --cov=tracker
+PYTEST_PDB?=0
+PYTEST_PDB_OPTIONS?=--pdb --pdbcls=IPython.terminal.debugger:TerminalPdb
 
 ISORT?=isort
 ISORT_OPTIONS+=--recursive
 ISORT_CHECK_OPTIONS+=--check-only --diff
+
+ifeq (${PYTEST_PDB},1)
+PYTEST_OPTIONS+= ${PYTEST_PDB_OPTIONS}
+else
+test-pdb: PYTEST_OPTIONS+= ${PYTEST_PDB_OPTIONS}
+endif
+test-pdb: test
 
 .PHONY: update test
 
