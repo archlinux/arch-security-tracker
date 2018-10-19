@@ -1,8 +1,8 @@
 from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import event
-from sqlalchemy import Engine
 from sqlalchemy import pool
+from sqlalchemy.engine import Engine
 from logging.config import fileConfig
 import logging
 
