@@ -90,7 +90,7 @@
 {%- endmacro -%}
 
 {%- macro boolean_value(value, default='Unknown') -%}
-	{%- if value == None -%}
+	{%- if value is none -%}
 		{{ default }}
 	{%- elif value -%}
 		Yes
