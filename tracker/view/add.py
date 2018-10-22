@@ -120,13 +120,15 @@ def add_cve():
 
         return redirect('/{}'.format(cve.id))
 
-    cve = db.create(CVE, id=form.cve.data)
+    cve = CVE()
+    cve.id = form.cve.data
     cve.issue_type = form.issue_type.data
     cve.description = form.description.data
     cve.severity = Severity.fromstring(form.severity.data)
     cve.remote = Remote.fromstring(form.remote.data)
     cve.reference = form.reference.data
     cve.notes = form.notes.data
+    db.session.add(cve)
     db.session.commit()
     flash('Added {}'.format(cve.id))
     return redirect('/{}'.format(cve.id))
@@ -190,7 +192,6 @@ def add_group():
                       notes=form.notes.data,
                       severity=severity,
                       advisory_qualified=advisory_qualified)
-    db.session.commit()
 
     for cve in existing_issues:
         db.create(CVEGroupEntry, group=group, cve=cve)

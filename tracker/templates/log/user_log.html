@@ -1,0 +1,21 @@
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import boolean_value, colorize_diff, render_pagination, log_transaction_header -%}
+{% block content %}
+			<h1>{{ username }} - log</h1>
+			{{ render_pagination(pagination) }}
+			{%- for log in pagination.items %}
+			{%- set transaction = log[0] -%}
+			{%- set issue = log[1] -%}
+			{%- set group = log[2] -%}
+			{%- set advisory = log[3] -%}
+			{%- if group.__class__.__name__ == 'CVEGroupVersion' %}
+{% include 'log/group_log_table.html' %}
+			{%- endif -%}
+			{%- if issue.__class__.__name__ == 'CVEVersion' %}
+{% include 'log/cve_log_table.html' %}
+			{%- endif -%}
+			{%- if advisory.__class__.__name__ == 'AdvisoryVersion' %}
+{% include 'log/advisory_log_table.html' %}
+			{%- endif -%}
+			{%- endfor %}
+{%- endblock %}

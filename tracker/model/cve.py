@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from tracker import db
 from tracker.util import issue_to_numeric
 
@@ -46,7 +48,9 @@ class CVE(db.Model):
     REFERENCES_LENGTH = 4096
     NOTES_LENGTH = 4096
 
+    __versioned__ = {}
     __tablename__ = 'cve'
+
     id = db.Column(db.String(15), index=True, unique=True, primary_key=True)
     issue_type = db.Column(db.String(64), default='unknown')
     description = db.Column(db.String(DESCRIPTION_LENGTH))
@@ -54,6 +58,18 @@ class CVE(db.Model):
     remote = db.Column(Remote.as_type(), nullable=False, default=Remote.unknown)
     reference = db.Column(db.String(REFERENCES_LENGTH))
     notes = db.Column(db.String(NOTES_LENGTH))
+    created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+    changed = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
+
+    @staticmethod
+    def new(id):
+        return CVE(id=id,
+                   issue_type='unknown',
+                   description='',
+                   severity=Severity.unknown,
+                   remote=Remote.unknown,
+                   reference='',
+                   notes='')
 
     def __repr__(self):
         return '{}'.format(self.id)

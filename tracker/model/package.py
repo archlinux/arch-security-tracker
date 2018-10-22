@@ -8,6 +8,7 @@ from tracker.util import cmp_to_key
 
 class Package(db.Model):
     __tablename__ = 'package'
+
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
     name = db.Column(db.String(96), index=True, nullable=False)
     base = db.Column(db.String(96), index=True, nullable=False)

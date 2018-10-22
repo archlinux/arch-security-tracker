@@ -1,6 +1,9 @@
+from difflib import ndiff
 from re import sub
 
 from flask import Blueprint
+from flask import request
+from flask import url_for
 from jinja2.filters import do_urlize
 from jinja2.filters import evalcontextfilter
 from jinja2.utils import Markup
@@ -10,6 +13,7 @@ from jinja2.utils import escape
 
 from tracker.model.cve import cve_id_regex
 from tracker.model.cvegroup import vulnerability_group_regex
+from tracker.util import issue_to_numeric
 
 blueprint = Blueprint('filters', __name__)
 
@@ -67,3 +71,27 @@ def urlize(ctx, text, trim_url_limit=None, rel=None, target=None):
 
     text = do_urlize(ctx, text, trim_url_limit=trim_url_limit, target=target, rel=rel)
     return text
+
+
+@blueprint.app_template_filter()
+def diff(previous, current):
+    # handle None explicitly to allow diff of False against True
+    return ndiff(str(previous).splitlines() if previous is not None else '',
+                 str(current).splitlines() if current is not None else '')
+
+
+@blueprint.app_template_filter()
+def issuesort(issues):
+    return sorted(issues, key=issue_to_numeric)
+
+
+@blueprint.app_template_global()
+def url_for_page(page):
+    args = request.view_args.copy()
+    args['page'] = page
+    return url_for(request.endpoint, **args)
+
+
+@blueprint.app_template_global()
+def diff_content(model, field):
+    return field if model.operation_type != 2 else None

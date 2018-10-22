@@ -1,0 +1,25 @@
+			<table class="styled-table column-major full size">
+				<thead>
+					<tr>
+						<th colspan="2">{{ log_transaction_header(advisory, can_watch_user_log) }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{%- if advisory.workaround_mod %}
+					<tr>
+						<td>Workaround</td>
+						<td class="full size">
+							{{- colorize_diff(advisory.previous.workaround, diff_content(advisory, advisory.workaround)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if advisory.impact_mod %}
+					<tr>
+						<td>Impact</td>
+						<td class="full size">
+							{{- colorize_diff(advisory.previous.impact, diff_content(advisory, advisory.impact)) }}
+						</td>
+					</tr>
+					{%- endif %}
+				</tbody>
+			</table>

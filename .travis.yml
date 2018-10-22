@@ -11,6 +11,7 @@ arch:
     - python-pytest
     - python-pytest-cov
     - python-sqlalchemy
+    - python-sqlalchemy-continuum
     - python-flask
     - python-flask-sqlalchemy
     - python-flask-wtf

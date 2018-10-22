@@ -138,9 +138,7 @@ h3 {
 	margin: 0.75em 0;
 }
 
-h1 a,
-h2 a,
-h3 a {
+h1 a {
 	font-size: 0.45em;
 	line-height: 0.45em;
 }
@@ -624,4 +622,40 @@ form .errors {
 
 .align-right {
 	text-align: right;
+}
+
+.unselectable {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.diff {
+	margin: 0;
+}
+
+.diff tr, .diff td {
+	border: 0 !important;
+}
+
+.diff td {
+	padding-bottom: 0;
+	padding-top: 0;
+	padding-right: 0em;
+}
+
+table.diff tr td:first-child {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.pagination {
+	margin: 1em 0;
 }

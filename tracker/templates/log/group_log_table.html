@@ -1,0 +1,89 @@
+			<table class="styled-table column-major full size">
+				<thead>
+					<tr>
+						<th colspan="2">{{ log_transaction_header(group, can_watch_user_log) }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{%- if (group.packages or group.previous.packages) and group.packages != group.previous.packages %}
+					<tr>
+						<td>Packages</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.packages|map(attribute='pkgname')|sort|join('\n'), group.packages|map(attribute='pkgname')|sort|join('\n')) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if (group.issues or group.previous.issues) and group.issues != group.previous.issues %}
+					<tr>
+						<td>Issues</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.issues|map(attribute='cve_id')|issuesort|join('\n'), group.issues|map(attribute='cve_id')|issuesort|join('\n')) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.status_mod %}
+					<tr>
+						<td>Status</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.status, diff_content(group, group.status)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.severity_mod %}
+					<tr>
+						<td>Severity</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.severity, diff_content(group, group.severity)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.affected_mod %}
+					<tr>
+						<td>Affected</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.affected, diff_content(group, group.affected)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.fixed_mod %}
+					<tr>
+						<td>Fixed</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.fixed, diff_content(group, group.fixed)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.bug_ticket_mod %}
+					<tr>
+						<td>Ticket</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.bug_ticket, diff_content(group, group.bug_ticket)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.advisory_qualified_mod %}
+					<tr>
+						<td>Advisory qualified</td>
+						<td class="full size">
+							{{- colorize_diff(boolean_value(group.previous.advisory_qualified|default(None), ''), diff_content(group, boolean_value(group.advisory_qualified))) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.reference_mod %}
+					<tr>
+						<td>References</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.reference, diff_content(group, group.reference)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if group.notes_mod %}
+					<tr>
+						<td>Notes</td>
+						<td class="full size">
+							{{- colorize_diff(group.previous.notes, diff_content(group, group.notes)) }}
+						</td>
+					</tr>
+					{%- endif %}
+				</tbody>
+			</table>

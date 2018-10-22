@@ -7,8 +7,12 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from sqlalchemy import event
+from sqlalchemy import orm
 from sqlalchemy.engine import Engine
 from sqlalchemy.sql.expression import ClauseElement
+from sqlalchemy_continuum import make_versioned
+from sqlalchemy_continuum.plugins import FlaskPlugin
+from sqlalchemy_continuum.plugins import PropertyModTrackerPlugin
 from werkzeug.routing import BaseConverter
 
 from config import FLASK_SESSION_PROTECTION
@@ -75,6 +79,7 @@ db.get = MethodType(db_get, db)
 db.create = MethodType(db_create, db)
 db.get_or_create = MethodType(db_get_or_create, db)
 
+make_versioned(plugins=[FlaskPlugin(), PropertyModTrackerPlugin()])
 migrate = Migrate(db=db, directory=SQLALCHEMY_MIGRATE_REPO)
 talisman = Talisman(strict_transport_security=FLASK_STRICT_TRANSPORT_SECURITY)
 login_manager = LoginManager()
@@ -87,6 +92,7 @@ def create_app(script_info=None):
 
     db.init_app(app)
     migrate.init_app(app)
+    orm.configure_mappers()
 
     talisman.init_app(app,
                       force_https=False,

@@ -1,0 +1,57 @@
+			<table class="styled-table column-major full size">
+				<thead>
+					<tr>
+						<th colspan="2">{{ log_transaction_header(issue, can_watch_user_log) }}</th>
+					</tr>
+				</thead>
+				<tbody>
+					{%- if issue.severity_mod %}
+					<tr>
+						<td>Severity</td>
+						<td class="full size">
+							{{- colorize_diff(issue.previous.severity, diff_content(issue, issue.severity)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if issue.remote_mod %}
+					<tr>
+						<td>Remote</td>
+						<td class="full size">
+							{{- colorize_diff(issue.previous.remote, diff_content(issue, issue.remote)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if issue.issue_type_mod %}
+					<tr>
+						<td>Type</td>
+						<td class="full size">
+							{{- colorize_diff(issue.previous.issue_type|capitalize, diff_content(issue, issue.issue_type|capitalize)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if issue.description_mod %}
+					<tr>
+						<td>Description</td>
+						<td class="full size">
+							{{- colorize_diff(issue.previous.description, diff_content(issue, issue.description)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if issue.reference_mod %}
+					<tr>
+						<td>References</td>
+						<td class="full size">
+							{{- colorize_diff(issue.previous.reference, diff_content(issue, issue.reference)) }}
+						</td>
+					</tr>
+					{%- endif %}
+					{%- if issue.notes_mod %}
+					<tr>
+						<td>Notes</td>
+						<td class="full size">
+							{{- colorize_diff(issue.previous.notes, diff_content(issue, issue.notes)) }}
+						</td>
+					</tr>
+					{%- endif %}
+				</tbody>
+			</table>
