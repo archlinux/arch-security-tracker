@@ -6,11 +6,14 @@ from flask import render_template
 from flask_login import current_user
 from jinja2.utils import escape
 from sqlalchemy import and_
+from sqlalchemy_continuum import version_class
+from sqlalchemy_continuum import versioning_manager
 
 from config import TRACKER_ADVISORY_URL
 from config import TRACKER_BUGTRACKER_URL
 from config import TRACKER_GROUP_URL
 from config import TRACKER_ISSUE_URL
+from config import TRACKER_LOG_ENTRIES_PER_PAGE
 from config import TRACKER_SUMMARY_LENGTH_MAX
 from tracker import db
 from tracker import tracker
@@ -38,6 +41,8 @@ from tracker.user import user_can_delete_issue
 from tracker.user import user_can_edit_group
 from tracker.user import user_can_edit_issue
 from tracker.user import user_can_handle_advisory
+from tracker.user import user_can_watch_log
+from tracker.user import user_can_watch_user_log
 from tracker.util import json_response
 from tracker.util import multiline_to_list
 from tracker.view.error import not_found
@@ -184,8 +189,23 @@ def show_cve(cve, path=None):
                            groups=data['groups'],
                            group_packages=data['group_packages'],
                            advisories=advisories,
+                           can_watch_log=user_can_watch_log(),
                            can_edit=user_can_edit_issue(advisories),
                            can_delete=user_can_delete_issue(advisories))
+
+
+@tracker.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve>/log'.format(cve_id_regex[1:-1]), methods=['GET'])
+def show_cve_log(cve, path=None):
+    data = get_cve_data(cve)
+    if not data:
+        return not_found()
+
+    title = '{} - log'.format(data['issue'].id)
+
+    return render_template('log/cve_log.html',
+                           title=title,
+                           issue=data['issue'],
+                           can_watch_user_log=user_can_watch_user_log())
 
 
 def get_group_data(avg):
@@ -305,7 +325,8 @@ def show_group(avg):
                            advisories_pending=data['advisories_pending'],
                            can_edit=user_can_edit_group(advisories),
                            can_delete=user_can_delete_group(advisories),
-                           can_handle_advisory=user_can_handle_advisory())
+                           can_handle_advisory=user_can_handle_advisory(),
+                           can_watch_log=user_can_watch_log())
 
 
 def get_package_data(pkgname):
@@ -364,6 +385,24 @@ def get_package_data(pkgname):
         'issues': issues,
         'advisories': advisories
     }
+
+
+@tracker.route('/group/<regex("{}"):avg>/log'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/avg/<regex("{}"):avg>/log'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/<regex("{}"):avg>/log'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+def show_group_log(avg):
+    data = get_group_data(avg)
+    if not data:
+        return not_found(json=True)
+
+    group = data['group']
+
+    return render_template('log/group_log.html',
+                           title='{} - log'.format(group),
+                           group=group,
+                           Status=Status,
+                           advisories_pending=data['advisories_pending'],
+                           can_watch_user_log=user_can_watch_user_log())
 
 
 @tracker.route('/package/<regex("{}"):pkgname><regex("[./]json"):suffix>'.format(pkgname_regex[1:-1]), methods=['GET'])
@@ -569,3 +608,46 @@ def show_generated_advisory(advisory_id, raw=False):
     raw_asa = str(escape(raw_asa))
     raw_asa = advisory_extend_html(raw_asa, issues, package)
     return render_html_advisory(advisory=advisory, package=package, group=group, raw_asa=raw_asa, generated=True)
+
+
+@tracker.route('/advisory/<regex("{}"):advisory_id>/log'.format(advisory_regex[1:-1]), methods=['GET'])
+@tracker.route('/<regex("{}"):advisory_id>/log'.format(advisory_regex[1:-1]), methods=['GET'])
+def show_advisory_log(advisory_id, path=None):
+    advisory = (db.session.query(Advisory)
+                .filter(Advisory.id == advisory_id)
+                ).first()
+    if not advisory:
+        return not_found()
+
+    return render_template('log/advisory_log.html',
+                           title='{} - log'.format(advisory_id),
+                           advisory=advisory,
+                           can_watch_user_log=user_can_watch_user_log())
+
+
+# TODO: define permission to view this
+@tracker.route('/log', defaults={'page': 1}, methods=['GET'])
+@tracker.route('/log/page/<int:page>', methods=['GET'])
+def show_log(page=1):
+    Transaction = versioning_manager.transaction_cls
+    VersionClassCVE = version_class(CVE)
+    VersionClassGroup = version_class(CVEGroup)
+    VersionClassAdvisory = version_class(Advisory)
+
+    pagination = (db.session.query(Transaction, VersionClassCVE, VersionClassGroup, VersionClassAdvisory)
+                  .outerjoin(VersionClassCVE, Transaction.id == VersionClassCVE.transaction_id)
+                  .outerjoin(VersionClassGroup, Transaction.id == VersionClassGroup.transaction_id)
+                  .outerjoin(VersionClassAdvisory, Transaction.id == VersionClassAdvisory.transaction_id)
+                  .order_by(Transaction.issued_at.desc())
+                  .filter((VersionClassCVE.transaction_id) |
+                          (VersionClassGroup.transaction_id) |
+                          (VersionClassAdvisory.transaction_id))
+                  ).paginate(page, TRACKER_LOG_ENTRIES_PER_PAGE, True)
+
+    return render_template('log/log.html',
+                           title=f'Log',
+                           can_watch_user_log=user_can_watch_user_log(),
+                           pagination=pagination,
+                           CVE=CVE,
+                           CVEGroup=CVEGroup,
+                           Advisory=Advisory)

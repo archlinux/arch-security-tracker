@@ -16,7 +16,7 @@
 				<tbody>
 					{%- for user in users %}
 					<tr>
-						<td>{{ user.name }}</td>
+						<td><a href="/user/{{ user.name }}/log">{{ user.name }}</a></td>
 						<td><a href="mailto:{{ user.email }}">{{ user.email }}</a></td>
 						<td>{{ user.role }}</td>
 						{%- if current_user.role.is_administrator %}

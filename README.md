@@ -19,6 +19,7 @@ vulnerability details and generating security advisories.
 
 * python >= 3.4
 * python-sqlalchemy
+* python-sqlalchemy-continuum
 * python-flask
 * python-flask-sqlalchemy
 * python-flask-talisman

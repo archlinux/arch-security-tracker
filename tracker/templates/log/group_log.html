@@ -1,0 +1,9 @@
+{%- extends "base.html" -%}
+{%- from "_formhelpers.html" import colorize_diff, log_transaction_header, boolean_value -%}
+{% block content %}
+			<h1>{{ group.name }} - log
+			<a href="/{{  group.name }}" accesskey="b">back</a></h1>
+			{%- for group in group.versions|reverse %}
+{% include 'log/group_log_table.html' %}
+			{%- endfor %}
+{%- endblock %}

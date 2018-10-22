@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 from itertools import chain
 
 from flask import flash
@@ -155,8 +156,10 @@ def edit_cve(cve):
                 issue_type = 'multiple issues' if len(issue_types) > 1 else next(iter(issue_types))
                 advisory.advisory_type = issue_type
 
+    if db.session.is_modified(cve):
+        flash('Edited {}'.format(cve.id))
+
     db.session.commit()
-    flash('Edited {}'.format(cve.id))
     return redirect('/{}'.format(cve.id))
 
 
@@ -221,33 +224,37 @@ def edit_group(avg):
     issues_removed = set(filter(lambda issue: issue not in cve_ids, issue_ids))
     issues_added = set(filter(lambda issue: issue not in issue_ids, cve_ids))
     issues_final = set(filter(lambda issue: issue.id not in issues_removed, issues))
+    issues_changed = any(issues_added) or any(issues_removed)
 
-    if issues_removed:
-        (db.session.query(CVEGroupEntry)
-         .filter(CVEGroupEntry.group_id == group.id).filter(CVEGroupEntry.cve_id.in_(issues_removed))
-         .delete(synchronize_session=False))
-        for removed in issues_removed:
-            flash('Removed {}'.format(removed))
+    # remove old issues
+    for issue in filter(lambda issue: issue.cve_id in issues_removed, list(group.issues)):
+        group.issues.remove(issue)
+        flash('Removed {}'.format(issue.cve_id))
 
+    # add new issues
     severities = [issue.severity for issue in list(filter(lambda issue: issue.id not in issues_removed, issues))]
     for cve_id in issues_added:
-        cve = db.get_or_create(CVE, id=cve_id)
+        # TODO check if we can avoid this by the latter append call
+        cve = db.get(CVE, id=cve_id)
+        if not cve:
+            cve = CVE.new(id=cve_id)
         db.get_or_create(CVEGroupEntry, group=group, cve=cve)
+        flash('Added {}'.format(cve.id))
+
         severities.append(cve.severity)
         issues_final.add(cve)
-        flash('Added {}'.format(cve.id))
     group.severity = highest_severity(severities)
 
     pkgnames_removed = set(filter(lambda pkgname: pkgname not in pkgnames_edited, pkgnames))
     pkgnames_added = set(filter(lambda pkgname: pkgname not in pkgnames, pkgnames_edited))
+    pkgnames_changed = any(pkgnames_removed) or any(pkgnames_added)
 
-    if pkgnames_removed:
-        (db.session.query(CVEGroupPackage)
-         .filter(CVEGroupPackage.group_id == group.id).filter(CVEGroupPackage.pkgname.in_(pkgnames_removed))
-         .delete(synchronize_session=False))
-        for removed in pkgnames_removed:
-            flash('Removed {}'.format(removed))
+    # remove old packages
+    for pkg in filter(lambda pkg: pkg.pkgname in pkgnames_removed, list(group.packages)):
+        group.packages.remove(pkg)
+        flash('Removed {}'.format(pkg.pkgname))
 
+    #  add new packages
     for pkgname in pkgnames_added:
         db.get_or_create(CVEGroupPackage, pkgname=pkgname, group=group)
         flash('Added {}'.format(pkgname))
@@ -259,6 +266,10 @@ def edit_group(avg):
         issue_type = 'multiple issues' if len(set([issue.issue_type for issue in issues_final])) > 1 else next(iter(issues_final)).issue_type
         advisory.advisory_type = issue_type
 
+    # update changed date on modification
+    if pkgnames_changed or issues_changed or db.session.is_modified(group):
+        group.changed = datetime.utcnow()
+        flash('Edited {}'.format(group.name))
+
     db.session.commit()
-    flash('Edited {}'.format(group.name))
     return redirect('/{}'.format(group.name))

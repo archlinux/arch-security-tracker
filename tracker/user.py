@@ -91,6 +91,14 @@ def user_can_handle_advisory():
     return current_user.role.is_security_team
 
 
+def user_can_watch_log():
+    return True
+
+
+def user_can_watch_user_log():
+    return current_user.role.is_reporter
+
+
 def user_invalidate(user):
     user.token = None
     user.is_authenticated = False

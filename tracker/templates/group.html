@@ -2,9 +2,10 @@
 {%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, colorize_remote, colorize_unknown, bug_ticket -%}
 {% block content %}
 			<h1>{{ group.name }}
-			{%- if can_edit %} <a href="/{{  group.name }}/edit" accesskey="e">edit</a>{% endif %}
-			{%- if can_edit %} <a href="/{{  group.name }}/copy" accesskey="c">copy</a>{% endif %}
-			{%- if can_delete %} <a href="/{{  group.name }}/delete" accesskey="d">delete</a>{% endif %}</h1>
+			{%- if can_watch_log %} <a href="/{{ group.name }}/log" accesskey="l">log</a>{% endif %}
+			{%- if can_edit %} <a href="/{{ group.name }}/edit" accesskey="e">edit</a>{% endif %}
+			{%- if can_edit %} <a href="/{{ group.name }}/copy" accesskey="c">copy</a>{% endif %}
+			{%- if can_delete %} <a href="/{{ group.name }}/delete" accesskey="d">delete</a>{% endif %}</h1>
 			<table class="styled-table column-major full size">
 				<tbody>
 					<tr>
