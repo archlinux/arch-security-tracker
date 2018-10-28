@@ -258,6 +258,11 @@ def test_advisory_get_workaround_from_text_invalid(db, client):
     assert advisory_get_workaround_from_text('test') is None
 
 
+def test_generated_advisory_not_found(db, client):
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert NotFound.code == resp.status_code
+
+
 @create_package(name='foo', version='1.2.3-4')
 @create_issue(description='foo is broken and foo.')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
@@ -450,6 +455,12 @@ def test_advisory_raw(db, client):
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert 'Arch Linux Security Advisory {}'.format(DEFAULT_ADVISORY_ID) in data
+
+
+@logged_in
+def test_show_advisory_not_found(db, client, patch_get):
+    resp = client.get(url_for('tracker.show_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert NotFound.code == resp.status_code
 
 
 @create_package(name='foo', version='1.2.3-4')
