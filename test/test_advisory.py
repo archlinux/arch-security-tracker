@@ -524,3 +524,18 @@ def test_advisory_raw_content_unescaped(db, client):
     assert '<snafu>' in data
     assert '<omg>' in data
     assert '<uninstall>' in data
+
+
+@logged_in
+def test_delete_advisory_not_found(db, client):
+    resp = client.get(url_for('tracker.delete_advisory', advisory_id=9999), follow_redirects=True)
+    assert NotFound.code == resp.status_code
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], publication=Publication.published)
+@logged_in
+def test_delete_advisory_published(db, client):
+    resp = client.get(url_for('tracker.delete_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert Forbidden.code == resp.status_code
