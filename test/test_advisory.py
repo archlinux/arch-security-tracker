@@ -58,6 +58,15 @@ def test_schedule_advisory(db, client):
     assert 1 == advisory_count()
 
 
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@logged_in
+def test_schedule_advisory_invalid(db, client):
+    resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), data={'advisory_type': 'fooo'})
+    assert 302 == resp.status_code
+    assert url_for('tracker.show_group', avg=DEFAULT_GROUP_NAME, _external=True) == resp.location
+
+
 @create_package(name='foo', base='yay', version='1.2.3-4')
 @create_package(name='foo2', base='yay', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foo', 'foo2'], affected='1.2.3-3', fixed='1.2.3-4')
