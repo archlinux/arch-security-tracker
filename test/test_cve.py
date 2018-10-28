@@ -165,6 +165,15 @@ def test_reporter_can_edit(db, client):
 
 @create_issue
 @logged_in(role=UserRole.reporter)
+def test_edit_cve_invalid(db, client):
+    data = {'description': 'LOLWUT'}
+    resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert 'Edit {}'.format(DEFAULT_ISSUE_ID) in resp.data.decode()
+
+
+@create_issue
+@logged_in(role=UserRole.reporter)
 def test_reporter_can_delete(db, client):
     resp = client.post(url_for('tracker.delete_issue', issue=DEFAULT_ISSUE_ID), follow_redirects=True,
                        data=dict(confirm=True))
