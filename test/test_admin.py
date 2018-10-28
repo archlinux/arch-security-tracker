@@ -50,6 +50,15 @@ def test_delete_user_not_found(db, client):
     assert resp.status_code == NotFound.code
 
 
+@create_user(username=USERNAME, password=PASSWORD, role=UserRole.administrator)
+@logged_in
+def test_delete_form_invalid(db, client):
+    resp = client.post(url_for('tracker.delete_user', username=USERNAME),
+                       data=dict())
+    assert resp.status_code == 302
+    assert resp.location == url_for('tracker.list_user', _external=True)
+
+
 @logged_in
 def test_create_user(db, client):
     role = UserRole.security_team
@@ -125,6 +134,14 @@ def test_edit_user(db, client):
     assert USERNAME == current_user.name
     assert new_email == current_user.email
     assert new_role == current_user.role
+
+
+@create_user(username=USERNAME, password=PASSWORD)
+@logged_in
+def test_get_edit_user(db, client):
+    resp = client.get(url_for('tracker.edit_user', username=USERNAME), follow_redirects=True)
+    assert resp.status_code == 200
+    assert 'Edit {}'.format(USERNAME) in resp.data.decode()
 
 
 @create_user(username=USERNAME, password=PASSWORD)
