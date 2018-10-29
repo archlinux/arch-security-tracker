@@ -12,6 +12,7 @@ class User(db.Model):
     SALT_LENGTH = 20
     PASSWORD_LENGTH = 80
     TOKEN_LENGTH = 120
+    OTP_TOKEN_LENGTH = 16
 
     __tablename__ = 'user'
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
@@ -22,9 +23,12 @@ class User(db.Model):
     token = db.Column(db.String(TOKEN_LENGTH), index=True, unique=True, nullable=True)
     role = db.Column(UserRole.as_type(), nullable=False, default=UserRole.reporter)
     active = db.Column(db.Boolean(), nullable=False, default=True)
+    otp_token = db.Column(db.String(OTP_TOKEN_LENGTH), index=True, nullable=True)
 
     is_authenticated = False
     is_anonymous = False
+
+    first_time_login_otp = False
 
     @property
     def is_active(self):

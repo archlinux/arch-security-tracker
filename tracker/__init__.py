@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
+from flask_qrcode import QRcode
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.sql.expression import ClauseElement
@@ -66,7 +67,8 @@ csp = {
     'default-src': '\'self\'',
     'style-src': '\'self\'',
     'font-src': '\'self\'',
-    'form-action': '\'self\''
+    'form-action': '\'self\'',
+    'img-src': 'data:'
 }
 
 db = SQLAlchemy()
@@ -86,6 +88,7 @@ def create_app(script_info=None):
 
     db.init_app(app)
     migrate.init_app(app)
+    QRcode(app)
 
     talisman.init_app(app,
                       force_https=False,
