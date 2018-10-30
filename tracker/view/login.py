@@ -60,8 +60,8 @@ def two_factor():
                                title='Two Factor Login',
                                User=User,
                                form=form,
-                               display_qr=current_user.first_time_login_otp,
-                               otp_string=TRACKER_OTP_FORMAT.format(current_user.name, current_user.otp_token),
+                               display_qr=user.first_time_login_otp,
+                               otp_string=TRACKER_OTP_FORMAT.format(user.name, user.otp_token),
                                otp_code_length={'max': 6}), status_code
 
     user = user_assign_new_token(user)
