@@ -1,0 +1,18 @@
+{%- extends "base.html" -%}
+{% block content %}
+			<h1>Two Factor</h1>
+            {% if display_qr %}
+                <img src="{{ qrcode(otp_string) }}">
+            {%endif%}  
+			<div class="tiny size">
+				<form action="" method="post" name="login">
+					{{ form.hidden_tag() }}
+					<div class="row">
+						<div class="single columns">
+							{{ render_field(form.otp_code, class='full size', placeholder='OTP Code', autofocus='', required='', indent=7) }}
+						</div>
+					</div>
+					{{ form.login(class='button-primary') }}
+				</form>
+			</div>
+{%- endblock %}
