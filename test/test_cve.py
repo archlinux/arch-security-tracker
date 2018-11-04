@@ -166,10 +166,13 @@ def test_reporter_can_edit(db, client):
 @create_issue
 @logged_in(role=UserRole.reporter)
 def test_edit_cve_invalid(db, client):
-    data = {'description': 'LOLWUT'}
+    data = default_issue_dict()
+    data.update(dict(issue_type='OMG'))
     resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert 'Edit {}'.format(DEFAULT_ISSUE_ID) in resp.data.decode()
+    assert ERROR_INVALID_CHOICE in resp.data.decode()
+    assert 1 == resp.data.decode().count(ERROR_INVALID_CHOICE)
 
 
 @create_issue
