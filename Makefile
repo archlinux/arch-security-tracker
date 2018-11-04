@@ -41,7 +41,7 @@ shell: setup
 	./trackerctl shell
 
 check: setup
-	./trackerctl setup check
+	./trackerctl db check
 
 test: test-py test-isort
 
