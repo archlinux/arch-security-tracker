@@ -166,17 +166,13 @@ def affected_to_status(affected, pkgname, fixed_version):
     # vulnerable if the latest version is still affected
     if not fixed_version or 0 > vercmp(version.version, fixed_version):
         return Status.vulnerable
-    # check if any non-testing versions are fixed
-    non_testing = list(filter(lambda e: 'testing' not in e.database, versions))
-    latest_non_testing = non_testing[0]
-    if 0 <= vercmp(latest_non_testing.version, fixed_version):
-        return Status.fixed
-    # check if latest version is testing
-    if 'testing' in version.database:
+    # at least one version is fixed
+    fixed_versions = [p for p in versions if vercmp(p.version, fixed_version) >= 0]
+    # if the only fixed versions are in [testing], return testing
+    if all('testing' in p.database for p in fixed_versions):
         return Status.testing
-    # return vulnerable otherwise
-    return Status.vulnerable
-
+    # otherwise a fixed version exists outside [testing]
+    return Status.fixed
 
 def highest_severity(cves):
     severity = list(filter(lambda severity: Severity.unknown != severity, cves))
