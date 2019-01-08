@@ -9,6 +9,7 @@ from tracker.model.cvegroup import CVEGroup
 from tracker.model.enum import Affected
 from tracker.model.enum import Status
 from tracker.model.enum import UserRole
+from tracker.model.enum import affected_to_status
 from tracker.view.add import ERROR_GROUP_WITH_ISSUE_EXISTS
 from tracker.view.show import get_bug_project
 
@@ -322,3 +323,67 @@ def test_show_group_json(db, client):
 def test_show_group_json_not_found(db, client):
     resp = client.get(url_for('tracker.show_group_json', avg=DEFAULT_GROUP_NAME, postfix='/json'), follow_redirects=True)
     assert NotFound.code == resp.status_code
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_fixed(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.affected, 'foo', avg.fixed)
+    assert status == Status.fixed
+
+@create_package(name='foo', version='1.2.3-3')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_vulnerable(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.affected, 'foo', avg.fixed)
+    assert status == Status.vulnerable
+
+@create_package(name='foo', version='1.2.3-3', database='testing')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_vulnerable_testing(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.affected, 'foo', avg.fixed)
+    assert status == Status.vulnerable
+
+@create_package(name='foo', version='1.2.3-3')
+@create_package(name='foo', version='1.2.3-4', database='testing')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_testing(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.affected, 'foo', avg.fixed)
+    assert status == Status.testing
+
+@create_package(name='foo', version='1.2.3-4', database='testing')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_testing_only(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.affected, 'foo', avg.fixed)
+    assert status == Status.testing
+
+@create_package(name='foo', version='1.2.3-3', database='community')
+@create_package(name='foo', version='1.2.3-4', database='community-testing')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_community_testing(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.affected, 'foo', avg.fixed)
+    assert status == Status.testing
+
+@create_package(name='foo', version='1.2.3-3')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_unknown(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.unknown, 'foo', avg.fixed)
+    assert status == Status.unknown
+
+@create_package(name='foo', version='1.2.3-3')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_not_affected(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.not_affected, 'foo', avg.fixed)
+    assert status == Status.not_affected
+
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+def test_affected_to_status_unknown_package(db, client):
+    avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    status = affected_to_status(Affected.affected, 'foo', avg.fixed)
+    assert status == Status.unknown
