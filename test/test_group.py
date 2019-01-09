@@ -153,7 +153,7 @@ def test_edit_group_not_found(db, client):
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4',
               issues=['CVE-1111-1234', 'CVE-1234-12345', 'CVE-1111-12345',
-                      'CVE-1234-11112', 'CVE-1234-123456', 'CVE-1234-11111'])
+                      'CVE-1234-11112', 'CVE-1234-111111', 'CVE-1234-11111'])
 @logged_in
 def test_edit_sort_cve_entries(db, client):
     resp = client.get(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
@@ -165,7 +165,7 @@ def test_edit_sort_cve_entries(db, client):
             'CVE-1234-11111',
             'CVE-1234-11112',
             'CVE-1234-12345',
-            'CVE-1234-123456'] == html.get_element_by_id('cve').data.split()
+            'CVE-1234-111111'] == html.get_element_by_id('cve').data.split()
 
 
 @logged_in
@@ -306,6 +306,27 @@ def test_forbid_delete_with_advisory(db, client):
     resp = client.post(url_for('tracker.delete_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
     assert Forbidden.code == resp.status_code
 
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4',
+              issues=['CVE-1111-1234', 'CVE-1234-12345', 'CVE-1111-12345',
+                      'CVE-1234-11112', 'CVE-1234-111111', 'CVE-1234-11111'])
+@logged_in
+def test_show_group_sort_cve_entries(db, client):
+    resp = client.get(url_for('tracker.show_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert 200 == resp.status_code
+    html = AssertionHTMLParser()
+    html.feed(resp.data.decode())
+    cves = []
+    for e in html.get_elements_by_tag('a'):
+        if len(e.attrs) == 1 and e.attrs[0][0] == 'href':
+            if e.data.startswith("CVE") and e.attrs[0][1].startswith("/CVE"):
+                cves.append(e.data.strip())
+    assert ['CVE-1234-111111',
+            'CVE-1234-12345',
+            'CVE-1234-11112',
+            'CVE-1234-11111',
+            'CVE-1111-12345',
+            'CVE-1111-1234'] == cves
 
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
