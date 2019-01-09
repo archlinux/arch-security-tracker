@@ -138,11 +138,11 @@
 						<td>{{ advisory.created.strftime('%d %b %Y') }}</td>
 						<td><a href="/{{ advisory.id }}">{{ advisory.id }}</a></td>
 						<td><a href="/{{ advisory.group_package.group.name }}">{{ advisory.group_package.group.name }}</a></td>
-						<td>{{ colorize_severity(advisory.group_package.group.severity) }}</a></td>
+						<td>{{ colorize_severity(advisory.group_package.group.severity) }}</td>
 						<td>{{ advisory.advisory_type }}</td>
 					</tr>
-				</tbody>
 				{%- endfor %}
+				</tbody>
 			</table>
 			{%- endif %}
 {%- endblock %}

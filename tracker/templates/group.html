@@ -98,8 +98,8 @@
 						<td>{{ colorize_unknown(cve.issue_type|capitalize) }}</td>
 						<td><pre>{% if cve.description %}{{ cve.description|wordwrap(70, wrapstring=' ')|truncate(160) }}{% endif %}</pre></td>
 					</tr>
-				</tbody>
 				{%- endfor %}
+				</tbody>
 			</table>
 			{%- if advisories %}
 			<table class="styled-table full size">
@@ -119,8 +119,8 @@
 						<td><a href="/package/{{ advisory.group_package.pkgname }}">{{ advisory.group_package.pkgname }}</a></td>
 						<td>{{ advisory.advisory_type }}</td>
 					</tr>
-				</tbody>
 				{% endfor %}
+				</tbody>
 			</table>
 			{%- endif %}
 			{%- if group.reference %}

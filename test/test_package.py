@@ -9,6 +9,7 @@ from .conftest import DEFAULT_GROUP_ID
 from .conftest import create_advisory
 from .conftest import create_group
 from .conftest import create_package
+from .util import AssertionHTMLParser
 
 
 @create_package(name='foo', version='1.2.3-4')
@@ -38,5 +39,7 @@ def test_show_package_not_found(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.published)
 def test_show_package(db, client):
     resp = client.get(url_for('tracker.show_package', pkgname='foo'), follow_redirects=True)
+    html = AssertionHTMLParser()
+    html.feed(resp.data.decode())
     assert 200 == resp.status_code
     assert 'foo' in resp.data.decode()
