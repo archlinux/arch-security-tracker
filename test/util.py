@@ -29,6 +29,8 @@ class AssertionHTMLParser(HTMLParser):
         self.processing.pop()
 
     def handle_data(self, data):
+        if not self.processing:
+            return
         self.processing[-1].data = data.strip()
 
     def get_element_by_id(self, id):
