@@ -1,3 +1,4 @@
+language: shell
 sudo: required
 
 services:
@@ -21,7 +22,6 @@ arch:
     - pyalpm
     - sqlite
   script:
-    - sudo pacman -Syu --noconfirm --needed "${CONFIG_PACKAGES[@]}"
     - python3 -m py_compile $(git ls-files '*.py')
     - make test
 
