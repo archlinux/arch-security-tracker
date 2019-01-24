@@ -11,16 +11,16 @@ ISORT?=isort
 ISORT_OPTIONS+=--recursive --skip .virtualenv --skip .venv
 ISORT_CHECK_OPTIONS+=--check-only --diff
 
+.PHONY: update test
+
+all: update
+
 ifeq (${PYTEST_PDB},1)
 PYTEST_OPTIONS+= ${PYTEST_PDB_OPTIONS}
 else
 test-pdb: PYTEST_OPTIONS+= ${PYTEST_PDB_OPTIONS}
 endif
 test-pdb: test
-
-.PHONY: update test
-
-all: update
 
 setup: submodule
 	./trackerctl setup bootstrap
