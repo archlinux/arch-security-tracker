@@ -61,4 +61,4 @@ open-coverage: coverage
 	${BROWSER} test/coverage/index.html
 
 isort:
-	${ISORT} --recursive .
+	${ISORT} ${ISORT_OPTIONS} .
