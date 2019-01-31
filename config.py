@@ -55,6 +55,7 @@ FLASK_HOST = config_flask['host']
 FLASK_PORT = config_flask.getint('port')
 FLASK_SESSION_PROTECTION = None if 'none' == config_flask['session_protection'] else config_flask['session_protection']
 set_debug_flag(config_flask.getboolean('debug'))
+FLASK_STRICT_TRANSPORT_SECURITY = config_flask.getboolean('strict_transport_security')
 
 config_pacman = config['pacman']
 PACMAN_HANDLE_CACHE_TIME = config_pacman.getint('handle_cache_time')

@@ -12,6 +12,7 @@ from sqlalchemy.sql.expression import ClauseElement
 from werkzeug.routing import BaseConverter
 
 from config import FLASK_SESSION_PROTECTION
+from config import FLASK_STRICT_TRANSPORT_SECURITY
 from config import SQLALCHEMY_MIGRATE_REPO
 from config import SQLITE_CACHE_SIZE
 from config import SQLITE_JOURNAL_MODE
@@ -75,7 +76,7 @@ db.create = MethodType(db_create, db)
 db.get_or_create = MethodType(db_get_or_create, db)
 
 migrate = Migrate(db=db, directory=SQLALCHEMY_MIGRATE_REPO)
-talisman = Talisman()
+talisman = Talisman(strict_transport_security=FLASK_STRICT_TRANSPORT_SECURITY)
 login_manager = LoginManager()
 tracker = Blueprint('tracker', __name__)
 
