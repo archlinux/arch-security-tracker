@@ -83,7 +83,9 @@ def edit_advisory(advisory_id):
 def edit_cve(cve):
     entries = (db.session.query(CVE, CVEGroup, Advisory)
                .filter(CVE.id == cve)
-               .outerjoin(CVEGroupEntry).outerjoin(CVEGroup).outerjoin(CVEGroupPackage)
+               .outerjoin(CVEGroupEntry, CVEGroupEntry.cve_id == CVE.id)
+               .outerjoin(CVEGroup, CVEGroupEntry.group)
+               .outerjoin(CVEGroupPackage, CVEGroup.packages)
                .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)).all()
     if not entries:
         return not_found()
@@ -127,7 +129,8 @@ def edit_cve(cve):
         # update cached group severity for all goups containing this issue
         group_ids = [group.id for group in groups]
         issues = (db.session.query(CVEGroup, CVE)
-                  .join(CVEGroupEntry).join(CVE)
+                  .join(CVEGroupEntry, CVEGroup.issues)
+                  .join(CVE, CVEGroupEntry.cve)
                   .group_by(CVEGroup.id).group_by(CVE.id))
         if group_ids:
             issues = issues.filter(CVEGroup.id.in_(group_ids))
@@ -165,7 +168,9 @@ def edit_group(avg):
     group_id = avg.replace('AVG-', '')
     group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '), Advisory)
                   .filter(CVEGroup.id == group_id)
-                  .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                  .join(CVEGroupEntry, CVEGroup.issues)
+                  .join(CVE, CVEGroupEntry.cve)
+                  .join(CVEGroupPackage, CVEGroup.packages)
                   .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                   .group_by(CVEGroup.id).group_by(CVE.id).group_by(CVEGroupPackage.pkgname)
                   .order_by(CVE.id)).all()

@@ -21,7 +21,9 @@ from tracker.util import json_response
 def get_index_data(only_vulnerable=False, only_in_repo=True):
     select = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '),
                                func.group_concat(Advisory.id, ' '))
-                        .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                        .join(CVEGroupEntry, CVEGroup.issues)
+                        .join(CVE, CVEGroupEntry.cve)
+                        .join(CVEGroupPackage, CVEGroup.packages)
                         .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
                                                   Advisory.publication == Publication.published)))
     if only_vulnerable:

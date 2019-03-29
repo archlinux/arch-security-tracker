@@ -51,7 +51,9 @@ def copy_group(avg):
     group_id = avg.replace('AVG-', '')
     group_data = (db.session.query(CVEGroup, CVE, func.group_concat(CVEGroupPackage.pkgname, ' '))
                   .filter(CVEGroup.id == group_id)
-                  .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                  .join(CVEGroupEntry, CVEGroup.issues)
+                  .join(CVE, CVEGroupEntry.cve)
+                  .join(CVEGroupPackage, CVEGroup.packages)
                   .group_by(CVEGroup.id).group_by(CVE.id)
                   .order_by(CVE.id)).all()
     if not group_data:

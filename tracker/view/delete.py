@@ -31,7 +31,9 @@ def delete_group(avg):
     avg_id = avg.replace('AVG-', '')
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
                .filter(CVEGroup.id == avg_id)
-               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+               .join(CVEGroupEntry, CVEGroup.issues)
+               .join(CVE, CVEGroupEntry.cve)
+               .join(CVEGroupPackage, CVEGroup.packages)
                .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                ).all()
     if not entries:
@@ -80,7 +82,9 @@ def delete_group(avg):
 def delete_issue(issue):
     entries = (db.session.query(CVE, CVEGroup, CVEGroupPackage, Advisory)
                .filter(CVE.id == issue)
-               .outerjoin(CVEGroupEntry).outerjoin(CVEGroup).outerjoin(CVEGroupPackage)
+               .outerjoin(CVEGroupEntry, CVEGroupEntry.cve_id == CVE.id)
+               .outerjoin(CVEGroup, CVEGroupEntry.group)
+               .outerjoin(CVEGroupPackage, CVEGroup.packages)
                .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
     if not entries:
@@ -103,7 +107,8 @@ def delete_issue(issue):
     group_ids = [group.id for group in groups]
 
     group_entries = (db.session.query(CVEGroup, CVE)
-                     .join(CVEGroupEntry).join(CVE)
+                     .join(CVEGroupEntry, CVEGroup.issues)
+                     .join(CVE, CVEGroupEntry.cve)
                      .order_by(CVE.id.desc()))
     if group_ids:
         group_entries = group_entries.filter(CVEGroup.id.in_(group_ids))
@@ -150,7 +155,8 @@ def delete_issue(issue):
 def delete_advisory(advisory_id):
     advisory, pkg, group = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
                             .filter(Advisory.id == advisory_id)
-                            .join(CVEGroupPackage).join(CVEGroup)).first()
+                            .join(CVEGroupPackage, Advisory.group_package)
+                            .join(CVEGroup, CVEGroupPackage.group)).first()
 
     if not advisory:
         return not_found()

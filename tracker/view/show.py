@@ -110,7 +110,8 @@ def get_cve_data(cve):
 
     entries = (db.session.query(CVEGroupEntry, CVEGroup, CVEGroupPackage, Advisory)
                .filter_by(cve=cve_model)
-               .join(CVEGroup).join(CVEGroupPackage)
+               .join(CVEGroup, CVEGroupEntry.group)
+               .join(CVEGroupPackage, CVEGroup.packages)
                .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                .order_by(CVEGroup.created.desc()).order_by(CVEGroupPackage.pkgname)).all()
 
@@ -191,7 +192,9 @@ def get_group_data(avg):
     avg_id = int(avg.replace('AVG-', ''))
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory, Package)
                .filter(CVEGroup.id == avg_id)
-               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+               .join(CVEGroupEntry, CVEGroup.issues)
+               .join(CVE, CVEGroupEntry.cve)
+               .join(CVEGroupPackage, CVEGroup.packages)
                .outerjoin(Package, Package.name == CVEGroupPackage.pkgname)
                .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)).all()
     if not entries:
@@ -308,10 +311,10 @@ def show_group(avg):
 def get_package_data(pkgname):
     entries = (db.session.query(Package, CVEGroup, CVE, Advisory)
                .filter(Package.name == pkgname)
-               .outerjoin(CVEGroupPackage, CVEGroupPackage.pkgname == pkgname)
-               .outerjoin(CVEGroup, CVEGroup.id == CVEGroupPackage.group_id)
-               .outerjoin(CVEGroupEntry, CVEGroupPackage.group_id == CVEGroupEntry.group_id)
-               .outerjoin(CVE, CVE.id == CVEGroupEntry.cve_id)
+               .outerjoin(CVEGroupPackage, CVEGroupPackage.pkgname == Package.name)
+               .outerjoin(CVEGroup, CVEGroupPackage.group)
+               .outerjoin(CVEGroupEntry, CVEGroup.issues)
+               .outerjoin(CVE, CVEGroupEntry.cve)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
                                          Advisory.publication == Publication.published))
                ).all()
@@ -320,9 +323,9 @@ def get_package_data(pkgname):
     if not entries:
         entries = (db.session.query(CVEGroupPackage, CVEGroup, CVE, Advisory)
                    .filter(CVEGroupPackage.pkgname == pkgname)
-                   .join(CVEGroup, CVEGroup.id == CVEGroupPackage.group_id)
-                   .join(CVEGroupEntry, CVEGroupPackage.group_id == CVEGroupEntry.group_id)
-                   .join(CVE, CVE.id == CVEGroupEntry.cve_id)
+                   .join(CVEGroup, CVEGroupPackage.group)
+                   .join(CVEGroupEntry, CVEGroup.issues)
+                   .join(CVE, CVEGroupEntry.cve)
                    .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id,
                                              Advisory.publication == Publication.published))
                    ).all()
@@ -477,7 +480,10 @@ def show_generated_advisory_raw(advisory_id):
 def show_advisory(advisory_id, raw=False):
     entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage, CVE)
                .filter(Advisory.id == advisory_id)
-               .join(CVEGroupPackage).join(CVEGroup).join(CVEGroupEntry).join(CVE)
+               .join(CVEGroupPackage, Advisory.group_package)
+               .join(CVEGroup, CVEGroupPackage.group)
+               .join(CVEGroupEntry, CVEGroup.issues)
+               .join(CVE, CVEGroupEntry.cve)
                .order_by(CVE.id)
                ).all()
     if not entries:
@@ -504,7 +510,10 @@ def show_advisory(advisory_id, raw=False):
 def show_generated_advisory(advisory_id, raw=False):
     entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage, CVE)
                .filter(Advisory.id == advisory_id)
-               .join(CVEGroupPackage).join(CVEGroup).join(CVEGroupEntry).join(CVE)
+               .join(CVEGroupPackage, Advisory.group_package)
+               .join(CVEGroup, CVEGroupPackage.group)
+               .join(CVEGroupEntry, CVEGroup.issues)
+               .join(CVE, CVEGroupEntry.cve)
                .order_by(CVE.id)
                ).all()
     if not entries:

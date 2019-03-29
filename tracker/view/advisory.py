@@ -37,7 +37,8 @@ ERROR_ADVISORY_ALREADY_EXISTS = 'Advisory already exists.'
 
 def get_advisory_data():
     entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage)
-               .join(CVEGroupPackage).join(CVEGroup)
+               .join(CVEGroupPackage, Advisory.group_package)
+               .join(CVEGroup, CVEGroupPackage.group)
                .group_by(CVEGroupPackage.id)
                .order_by(Advisory.created.desc())).all()
     entries = [{'advisory': advisory, 'group': group, 'package': package} for advisory, group, package in entries]
@@ -136,7 +137,9 @@ def schedule_advisory(avg):
 
     entries = (db.session.query(CVEGroup, CVE, CVEGroupPackage, Advisory)
                .filter(CVEGroup.id == avg_id)
-               .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+               .join(CVEGroupEntry, CVEGroup.issues)
+               .join(CVE, CVEGroupEntry.cve)
+               .join(CVEGroupPackage, CVEGroup.packages)
                .outerjoin(Advisory, and_(Advisory.group_package_id == CVEGroupPackage.id))
                ).all()
     if not entries:

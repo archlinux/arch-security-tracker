@@ -153,7 +153,9 @@ def add_group():
     # check if a package with a CVE clashes with an existing group
     if not form.force_submit.data:
         same_group = (db.session.query(CVEGroup, CVE, CVEGroupPackage)
-                      .join(CVEGroupEntry).join(CVE).join(CVEGroupPackage)
+                      .join(CVEGroupEntry, CVEGroup.issues)
+                      .join(CVE, CVEGroupEntry.cve)
+                      .join(CVEGroupPackage, CVEGroup.packages)
                       .filter(CVEGroupPackage.pkgname.in_(pkgnames)))
         if issue_ids:
             same_group = same_group.filter(CVE.id.in_(issue_ids))

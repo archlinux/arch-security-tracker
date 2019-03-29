@@ -32,7 +32,8 @@ from tracker.util import json_response
 
 def get_todo_data():
     incomplete_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
-                             .join(CVEGroupPackage).join(CVEGroup)
+                             .join(CVEGroupPackage, Advisory.group_package)
+                             .join(CVEGroup, CVEGroupPackage.group)
                              .filter(and_(
                                  Advisory.publication == Publication.published,
                                  or_(Advisory.content == '', Advisory.content.is_(None),
@@ -41,13 +42,14 @@ def get_todo_data():
                              .order_by(Advisory.created.desc())).all()
 
     scheduled_advisories = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
-                            .join(CVEGroupPackage).join(CVEGroup)
+                            .join(CVEGroupPackage, Advisory.group_package)
+                            .join(CVEGroup, CVEGroupPackage.group)
                             .filter(Advisory.publication == Publication.scheduled)
                             .group_by(CVEGroupPackage.id)
                             .order_by(Advisory.created.desc())).all()
 
     unhandled_advisories = (db.session.query(CVEGroup, Package)
-                            .join(CVEGroupPackage)
+                            .join(CVEGroupPackage, CVEGroup.packages)
                             .join(Package, Package.name == CVEGroupPackage.pkgname)
                             .outerjoin(Advisory)
                             .filter(CVEGroup.advisory_qualified)
@@ -74,7 +76,8 @@ def get_todo_data():
 
     unknown_groups = CVEGroup.query.filter(CVEGroup.status == Status.unknown).all()
     unknown_groups = (db.session.query(CVEGroup, Package)
-                        .join(CVEGroupPackage).join(Package, Package.name == CVEGroupPackage.pkgname)
+                        .join(CVEGroupPackage, CVEGroup.packages)
+                        .join(Package, Package.name == CVEGroupPackage.pkgname)
                         .filter(CVEGroup.status == Status.unknown)
                         .group_by(CVEGroupPackage.id)
                         .order_by(CVEGroup.created.desc())).all()
@@ -88,7 +91,8 @@ def get_todo_data():
     unknown_groups = sorted(unknown_groups, key=lambda item: item[0].id)
 
     vulnerable_groups = (db.session.query(CVEGroup, Package)
-                         .join(CVEGroupPackage).join(Package, Package.name == CVEGroupPackage.pkgname)
+                         .join(CVEGroupPackage, CVEGroup.packages)
+                         .join(Package, Package.name == CVEGroupPackage.pkgname)
                          .filter(CVEGroup.status == Status.vulnerable)
                          .filter(or_(CVEGroup.fixed.is_(None), CVEGroup.fixed == ''))
                          .group_by(CVEGroup.id).group_by(Package.name, Package.version)

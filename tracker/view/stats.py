@@ -23,7 +23,8 @@ from tracker.util import json_response
 def get_stats_data():
     # CVEs
     entries = (db.session.query(CVE, CVEGroupEntry, CVEGroup)
-               .outerjoin(CVEGroupEntry).outerjoin(CVEGroup)).all()
+               .outerjoin(CVEGroupEntry, CVE.id == CVEGroupEntry.cve_id)
+               .outerjoin(CVEGroup, CVEGroupEntry.group)).all()
 
     issues = set()
     issue_groups = defaultdict(set)
@@ -131,7 +132,7 @@ def get_stats_data():
 
     # packages
     entries = (db.session.query(CVEGroupPackage, CVEGroup)
-               .join(CVEGroup)).all()
+               .join(CVEGroup, CVEGroupPackage.group)).all()
 
     packages = set()
     package_groups = defaultdict(set)
@@ -173,7 +174,8 @@ def get_stats_data():
 
     # advisory
     entries = (db.session.query(Advisory, CVEGroupPackage, CVEGroup)
-               .join(CVEGroupPackage).join(CVEGroup)).all()
+               .join(CVEGroupPackage, Advisory.group_package)
+               .join(CVEGroup, CVEGroupPackage.group)).all()
 
     data_advisories = OrderedDict()
     data_advisories['severity'] = OrderedDict()
