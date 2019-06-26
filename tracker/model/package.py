@@ -1,6 +1,7 @@
 from operator import attrgetter
 
 from pyalpm import vercmp
+
 from tracker import db
 from tracker.util import cmp_to_key
 

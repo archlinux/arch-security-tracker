@@ -4,11 +4,11 @@ from operator import attrgetter
 from random import randint
 
 from flask import render_template
+from pyalpm import vercmp
 from sqlalchemy import and_
 from sqlalchemy import func
 from sqlalchemy import or_
 
-from pyalpm import vercmp
 from tracker import db
 from tracker import tracker
 from tracker.model import CVE

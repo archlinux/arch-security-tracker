@@ -1,10 +1,10 @@
 from enum import Enum
 
+from pyalpm import vercmp
 from sqlalchemy.types import Enum as SQLAlchemyEnum
 from sqlalchemy.types import SchemaType
 from sqlalchemy.types import TypeDecorator
 
-from pyalpm import vercmp
 from tracker import db
 
 from .package import Package

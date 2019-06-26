@@ -1,3 +1,4 @@
+from pyalpm import vercmp
 from wtforms import BooleanField
 from wtforms import SelectField
 from wtforms import StringField
@@ -8,7 +9,6 @@ from wtforms.validators import Length
 from wtforms.validators import Optional
 from wtforms.validators import Regexp
 
-from pyalpm import vercmp
 from tracker.form.validators import SamePackageBase
 from tracker.form.validators import ValidIssues
 from tracker.form.validators import ValidPackageNames
