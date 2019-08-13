@@ -1,8 +1,8 @@
 {%- extends "base.html" -%}
 {% block content %}
 			<h1>{{ advisory.id }}
-				{%- if can_handle_advisory %}
 				<a href="/{{  advisory.id }}/log" accesskey="l">log</a>
+				{%- if can_handle_advisory %}
 				<a href="/{{  advisory.id }}/edit" accesskey="e">edit</a>
 					{%- if advisory.publication == Publication.scheduled %}
 				<a href="/{{  advisory.id }}/delete" accesskey="d">delete</a>
