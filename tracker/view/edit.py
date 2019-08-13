@@ -71,9 +71,13 @@ def edit_advisory(advisory_id):
         advisory.content = form.advisory_content
         advisory_extend_model_from_advisory_text(advisory)
     advisory.reference = form.reference.data or None
-    db.session.commit()
 
-    flash('Edited {}'.format(advisory.id))
+    # update changed date on modification
+    if db.session.is_modified(advisory):
+        advisory.changed = datetime.utcnow()
+        flash('Edited {}'.format(advisory.id))
+
+    db.session.commit()
     return redirect('/{}'.format(advisory.id))
 
 
