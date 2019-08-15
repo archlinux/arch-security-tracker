@@ -61,8 +61,8 @@ def urlize(ctx, text, trim_url_limit=None, rel=None, target=None):
         match = _punctuation_re.match(word)
         if match:
             lead, word, trail = match.groups()
-            word = sub('({})'.format(cve_id_regex), '<a href="/\\1">\\1</a>', word)
-            word = sub('({})'.format(vulnerability_group_regex), '<a href="/\\1">\\1</a>', word)
+            word = sub('({})'.format(cve_id_regex), '<a href="/\\1" rel="noopener">\\1</a>', word)
+            word = sub('({})'.format(vulnerability_group_regex), '<a href="/\\1" rel="noopener">\\1</a>', word)
             words[i] = '{}{}{}'.format(lead, word, trail)
 
     text = ''.join(words)

@@ -355,10 +355,10 @@ def test_show_issue_urlize_description(db, client):
     resp = client.get(url_for('tracker.show_cve', cve=DEFAULT_ISSUE_ID, path=''))
     assert 200 == resp.status_code
     data = resp.data.decode()
-    assert 'foo <a href="/{0}">{0}</a> bar'.format('AVG-1') in data
-    assert 'bar <a href="/{0}">{0}</a> qux'.format('CVE-1234-5678') in data
+    assert 'foo <a href="/{0}" rel="noopener">{0}</a> bar'.format('AVG-1') in data
+    assert 'bar <a href="/{0}" rel="noopener">{0}</a> qux'.format('CVE-1234-5678') in data
     assert 'qux <a href="{0}" rel="noopener">{0}</a> doo'.format('https://foo.bar') in data
-    assert 'doo <a href="/{0}">{0}</a>.'.format('CVE-1337-1337') in data
+    assert 'doo <a href="/{0}" rel="noopener">{0}</a>.'.format('CVE-1337-1337') in data
 
 
 @create_issue(notes='foo AVG-1 bar CVE-1234-5678 qux https://foo.bar doo CVE-1337-1337.')
@@ -366,7 +366,7 @@ def test_show_issue_urlize_notes(db, client):
     resp = client.get(url_for('tracker.show_cve', cve=DEFAULT_ISSUE_ID, path=''))
     assert 200 == resp.status_code
     data = resp.data.decode()
-    assert 'foo <a href="/{0}">{0}</a> bar'.format('AVG-1') in data
-    assert 'bar <a href="/{0}">{0}</a> qux'.format('CVE-1234-5678') in data
+    assert 'foo <a href="/{0}" rel="noopener">{0}</a> bar'.format('AVG-1') in data
+    assert 'bar <a href="/{0}" rel="noopener">{0}</a> qux'.format('CVE-1234-5678') in data
     assert 'qux <a href="{0}" rel="noopener">{0}</a> doo'.format('https://foo.bar') in data
-    assert 'doo <a href="/{0}">{0}</a>.'.format('CVE-1337-1337') in data
+    assert 'doo <a href="/{0}" rel="noopener">{0}</a>.'.format('CVE-1337-1337') in data

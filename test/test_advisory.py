@@ -280,8 +280,8 @@ def test_advisory_html_replace_package_name(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
-    assert '<a href="/package/foo">foo</a> is broken' in data
-    assert 'and <a href="/package/foo">foo</a>' in data
+    assert '<a href="/package/foo" rel="noopener">foo</a> is broken' in data
+    assert 'and <a href="/package/foo" rel="noopener">foo</a>' in data
 
 
 @create_package(name='foo', version='1.2.3-4')
@@ -292,8 +292,8 @@ def test_advisory_html_replace_package_name_case_insensitive(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
-    assert '<a href="/package/foo">FoO</a> is broken' in data
-    assert 'and <a href="/package/foo">fOO</a>.' in data
+    assert '<a href="/package/foo" rel="noopener">FoO</a> is broken' in data
+    assert 'and <a href="/package/foo" rel="noopener">fOO</a>.' in data
 
 
 @create_package(name='foo', version='1.2.3-4')
@@ -305,8 +305,8 @@ def test_advisory_html_overlapping_cve_link(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
-    assert '<a href="/{0}">{0}</a>'.format('CVE-1234-1234') in data
-    assert '<a href="/{0}">{0}</a>'.format('CVE-1234-12345') in data
+    assert '<a href="/{0}" rel="noopener">{0}</a>'.format('CVE-1234-1234') in data
+    assert '<a href="/{0}" rel="noopener">{0}</a>'.format('CVE-1234-12345') in data
 
 
 @create_package(name='crypto++', version='1.2.3-4')
@@ -317,8 +317,8 @@ def test_advisory_html_regex_keyword_in_package_name(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
-    assert '<a href="/package/crypto++">crypto++</a> is broken' in data
-    assert 'and <a href="/package/crypto++">crypto++</a>' in data
+    assert '<a href="/package/crypto++" rel="noopener">crypto++</a> is broken' in data
+    assert 'and <a href="/package/crypto++" rel="noopener">crypto++</a>' in data
 
 
 @create_package(name='foo', version='1.2.3-4')
@@ -381,9 +381,9 @@ def test_advisory_html_urlize_description(db, client):
     resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.data.decode()
-    assert 'qux <a href="/{0}">{0}</a> is'.format('AVG-1') in data
+    assert 'qux <a href="/{0}" rel="noopener">{0}</a> is'.format('AVG-1') in data
     assert 'bar <a href="{0}" rel="noopener">{0}</a> is'.format('https://foo.bar') in data
-    assert 'lol <a href="/{0}">{0}</a>.'.format('CVE-1111-2222') in data
+    assert 'lol <a href="/{0}" rel="noopener">{0}</a>.'.format('CVE-1111-2222') in data
 
 
 @create_package(name='foo', version='1.2.3-4')
