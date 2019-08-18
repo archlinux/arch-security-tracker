@@ -1,9 +1,13 @@
 
+from collections import namedtuple
+
 from flask import url_for
+from jinja2.utils import escape
 from pytest import mark
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
 
+from tracker.advisory import advisory_extend_html
 from tracker.advisory import advisory_format_issue_listing
 from tracker.advisory import advisory_get_impact_from_text
 from tracker.advisory import advisory_get_label
@@ -450,7 +454,7 @@ def test_advisory_publish_advisory_text_wrong(db, client, patch_get):
 @logged_in
 def test_advisory_publish_advisory(db, client, patch_get):
     resp = client.post(url_for('tracker.publish_advisory', asa=DEFAULT_ADVISORY_ID), follow_redirects=True,
-                       data=dict(reference='https://archlinux.org', confirm=True))
+                       data=dict(reference=f'https://security.archlinux.org/{DEFAULT_ADVISORY_ID}', confirm=True))
     assert 200 == resp.status_code
     assert 'Published {}'.format(DEFAULT_ADVISORY_ID) in resp.data.decode()
 
@@ -539,3 +543,110 @@ def test_delete_advisory_not_found(db, client):
 def test_delete_advisory_published(db, client):
     resp = client.get(url_for('tracker.delete_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert Forbidden.code == resp.status_code
+
+def test_advisory_extend_html():
+    package = namedtuple('package', 'pkgname')
+    pkgname = 'foo'
+    pkg = package(pkgname)
+    id = DEFAULT_ADVISORY_ID
+    cve = 'CVE-1111-2222'
+    group = DEFAULT_GROUP_NAME
+    pkgver = '1.0-1'
+    references = f'https://security.{pkgname}.com/{pkgname}'
+    workaround = f"""{pkgname} yap
+A {pkgname} yap
+Foo {pkgname}."""
+    description = ''
+    impact = ''
+    advisory_text = create_advisory_content(id=id, cve=cve, group=group, pkgname=pkgname, pkgver=pkgver, workaround=workaround, description=description, impact=impact, references=references)
+    expected = f"""Arch Linux Security Advisory {id}
+==========================================
+
+Severity: Critical
+Date    : 2012-12-21
+CVE-ID  : {cve}
+Package : <a href="/package/{pkgname}" rel="noopener">{pkgname}</a>
+Type    : arbitrary code execution
+Remote  : Yes
+Link    : https://security.archlinux.org/{group}
+
+Summary
+=======
+
+The package <a href="/package/{pkgname}" rel="noopener">{pkgname}</a> before version {pkgver} is vulnerable to arbitrary
+code execution.
+
+Resolution
+==========
+
+Upgrade to {pkgver}.
+
+# pacman -Syu "<a href="/package/{pkgname}" rel="noopener">{pkgname}</a>>={pkgver}"
+
+The problem has been fixed upstream in version {pkgver}.
+
+Workaround
+==========
+
+<a href="/package/{pkgname}" rel="noopener">{pkgname}</a> yap
+A <a href="/package/{pkgname}" rel="noopener">{pkgname}</a> yap
+<a href="/package/{pkgname}" rel="noopener">Foo</a> <a href="/package/{pkgname}" rel="noopener">{pkgname}</a>.
+
+Description
+===========
+
+{description}
+
+Impact
+======
+
+{impact}
+
+References
+==========
+
+https://security.archlinux.org/{group}
+{references}
+"""
+
+    assert expected == advisory_extend_html(advisory_text, [], pkg)
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1],
+                 content=create_advisory_content(description='<description>', impact='<impact>', workaround='<workaround>'),
+                 publication=Publication.published)
+@logged_in
+def test_advisory_published_content_not_overescaped(db, client, patch_get):
+    resp = client.get(url_for('tracker.show_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert str(escape('<a href>')) not in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_issue(description='foo is broken and <snafu>.')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4', issues=[DEFAULT_ISSUE_ID])
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], impact='<omg>', workaround='<uninstall>')
+def test_advisory_generated_content_not_over_escaped(db, client):
+    resp = client.get(url_for('tracker.show_generated_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert str(escape('<a href')) not in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+@logged_in
+def test_advisory_published_content_not_over_escaped(db, client, patch_get):
+    resp = client.post(url_for('tracker.publish_advisory', asa=DEFAULT_ADVISORY_ID), follow_redirects=True,
+                       data=dict(reference=f'https://security.archlinux.org/{DEFAULT_ADVISORY_ID}', confirm=True))
+    assert 200 == resp.status_code
+    assert 'Published {}'.format(DEFAULT_ADVISORY_ID) in resp.data.decode()
+
+    resp = client.get(url_for('tracker.show_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert str(escape('<a href')) not in data

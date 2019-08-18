@@ -84,14 +84,15 @@ def advisory_escape_html(advisory):
         return None
     start_index = advisory.index(start) + len(start)
     end_index = advisory.index(end)
-    advisory = advisory[:start_index] + html_escape(advisory[start_index:end_index]) + advisory[end_index:]
+    advisory = advisory[:start_index] + str(html_escape(advisory[start_index:end_index])) + advisory[end_index:]
     return advisory
 
 
 def advisory_extend_html(advisory, issues, package):
-    advisory = sub('({}) '.format(escape(package.pkgname)), '<a href="/package/{0}" rel="noopener">\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(' ({})'.format(escape(package.pkgname)), ' <a href="/package/{0}" rel="noopener">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
-    advisory = sub(';({})'.format(escape(package.pkgname)), ';<a href="/package/{0}" rel="noopener">\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub('({}) '.format(escape(package.pkgname)), '<a href="/package/{0}" rel="noopener">\\g<1></a> '.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(' ({})'.format(escape(package.pkgname)), ' <a href="/package/{0}" rel="noopener">\\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub(';({})'.format(escape(package.pkgname)), ';<a href="/package/{0}" rel="noopener">\\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
+    advisory = sub('"({})'.format(escape(package.pkgname)), '"<a href="/package/{0}" rel="noopener">\\g<1></a>'.format(package.pkgname), advisory, flags=IGNORECASE)
     return advisory
 
 

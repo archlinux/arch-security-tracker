@@ -1,5 +1,7 @@
 from datetime import datetime
 from functools import wraps
+from re import match
+from urllib.parse import urlparse
 
 import pytest
 from flask import url_for
@@ -10,6 +12,7 @@ from tracker import create_app
 from tracker import db as flask_db
 from tracker.advisory import advisory_get_label
 from tracker.model.advisory import Advisory
+from tracker.model.advisory import advisory_regex
 from tracker.model.cve import CVE
 from tracker.model.cve import issue_types
 from tracker.model.cvegroup import CVEGroup
@@ -27,6 +30,7 @@ from tracker.model.user import User
 from tracker.user import hash_password
 from tracker.user import random_string
 
+DEFAULT_ADVISORY_ID = advisory_get_label()
 DEFAULT_USERNAME = 'cyberwehr12345678'
 ERROR_LOGIN_REQUIRED = 'Please log in to access this page.'
 ERROR_INVALID_CHOICE = 'Not a valid choice'
@@ -80,7 +84,7 @@ def run_scoped(app, db, client, request):
 @pytest.fixture(scope='function')
 def patch_get(monkeypatch, request):
     status_code = 200
-    text = '<PRE>Arch Linux Security Advisory {}\n=====\nTEST\n-------------- next part --------------</PRE>'.format(DEFAULT_ADVISORY_ID)
+    text = ''
     if hasattr(request, 'param'):
         if isinstance(request.param, str):
             text = request.param
@@ -88,6 +92,13 @@ def patch_get(monkeypatch, request):
             status_code = request.param
 
     def mocked_get(uri, *args, **kwargs):
+        nonlocal text, status_code
+        uri = urlparse(uri)
+        path = uri.path
+        if uri.path.startswith('/'):
+            path = uri.path[1:]
+        if match(advisory_regex, path):
+            text = '<PRE>{}\n-------------- next part --------------</PRE>'.format(create_advisory_content(id=path))
         return type('MockedReq', (), {'status_code': status_code, 'text': text})()
     monkeypatch.setattr(advisory, 'get', mocked_get)
 
@@ -259,8 +270,33 @@ def create_group(func=None, id=None, status=None, severity=None,
     return decorator(func)
 
 
-def create_advisory_content(description='SNAFU', impact='Robots will take over', workaround='Update your machine', references=''):
-    return f"""
+def create_advisory_content(id=DEFAULT_ADVISORY_ID, group=DEFAULT_GROUP_NAME, pkgname='foo', pkgver='1.1-1', cve='CVE-2012-1337', description='SNAFU', impact='Robots will take over', workaround='Update your machine', references=''):
+    return f"""Arch Linux Security Advisory {id}
+==========================================
+
+Severity: Critical
+Date    : 2012-12-21
+CVE-ID  : {cve}
+Package : {pkgname}
+Type    : arbitrary code execution
+Remote  : Yes
+Link    : https://security.archlinux.org/{group}
+
+Summary
+=======
+
+The package {pkgname} before version {pkgver} is vulnerable to arbitrary
+code execution.
+
+Resolution
+==========
+
+Upgrade to {pkgver}.
+
+# pacman -Syu "{pkgname}>={pkgver}"
+
+The problem has been fixed upstream in version {pkgver}.
+
 Workaround
 ==========
 
@@ -279,11 +315,10 @@ Impact
 References
 ==========
 
+https://security.archlinux.org/{group}
 {references}
 """
 
-
-DEFAULT_ADVISORY_ID = advisory_get_label()
 DEFAULT_ADVISORY_CONTENT = create_advisory_content()
 
 
