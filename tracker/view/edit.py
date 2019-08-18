@@ -161,6 +161,7 @@ def edit_cve(cve):
                 advisory.advisory_type = issue_type
 
     if db.session.is_modified(cve):
+        cve.changed = datetime.utcnow()
         flash('Edited {}'.format(cve.id))
 
     db.session.commit()
