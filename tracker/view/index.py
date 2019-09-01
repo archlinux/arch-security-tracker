@@ -33,7 +33,7 @@ def get_index_data(only_vulnerable=False, only_in_repo=True):
 
     entries = (select.group_by(CVEGroup.id).group_by(CVE.id)
                      .order_by(CVEGroup.status.desc())
-                     .order_by(CVEGroup.created.desc())).all()
+                     .order_by(CVEGroup.changed.desc())).all()
 
     groups = defaultdict(defaultdict)
     for group, cve, pkgs, advisories in entries:
@@ -47,7 +47,7 @@ def get_index_data(only_vulnerable=False, only_in_repo=True):
         group['issues'] = sorted(group['issues'], key=lambda item: item.id, reverse=True)
 
     groups = groups.values()
-    groups = sorted(groups, key=lambda item: item['group'].created, reverse=True)
+    groups = sorted(groups, key=lambda item: item['group'].changed, reverse=True)
     groups = sorted(groups, key=lambda item: item['group'].severity)
     groups = sorted(groups, key=lambda item: item['group'].status)
     return groups
