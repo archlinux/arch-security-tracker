@@ -6,6 +6,7 @@ from flask import flash
 from flask import redirect
 from flask import render_template
 from sqlalchemy import func
+from sqlalchemy.orm import contains_eager
 
 from tracker import db
 from tracker import tracker
@@ -181,7 +182,9 @@ def edit_group(avg):
                   .join(CVEGroupPackage, CVEGroup.packages)
                   .outerjoin(Advisory, Advisory.group_package_id == CVEGroupPackage.id)
                   .group_by(CVEGroup.id).group_by(CVE.id).group_by(CVEGroupPackage.pkgname)
-                  .order_by(CVE.id)).all()
+                  .order_by(CVE.id)
+                  .options(contains_eager(CVEGroup.issues),
+                           contains_eager(CVEGroup.packages))).all()
     if not group_data:
         return not_found()
 

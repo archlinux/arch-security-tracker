@@ -370,3 +370,31 @@ def test_show_issue_urlize_notes(db, client):
     assert 'bar <a href="/{0}" rel="noopener">{0}</a> qux'.format('CVE-1234-5678') in data
     assert 'qux <a href="{0}" rel="noopener">{0}</a> doo'.format('https://foo.bar') in data
     assert 'doo <a href="/{0}" rel="noopener">{0}</a>.'.format('CVE-1337-1337') in data
+
+
+@create_issue
+@logged_in
+def test_edit_issue_non_relational_field_updates_changed_date(db, client):
+    issue_changed_old = CVE.query.get(DEFAULT_ISSUE_ID).changed
+
+    resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
+                       data=default_issue_dict(dict(description='changed')))
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_ISSUE_ID}' in resp.data.decode()
+
+    issue = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert issue.changed > issue_changed_old
+
+
+@create_issue
+@logged_in
+def test_edit_issue_does_nothing_when_data_is_same(db, client):
+    issue_changed_old = CVE.query.get(DEFAULT_ISSUE_ID).changed
+
+    resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
+                       data=default_issue_dict())
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_ISSUE_ID}' not in resp.data.decode()
+
+    issue = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert issue.changed == issue_changed_old

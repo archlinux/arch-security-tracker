@@ -650,3 +650,35 @@ def test_advisory_published_content_not_over_escaped(db, client, patch_get):
     assert 200 == resp.status_code
     data = resp.data.decode()
     assert str(escape('<a href')) not in data
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], impact='', workaround='')
+@logged_in
+def test_edit_advisory_non_relational_field_updates_changed_date(db, client):
+    advisory_changed_old = Advisory.query.get(DEFAULT_ADVISORY_ID).changed
+
+    data = dict(impact='everything beyond repair', workaround='set computer on fire')
+    resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_ADVISORY_ID}' in resp.data.decode()
+
+    advisory = Advisory.query.get(DEFAULT_ADVISORY_ID)
+    assert advisory.changed > advisory_changed_old
+
+
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], impact='everything beyond repair', workaround='set computer on fire')
+@logged_in
+def test_edit_advisory_does_nothing_when_data_is_same(db, client):
+    advisory_changed_old = Advisory.query.get(DEFAULT_ADVISORY_ID).changed
+
+    data = dict(impact='everything beyond repair', workaround='set computer on fire')
+    resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_ADVISORY_ID}' not in resp.data.decode()
+
+    advisory = Advisory.query.get(DEFAULT_ADVISORY_ID)
+    assert advisory.changed == advisory_changed_old

@@ -408,3 +408,65 @@ def test_affected_to_status_unknown_package(db, client):
     avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
     status = affected_to_status(Affected.affected, 'foo', avg.fixed)
     assert status == Status.unknown
+
+
+@create_package(name='foopkg', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foopkg'])
+@logged_in
+def test_edit_group_non_relational_field_updates_changed_date(db, client):
+    group_changed_old = CVEGroup.query.get(DEFAULT_GROUP_ID).changed
+
+    data = default_group_dict(dict(notes='regular field change'))
+    resp = client.post(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_GROUP_NAME}' in resp.data.decode()
+
+    group = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    assert group.changed > group_changed_old
+
+
+@create_package(name='foopkg', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foopkg'])
+@logged_in
+def test_edit_group_relational_field_issues_updates_changed_date(db, client):
+    group_changed_old = CVEGroup.query.get(DEFAULT_GROUP_ID).changed
+
+    data = default_group_dict(dict(cve=' '.join(['CVE-1234-1111', 'CVE-1234-2222'])))
+    resp = client.post(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_GROUP_NAME}' in resp.data.decode()
+
+    group = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    assert group.changed > group_changed_old
+
+
+@create_package(name='foopkg', version='1.2.3-4', base='foo')
+@create_package(name='foopkg2', version='1.2.3-4', base='foo')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foopkg'])
+@logged_in
+def test_edit_group_relational_field_packages_updates_changed_date(db, client):
+    group_changed_old = CVEGroup.query.get(DEFAULT_GROUP_ID).changed
+
+    data = default_group_dict(dict(pkgnames=' '.join(['foopkg', 'foopkg2'])))
+    resp = client.post(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_GROUP_NAME}' in resp.data.decode()
+
+    group = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    assert group.changed > group_changed_old
+
+
+@create_package(name='foopkg', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, issues=[DEFAULT_ISSUE_ID], packages=['foopkg'])
+@logged_in
+def test_edit_group_does_nothing_when_data_is_same(db, client):
+    group_old = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    group_changed_old = group_old.changed
+
+    data = default_group_dict(dict(status=Affected.affected.name))
+    resp = client.post(url_for('tracker.edit_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True, data=data)
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_GROUP_NAME}' not in resp.data.decode()
+
+    group = CVEGroup.query.get(DEFAULT_GROUP_ID)
+    assert group.changed == group_changed_old
