@@ -161,7 +161,7 @@ def edit_cve(cve):
                 issue_type = 'multiple issues' if len(issue_types) > 1 else next(iter(issue_types))
                 advisory.advisory_type = issue_type
 
-    if db.session.is_modified(cve):
+    if db.session.is_modified(cve) or severity_changed or issue_type_changed:
         cve.changed = datetime.utcnow()
         flash('Edited {}'.format(cve.id))
 

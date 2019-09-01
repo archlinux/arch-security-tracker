@@ -386,6 +386,21 @@ def test_edit_issue_non_relational_field_updates_changed_date(db, client):
     assert issue.changed > issue_changed_old
 
 
+@create_issue(issue_type=issue_types[0])
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', issues=[DEFAULT_ISSUE_ID])
+@logged_in
+def test_edit_issue_changed_severity_updates_changed_date(db, client):
+    issue_changed_old = CVE.query.get(DEFAULT_ISSUE_ID).changed
+
+    resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
+                       data=default_issue_dict(dict(issue_type=issue_types[1])))
+    assert 200 == resp.status_code
+    assert f'Edited {DEFAULT_ISSUE_ID}' in resp.data.decode()
+
+    issue = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert issue.changed > issue_changed_old
+
+
 @create_issue
 @logged_in
 def test_edit_issue_does_nothing_when_data_is_same(db, client):
