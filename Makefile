@@ -43,6 +43,9 @@ shell: setup
 check: setup
 	./trackerctl db check
 
+db-upgrade: setup
+	./trackerctl db upgrade
+
 test: test-py test-isort
 
 test-py coverage: setup
