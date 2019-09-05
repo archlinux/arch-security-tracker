@@ -6,6 +6,5 @@ Flask-WTF
 flask-talisman
 requests
 scrypt
-SQLAlchemy-Continuum
 pyalpm
 SQLAlchemy-Continuum
