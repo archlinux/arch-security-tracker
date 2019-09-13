@@ -81,7 +81,7 @@ db.get_or_create = MethodType(db_get_or_create, db)
 
 make_versioned(plugins=[FlaskPlugin(), PropertyModTrackerPlugin()])
 migrate = Migrate(db=db, directory=SQLALCHEMY_MIGRATE_REPO)
-talisman = Talisman(strict_transport_security=FLASK_STRICT_TRANSPORT_SECURITY)
+talisman = Talisman()
 login_manager = LoginManager()
 tracker = Blueprint('tracker', __name__)
 
@@ -98,6 +98,7 @@ def create_app(script_info=None):
                       force_https=False,
                       session_cookie_secure=False,
                       content_security_policy=csp,
+                      strict_transport_security=FLASK_STRICT_TRANSPORT_SECURITY,
                       referrer_policy='no-referrer')
 
     login_manager.init_app(app)
