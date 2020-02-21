@@ -6,7 +6,6 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from sqlalchemy import and_
-from werkzeug.contrib.atom import AtomFeed
 
 from config import TRACKER_ISSUE_URL
 from tracker import db
@@ -59,8 +58,11 @@ def get_advisory_data():
 @tracker.route('/advisories/feed.atom', methods=['GET'])
 @tracker.route('/advisory/feed.atom', methods=['GET'])
 def advisory_atom():
+    return not_found()
+
     last_recent_entries = 15
     data = get_advisory_data()['published'][:last_recent_entries]
+    # TODO:fix me
     feed = AtomFeed('Arch Linux Security - Recent advisories',
                     feed_url=request.url, url=request.url_root)
 

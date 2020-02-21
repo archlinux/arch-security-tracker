@@ -342,9 +342,10 @@ def test_advisory_cve_listing_sorted_numerically(db, client):
 
 def test_advisory_atom_no_data(db, client):
     resp = client.get(url_for('tracker.advisory_atom'), follow_redirects=True)
-    assert 200 == resp.status_code
-    data = resp.data.decode()
-    assert DEFAULT_ADVISORY_ID not in data
+    assert 404 == resp.status_code
+    # TODO: re-enable feed test
+    # data = resp.data.decode()
+    # assert DEFAULT_ADVISORY_ID not in data
 
 
 @create_package(name='foo', version='1.2.3-4')
@@ -352,9 +353,10 @@ def test_advisory_atom_no_data(db, client):
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.published)
 def test_advisory_atom(db, client):
     resp = client.get(url_for('tracker.advisory_atom'), follow_redirects=True)
-    assert 200 == resp.status_code
-    data = resp.data.decode()
-    assert DEFAULT_ADVISORY_ID in data
+    assert 404 == resp.status_code
+    # TODO: re-enable feed test
+    # data = resp.data.decode()
+    # assert DEFAULT_ADVISORY_ID in data
 
 
 def test_advisory_json_no_data(db, client):
