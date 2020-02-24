@@ -4,8 +4,8 @@
 			<h1>Issues</h1>
 			<div class="navbar">
 				<ul>
-					<li>{%- if not only_vulnerable %}<a href="/issues/vulnerable">vulnerable</a>{%- else %}<b>vulnerable</b>{%- endif %}</li>
-					<li>{%- if only_vulnerable %}<a href="/issues/all">all</a>{%- else %}<b>all</b>{%- endif %}</li>
+					<li>{%- if not only_vulnerable %}<a href="{{ url_for('tracker.index_vulnerable') }}">vulnerable</a>{%- else %}<b>vulnerable</b>{%- endif %}</li>
+					<li>{%- if only_vulnerable %}<a href="{{ url_for('tracker.index_all') }}">all</a>{%- else %}<b>all</b>{%- endif %}</li>
 				</ul>
 			</div>
 			<div class="scroll-x">

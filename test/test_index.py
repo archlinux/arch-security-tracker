@@ -18,7 +18,7 @@ def test_index(db, client):
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3')
 def test_index_vulnerable(db, client):
-    resp = client.get(url_for('tracker.index_vulnerable', path=''), follow_redirects=True)
+    resp = client.get(url_for('tracker.index_vulnerable'), follow_redirects=True)
     assert 200 == resp.status_code
     assert DEFAULT_GROUP_NAME in resp.data.decode()
 
@@ -26,7 +26,7 @@ def test_index_vulnerable(db, client):
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3')
 def test_index_all(db, client):
-    resp = client.get(url_for('tracker.index_all', path=''), follow_redirects=True)
+    resp = client.get(url_for('tracker.index_all'), follow_redirects=True)
     assert 200 == resp.status_code
     assert DEFAULT_GROUP_NAME in resp.data.decode()
 

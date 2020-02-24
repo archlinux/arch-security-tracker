@@ -62,12 +62,12 @@ def index(only_vulnerable=True, path=None):
                            only_vulnerable=only_vulnerable)
 
 
-@tracker.route('/<regex("(issues?/)?(open|vulnerable)?"):path>', defaults={'path': ''}, methods=['GET'])
+@tracker.route('/<regex("issues(/(open|vulnerable))?"):path>', defaults={'path': 'issues'}, methods=['GET'])
 def index_vulnerable(path=None):
     return index(only_vulnerable=True)
 
 
-@tracker.route('/<regex("(issues/)?(all)?"):path>', defaults={'path': ''}, methods=['GET'])
+@tracker.route('/<regex("(issues/)?all"):path>', defaults={'path': 'issues/all'}, methods=['GET'])
 def index_all(path=None):
     return index(only_vulnerable=False)
 
