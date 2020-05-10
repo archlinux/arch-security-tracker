@@ -8,7 +8,6 @@ from flask import make_response
 from flask import redirect
 from flask import render_template
 from flask import request
-
 from sqlalchemy import and_
 
 from config import TRACKER_ISSUE_URL
@@ -34,10 +33,8 @@ from tracker.util import atom_feed
 from tracker.util import json_response
 from tracker.view.error import not_found
 
-
 ERROR_ADVISORY_GROUP_NOT_FIXED = 'AVG is not fixed yet.'
 ERROR_ADVISORY_ALREADY_EXISTS = 'Advisory already exists.'
-
 
 def get_advisory_data():
     entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage)
