@@ -1,7 +1,7 @@
 __pycache__/
+asset/
 tracker.db
-tracker.db-shm
-tracker.db-wal
+tracker.db*
 .cache
 .virtualenv
 .coverage

@@ -1,10 +1,14 @@
 from collections import OrderedDict
 from re import match
 
+import pytz
+from feedgen.feed import FeedGenerator
 from flask import flash
+from flask import make_response
 from flask import redirect
 from flask import render_template
 from flask import request
+
 from sqlalchemy import and_
 
 from config import TRACKER_ISSUE_URL
@@ -29,6 +33,7 @@ from tracker.user import security_team_required
 from tracker.util import atom_feed
 from tracker.util import json_response
 from tracker.view.error import not_found
+
 
 ERROR_ADVISORY_GROUP_NOT_FIXED = 'AVG is not fixed yet.'
 ERROR_ADVISORY_ALREADY_EXISTS = 'Advisory already exists.'
@@ -58,29 +63,31 @@ def get_advisory_data():
 @tracker.route('/advisories/feed.atom', methods=['GET'])
 @tracker.route('/advisory/feed.atom', methods=['GET'])
 def advisory_atom():
-    return not_found()
-
     last_recent_entries = 15
     data = get_advisory_data()['published'][:last_recent_entries]
-    # TODO:fix me
-    feed = AtomFeed('Arch Linux Security - Recent advisories',
-                    feed_url=request.url, url=request.url_root)
+
+    feed = FeedGenerator()
+    feed.title('Arch Linux Security - Recent advisories')
+    feed.description('Arch Linux recent advsisories RSS feed')
+    feed.link(href=request.url_root)
 
     for entry in data:
-        advisory = entry['advisory']
         package = entry['package']
-        title = '[{}] {}: {}'.format(advisory.id, package.pkgname, advisory.advisory_type)
+        advisory = entry['advisory']
+        content=render_template('feed.html', content=advisory.content)
+        summary=render_template('feed.html', content=advisory.impact)
+        published = updated = advisory.created.replace(tzinfo=pytz.UTC)
 
-        feed.add(title=title,
-                 content=render_template('feed.html', content=advisory.content),
-                 content_type='html',
-                 summary=render_template('feed.html', content=advisory.impact),
-                 summary_tpe='html',
-                 author='Arch Linux Security Team',
-                 url=TRACKER_ISSUE_URL.format(advisory.id),
-                 published=advisory.created,
-                 updated=advisory.created)
-    return feed.get_response()
+        entry = feed.add_entry()
+        entry.title(f'[{advisory.id}] {package.pkgname}: {advisory.advisory_type}')
+        entry.author(name='Arch Linux Security Team')
+        entry.description(content)
+        entry.description(summary, isSummary=True)
+        entry.published(published)
+        entry.updated(updated)
+        entry.link(href=TRACKER_ISSUE_URL.format(advisory.id))
+
+    return make_response(feed.rss_str())
 
 
 @tracker.route('/advisory<regex("[./]json"):postfix>', methods=['GET'])
