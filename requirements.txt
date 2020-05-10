@@ -8,3 +8,5 @@ requests
 scrypt
 pyalpm
 SQLAlchemy-Continuum
+feedgen
+pytz

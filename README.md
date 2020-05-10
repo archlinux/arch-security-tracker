@@ -28,6 +28,8 @@ vulnerability details and generating security advisories.
 * python-flask-migrate
 * python-requests
 * python-scrypt
+* python-feedgen
+* python-pytz
 * pyalpm
 * sqlite
 
