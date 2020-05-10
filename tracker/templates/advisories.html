@@ -2,7 +2,7 @@
 {%- from "_formhelpers.html" import nullable_value, colorize_severity, colorize_status, bug_ticket -%}
 {% block content %}
 			<h1>Advisories
-				<a href="{{ url_for('tracker.advisory_atom') }}">feed</a>
+                <a href="{{ url_for('tracker.advisory_atom') }}"><img src="/static/feed.svg" alt="rss feed" height="18" width="18" /></a>
 			</h1>
 			{%- if scheduled %}
 			<h2>Scheduled</h2>
