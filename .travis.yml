@@ -18,6 +18,8 @@ archlinux:
     - python-flask-login
     - python-flask-migrate
     - python-flask-talisman
+    - python-feedgen
+    - python-pytz
     - python-requests
     - python-scrypt
     - pyalpm
