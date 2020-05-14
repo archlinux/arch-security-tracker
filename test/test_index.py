@@ -73,13 +73,11 @@ def test_index_vulnerable_json(db, client):
               list(map(lambda i: 'CVE-0005-100{}'.format(i), range(1, 11))),
               packages=['morty'], fixed='1.3-8')
 def test_index_pagination(db, client):
-
     CVES_IN_PAGE = [
         ['CVE-0005-1009', 'CVE-0005-1008', 'CVE-0005-1007', 'CVE-0005-1006', 'CVE-0005-1005',
          'CVE-0003-1007', 'CVE-0003-1006', 'CVE-0003-1005', 'CVE-0003-1004', 'CVE-0003-1003'],
         ['CVE-0003-1002', 'CVE-0003-1001', 'CVE-0002-i1007', 'CVE-0002-i1006', 'CVE-0002-i1005',
          'CVE-0001-1005', 'CVE-0001-1004', 'CVE-0001-1003', 'CVE-0001-1002', 'CVE-0001-1001']]
-
 
     # we want a valid page
     resp = client.get(url_for('tracker.index'), follow_redirects=True)
