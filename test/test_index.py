@@ -55,55 +55,64 @@ def test_index_vulnerable_json(db, client):
     assert data[0]['name'] == DEFAULT_GROUP_NAME
 
 
-@create_package(name='morty', version='1.3-7')
-@create_issue(id='CVE-0001-0001', severity=Severity.unknown)
-@create_issue(id='CVE-0002-000', severity=Severity.low, count=2)
-@create_issue(id='CVE-0003-000', severity=Severity.medium, count=3)
-@create_issue(id='CVE-0004-000', severity=Severity.high, count=4)
-@create_issue(id='CVE-0005-000', severity=Severity.critical, count=5)
-@create_issue(id='CVE-0001-100', severity=Severity.unknown, count=6)
-@create_issue(id='CVE-0002-100', severity=Severity.low, count=7)
-@create_issue(id='CVE-0003-100', severity=Severity.medium, count=8)
-@create_issue(id='CVE-0004-100', severity=Severity.high, remote=Remote.local, count=9)
-@create_issue(id='CVE-0005-100', severity=Severity.critical, remote=Remote.remote, count=10)
-@create_group(issues=list(map(lambda i: 'CVE-0001-100{}'.format(i), range(1, 7))) +
-              list(map(lambda i: 'CVE-0002-i100{}'.format(i), range(1, 8))) +
-              list(map(lambda i: 'CVE-0003-100{}'.format(i), range(1, 9))) +
-              list(map(lambda i: 'CVE-0004-100{}'.format(i), range(1, 10))) +
-              list(map(lambda i: 'CVE-0005-100{}'.format(i), range(1, 11))),
-              packages=['morty'], fixed='1.3-8')
-def test_index_pagination(db, client):
-    CVES_IN_PAGE = [
-        ['CVE-0005-1009', 'CVE-0005-1008', 'CVE-0005-1007', 'CVE-0005-1006', 'CVE-0005-1005',
-         'CVE-0003-1007', 'CVE-0003-1006', 'CVE-0003-1005', 'CVE-0003-1004', 'CVE-0003-1003'],
-        ['CVE-0003-1002', 'CVE-0003-1001', 'CVE-0002-i1007', 'CVE-0002-i1006', 'CVE-0002-i1005',
-         'CVE-0001-1005', 'CVE-0001-1004', 'CVE-0001-1003', 'CVE-0001-1002', 'CVE-0001-1001']]
 
-    # we want a valid page
-    resp = client.get(url_for('tracker.index'), follow_redirects=True)
-    assert 200 == resp.status_code
-
-    # check if pagination elements exist
-    data_page_1 = resp.data.decode()
-    assert 'issue_top_pagination' in data_page_1
-    assert 'issue_bottom_pagination' in data_page_1
-    assert  url_for('tracker.index', page=2) in data_page_1
-
-    # check if cves for page 1 are there and those for 2 not
-    for cve_of_page_1, cve_of_page_2 in zip(*CVES_IN_PAGE):
-        assert cve_of_page_1 in data_page_1
-        assert cve_of_page_2 not in data_page_1
-
-    # check if cves on page1 and 2 are different
-    resp = client.get(url_for('tracker.index', page=2), follow_redirects=True)
-    assert 200 == resp.status_code
-    data_page_2 = resp.data.decode()
-
-    # check if cves for page 2 are there and those for 1 not
-    for cve_of_page_1, cve_of_page_2 in zip(*CVES_IN_PAGE):
-        assert cve_of_page_1 not in data_page_2
-        assert cve_of_page_2 in data_page_2
-
-    # we want 404 for non existing pages
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3')
+def test_index_pagination_404_on_wrong_index(db, client):
     resp = client.get(url_for('tracker.index', page=0xdead), follow_redirects=True)
     assert 404 == resp.status_code
+
+
+@create_package(name='morty', version='1.3-7')
+@create_group(issues=map(lambda i: f'CVE-0001-100{i}', range(1, 50)),
+              packages=['morty'], fixed='1.3-8')
+def test_index_pagination_exists(db, client):
+    resp = client.get(url_for('tracker.index'), follow_redirects=True)
+    assert 200 == resp.status_code
+    data = resp.data.decode()
+    assert 'issue_top_pagination' in data
+    assert 'issue_bottom_pagination' in data
+    assert  url_for('tracker.index', page=2) in data
+
+
+@create_package(name='morty', version='1.3-7')
+@create_issue(id='CVE-0001-0001')
+@create_issue(id='CVE-0002-000', count=2)
+@create_issue(id='CVE-0003-000', count=3)
+@create_issue(id='CVE-0004-000', count=4)
+@create_issue(id='CVE-0005-000', count=5)
+@create_issue(id='CVE-0001-100', count=6)
+@create_issue(id='CVE-0002-100', count=7)
+@create_issue(id='CVE-0003-100', count=8)
+@create_issue(id='CVE-0004-100', count=9)
+@create_issue(id='CVE-0005-100', count=10)
+@create_group(issues=
+              list(map(lambda i: f'CVE-0001-100{i}', range(1, 7))) +
+              list(map(lambda i: f'CVE-0002-100{i}', range(1, 8))) +
+              list(map(lambda i: f'CVE-0003-100{i}', range(1, 9))) +
+              list(map(lambda i: f'CVE-0004-100{i}', range(1, 10))) +
+              list(map(lambda i: f'CVE-0005-100{i}', range(1, 11))),
+              packages=['morty'], fixed='1.3-8')
+def test_index_pagination_pages_correctly(db, client):
+    PAGE_1_CVES = [
+        'CVE-0005-1009', 'CVE-0005-1008', 'CVE-0005-1007', 'CVE-0005-1006', 'CVE-0005-1005',
+        'CVE-0003-1007', 'CVE-0003-1006', 'CVE-0003-1005', 'CVE-0003-1004', 'CVE-0003-1003']
+    PAGE_2_CVES = [
+        'CVE-0003-1002', 'CVE-0003-1001', 'CVE-0002-1007', 'CVE-0002-1006', 'CVE-0002-1005',
+        'CVE-0001-1005', 'CVE-0001-1004', 'CVE-0001-1003', 'CVE-0001-1002', 'CVE-0001-1001']
+
+    resp_1 = client.get(url_for('tracker.index', page=1), follow_redirects=True)
+    resp_2 = client.get(url_for('tracker.index', page=2), follow_redirects=True)
+    assert 200 == resp_1.status_code
+    assert 200 == resp_2.status_code
+
+    page_1 = resp_1.data.decode()
+    page_2 = resp_2.data.decode()
+
+    for cve_of_page_1 in PAGE_1_CVES:
+        assert cve_of_page_1 in page_1
+        assert cve_of_page_1 not in page_2
+
+    for cve_of_page_2 in PAGE_2_CVES:
+        assert cve_of_page_2 in page_2
+        assert cve_of_page_2 not in page_1
