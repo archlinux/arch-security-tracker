@@ -1,13 +1,13 @@
 from collections import OrderedDict
 from re import match
 
-import pytz
 from feedgen.feed import FeedGenerator
 from flask import flash
 from flask import make_response
 from flask import redirect
 from flask import render_template
 from flask import request
+from pytz import UTC
 from sqlalchemy import and_
 
 from config import TRACKER_ISSUE_URL
@@ -62,7 +62,6 @@ def get_advisory_data():
 def advisory_atom():
     last_recent_entries = 15
     data = get_advisory_data()['published'][:last_recent_entries]
-
     feed = FeedGenerator()
     feed.title('Arch Linux Security - Recent advisories')
     feed.description('Arch Linux recent advsisories RSS feed')
@@ -73,7 +72,7 @@ def advisory_atom():
         advisory = entry['advisory']
         content=render_template('feed.html', content=advisory.content)
         summary=render_template('feed.html', content=advisory.impact)
-        published = updated = advisory.created.replace(tzinfo=pytz.UTC)
+        published = updated = advisory.created.replace(tzinfo=UTC)
 
         entry = feed.add_entry()
         entry.title(f'[{advisory.id}] {package.pkgname}: {advisory.advisory_type}')
