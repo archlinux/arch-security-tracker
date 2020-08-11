@@ -6,9 +6,9 @@ jobs:
     steps:
       - name: Install dependencies
         run: >
-          pacman -Syu --noconfirm git make python python-isort python-pytest python-pytest-cov python-sqlalchemy
-          python-sqlalchemy-continuum python-flask python-flask-sqlalchemy python-flask-wtf python-flask-login
-          python-flask-migrate python-flask-talisman python-email-validator python-feedgen
+          pacman -Syu --noconfirm git make python python-authlib python-isort python-pytest python-pytest-cov
+          python-sqlalchemy python-sqlalchemy-continuum python-flask python-flask-sqlalchemy python-flask-wtf
+          python-flask-login python-flask-migrate python-flask-talisman python-email-validator python-feedgen
           python-pytz python-requests python-scrypt pyalpm sqlite
       - uses: actions/checkout@v2
       - name: Run tests

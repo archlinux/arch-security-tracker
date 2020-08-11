@@ -7,6 +7,10 @@ from flask_login import login_required
 from scrypt import hash as shash
 from sqlalchemy.exc import IntegrityError
 
+from config import SSO_ADMINISTRATOR_GROUP
+from config import SSO_ENABLED
+from config import SSO_REPORTER_GROUP
+from config import SSO_SECURITY_TEAM_GROUP
 from config import TRACKER_PASSWORD_LENGTH_MIN
 from tracker import db
 from tracker import login_manager
@@ -61,6 +65,26 @@ def security_team_required(func):
 
 def administrator_required(func):
     return permission_required(UserRole.is_administrator)(func)
+
+
+def require_expected_sso_state(expected):
+    def decorator(func):
+        @wraps(func)
+        def decorated_view(*args, **kwargs):
+            if SSO_ENABLED is not expected:
+                from tracker.view.error import not_found
+                return not_found()
+            return func(*args, **kwargs)
+        return decorated_view
+    return decorator
+
+
+def only_with_sso(func):
+    return require_expected_sso_state(expected=True)(func)
+
+
+def only_without_sso(func):
+    return require_expected_sso_state(expected=False)(func)
 
 
 def user_can_edit_issue(advisories=[]):
@@ -127,3 +151,17 @@ def user_generate_new_token(callback, max_tries=32):
             db.session.rollback()
             failed += 1
     raise Exception('Failed to obtain unique token within {} tries'.format(max_tries))
+
+
+def get_user_role_from_idp_groups(idp_groups):
+    group_names_for_roles = {
+        SSO_ADMINISTRATOR_GROUP: UserRole.administrator,
+        SSO_SECURITY_TEAM_GROUP: UserRole.security_team,
+        SSO_REPORTER_GROUP: UserRole.reporter
+    }
+
+    eligible_roles = [group_names_for_roles[group] for group in idp_groups if group in group_names_for_roles]
+
+    if eligible_roles:
+        return sorted(eligible_roles, reverse=False)[0]
+    return None

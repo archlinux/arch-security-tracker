@@ -5,6 +5,8 @@ from os import urandom
 from random import randint
 
 from flask import render_template
+from werkzeug import Response
+from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import Gone
 from werkzeug.exceptions import InternalServerError
@@ -32,10 +34,10 @@ def errorhandler(code_or_exception):
 def handle_error(e, code, json=False):
     if json:
         return {'message': e}, code
-    return render_template('error.html',
-                           smiley=smileys_sad[randint(0, len(smileys_sad) - 1)],
-                           text=e,
-                           title='{}'.format(code)), code
+    return Response(render_template('error.html',
+                                    smiley=smileys_sad[randint(0, len(smileys_sad) - 1)],
+                                    text=e,
+                                    title='{}'.format(code)), code)
 
 
 @errorhandler(NotFound.code)
@@ -56,6 +58,11 @@ def method_not_allowed(e='405: Method Not Allowed', json=False):
 @errorhandler(Gone.code)
 def gone(e='410: Gone', json=False):
     return handle_error(e, Gone.code, json)
+
+
+@errorhandler(BadRequest.code)
+def bad_request(e='400: Bad Request', json=False):
+    return handle_error(e, BadRequest.code, json)
 
 
 @errorhandler(Exception)

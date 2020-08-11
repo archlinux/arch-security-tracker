@@ -12,6 +12,7 @@ vulnerability details and generating security advisories.
 * Todo lists
 * Advisory scheduling
 * Advisory generation
+* SSO or local users
 
 ## Dependencies
 
@@ -26,6 +27,7 @@ vulnerability details and generating security advisories.
 * python-flask-wtf
 * python-flask-login
 * python-flask-migrate
+* python-authlib
 * python-email-validator
 * python-requests
 * python-scrypt
@@ -99,8 +101,22 @@ a new configuration file with a ```.local.conf``` suffix and some non
 zero prefix like ```20-user.local.conf```. Files using this suffix are
 on the ```.gitignore``` and not handled as untracked or dirty.
 
+## SSO setup
+
+A simple test environment for SSO can be configured using Keycloak:
+
+1. Run a local Keycloak installation via docker as [described
+   upstream](https://www.keycloak.org/getting-started/getting-started-docker).
+
+2. Create an ```arch-securiy-tracker``` client in Keycloak like in
+   [test/data/openid-client.json](test/data/openid-client.json).
+   Make sure the client contains a mapper for the group memberships called
+   ```groups``` which is included as a claim.
+
+3. Create a local tracker config file with enabled SSO and configure OIDC
+   secrets, groups and metadata url accordingly.
+
 ## Contribution
 
 Help is appreciated, for some guidelines and recommendations check our
-[Contribution](https://github.com/archlinux/arch-security-tracker/blob/master/CONTRIBUTING.md)
-file.
+[Contribution](CONTRIBUTING.md) file.

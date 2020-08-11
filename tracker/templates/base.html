@@ -32,7 +32,9 @@
 					<li><a href="/user">user</a></li>
 					<li><a href="/cve/add">add CVE</a></li>
 					<li><a href="/avg/add">add AVG</a></li>
+					{%- if not SSO_ENABLED %}
 					<li><a href="/profile">profile</a></li>
+					{%- endif %}
 					<li><a href="/logout" accesskey="q">logout</a></li>
 					{%- endif %}
 				</ul>

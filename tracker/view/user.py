@@ -17,10 +17,12 @@ from tracker.model import CVEGroup
 from tracker.model import User
 from tracker.model.user import username_regex
 from tracker.user import hash_password
+from tracker.user import only_without_sso
 from tracker.user import random_string
 
 
 @tracker.route('/profile', methods=['GET', 'POST'])
+@only_without_sso
 @login_required
 def edit_own_user_profile():
     form = UserPasswordForm()

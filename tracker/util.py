@@ -2,6 +2,7 @@ import re
 from functools import wraps
 
 from flask import json
+from requests.models import PreparedRequest
 
 from config import atom_feeds
 
@@ -12,6 +13,7 @@ punctuation_re = re.compile(
         '|'.join(map(re.escape, ('.', ',', ')', '>', '\n', '&gt;')))
     )
 )
+
 
 def multiline_to_list(data, whitespace_separator=True, unique_only=True, filter_empty=True):
     if not data:
@@ -93,3 +95,9 @@ def atom_feed(title):
 def issue_to_numeric(issue_label):
     self_parts = issue_label.split('-')
     return int(self_parts[1] + self_parts[2].rjust(7, '0'))
+
+
+def add_params_to_uri(url, params):
+    req = PreparedRequest()
+    req.prepare_url(url, params)
+    return req.url

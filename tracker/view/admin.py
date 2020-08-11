@@ -4,6 +4,7 @@ from flask import render_template
 from flask_login import current_user
 from flask_login import login_required
 
+from config import SSO_ENABLED
 from config import TRACKER_PASSWORD_LENGTH_MAX
 from config import TRACKER_PASSWORD_LENGTH_MIN
 from tracker import db
@@ -16,6 +17,7 @@ from tracker.model.user import User
 from tracker.model.user import username_regex
 from tracker.user import administrator_required
 from tracker.user import hash_password
+from tracker.user import only_without_sso
 from tracker.user import random_string
 from tracker.user import user_invalidate
 from tracker.view.error import forbidden
@@ -48,6 +50,7 @@ def list_user():
 
 
 @tracker.route('/user/create', methods=['GET', 'POST'])
+@only_without_sso
 @administrator_required
 def create_user():
     form = UserForm()
@@ -76,6 +79,7 @@ def create_user():
 
 
 @tracker.route('/user/<regex("{}"):username>/edit'.format(username_regex[1:-1]), methods=['GET', 'POST'])
+@only_without_sso
 @administrator_required
 def edit_user(username):
     own_user = username == current_user.name
@@ -125,6 +129,7 @@ def edit_user(username):
 
 
 @tracker.route('/user/<regex("{}"):username>/delete'.format(username_regex[1:-1]), methods=['GET', 'POST'])
+@only_without_sso
 @administrator_required
 def delete_user(username):
     user = User.query.filter_by(name=username).first()

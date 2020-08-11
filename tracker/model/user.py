@@ -12,6 +12,7 @@ class User(db.Model):
     SALT_LENGTH = 20
     PASSWORD_LENGTH = 80
     TOKEN_LENGTH = 120
+    IDP_ID_LENGTH = 255
 
     __tablename__ = 'user'
     id = db.Column(db.Integer(), index=True, unique=True, primary_key=True, autoincrement=True)
@@ -22,6 +23,7 @@ class User(db.Model):
     token = db.Column(db.String(TOKEN_LENGTH), index=True, unique=True, nullable=True)
     role = db.Column(UserRole.as_type(), nullable=False, default=UserRole.reporter)
     active = db.Column(db.Boolean(), nullable=False, default=True)
+    idp_id = db.Column(db.String(IDP_ID_LENGTH), nullable=True, default=None, index=True, unique=True)
 
     is_authenticated = False
     is_anonymous = False

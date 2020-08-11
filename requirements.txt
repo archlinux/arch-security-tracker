@@ -12,3 +12,4 @@ SQLAlchemy-Continuum
 SQLAlchemy~=1.3.0
 feedgen
 pytz
+authlib
