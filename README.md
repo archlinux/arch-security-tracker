@@ -26,6 +26,7 @@ vulnerability details and generating security advisories.
 * python-flask-wtf
 * python-flask-login
 * python-flask-migrate
+* python-email-validator
 * python-requests
 * python-scrypt
 * python-feedgen

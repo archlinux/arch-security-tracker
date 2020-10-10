@@ -4,6 +4,7 @@ Flask-SQLAlchemy
 Flask-Migrate
 Flask-WTF
 flask-talisman
+email_validator
 requests
 scrypt
 pyalpm
