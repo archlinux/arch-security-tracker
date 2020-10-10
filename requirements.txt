@@ -8,3 +8,4 @@ requests
 scrypt
 pyalpm
 SQLAlchemy-Continuum
+email_validator
