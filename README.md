@@ -30,6 +30,7 @@ vulnerability details and generating security advisories.
 * python-scrypt
 * pyalpm
 * sqlite
+* python-email-validator
 
 ### Tests
 

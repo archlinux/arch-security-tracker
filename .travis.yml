@@ -22,6 +22,7 @@ archlinux:
     - python-scrypt
     - pyalpm
     - sqlite
+    - python-email-validator
   script:
     - python3 -m py_compile $(git ls-files '*.py')
     - make test
