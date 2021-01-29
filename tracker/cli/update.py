@@ -52,7 +52,9 @@ def env(ctx):
 def group(recalc=False, recalc_status=False, recalc_severity=False):
     """Update group status."""
 
-    from tracker.maintenance import update_group_status, recalc_group_severity, recalc_group_status
+    from tracker.maintenance import recalc_group_severity
+    from tracker.maintenance import recalc_group_status
+    from tracker.maintenance import update_group_status
 
     echo('Updating group status...', nl=False)
     updated = update_group_status()

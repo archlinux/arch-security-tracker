@@ -41,9 +41,10 @@ def run(info, host, port, debug, reload, debugger, eager_loading, with_threads):
     The reloader and debugger are by default enabled if the debug flag of
     Flask is enabled and disabled otherwise.
     """
-    from werkzeug.serving import run_simple
     import os
+
     from flask.cli import DispatchingApp
+    from werkzeug.serving import run_simple
 
     if debug != FLASK_DEBUG:
         set_debug_flag(debug)

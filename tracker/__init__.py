@@ -118,7 +118,13 @@ def create_app(script_info=None):
 
     @app.shell_context_processor
     def make_shell_context():
-        from tracker.model import Advisory, CVE, CVEGroup, CVEGroupEntry, CVEGroupPackage, User, Package
+        from tracker.model import CVE
+        from tracker.model import Advisory
+        from tracker.model import CVEGroup
+        from tracker.model import CVEGroupEntry
+        from tracker.model import CVEGroupPackage
+        from tracker.model import Package
+        from tracker.model import User
         return dict(db=db, migrate=migrate, talisman=talisman, login_manager=login_manager, tracker=tracker,
                     Advisory=Advisory, CVE=CVE, CVEGroup=CVEGroup, CVEGroupEntry=CVEGroupEntry,
                     CVEGroupPackage=CVEGroupPackage, User=User, Package=Package)

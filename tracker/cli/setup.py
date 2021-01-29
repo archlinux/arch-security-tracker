@@ -108,7 +108,8 @@ def user(username, email, password, role, active):
     """Create a new application user."""
 
     from tracker import db
-    from tracker.user import random_string, hash_password
+    from tracker.user import hash_password
+    from tracker.user import random_string
 
     user_by_name = db.get(User, name=username)
     if user_by_name:

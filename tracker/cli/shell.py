@@ -17,13 +17,16 @@ def shell(ipython_args):
     without having to manually configuring the application.
     """
 
-    from sys import version, platform
+    from sys import platform
+    from sys import version
+
     from flask.globals import _app_ctx_stack
     app = _app_ctx_stack.top.app
     ctx = app.make_shell_context()
 
     try:
-        from IPython import __version__ as ipython_version, start_ipython
+        from IPython import __version__ as ipython_version
+        from IPython import start_ipython
         from IPython.terminal.ipapp import load_default_config
         from traitlets.config.loader import Config
 
