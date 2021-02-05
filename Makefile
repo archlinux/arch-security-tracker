@@ -8,7 +8,7 @@ PYTEST_PDB?=0
 PYTEST_PDB_OPTIONS?=--pdb --pdbcls=IPython.terminal.debugger:TerminalPdb
 
 ISORT?=isort
-ISORT_OPTIONS+=--recursive --skip .virtualenv --skip .venv
+ISORT_OPTIONS+=--skip .virtualenv --skip .venv
 ISORT_CHECK_OPTIONS+=--check-only --diff
 
 .PHONY: update test
