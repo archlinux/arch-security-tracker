@@ -16,21 +16,8 @@
 		{%- endfor %}
 	</head>
 	<body>
-		<div id="archnavbar">
-			<div id="logo"><a href="https://archlinux.org" title="Return to the main page">Arch Linux</a></div>
-			<div id="archnavbarmenu">
-				<ul id="archnavbarlist">
-					<li id="anb-home"><a href="https://archlinux.org" title="Arch news, packages, projects and more">Home</a></li>
-					<li id="anb-packages"><a href="https://archlinux.org/packages/" title="Arch Package Database">Packages</a></li>
-					<li id="anb-forums"><a href="https://bbs.archlinux.org/" title="Community forums">Forums</a></li>
-					<li id="anb-wiki"><a href="https://wiki.archlinux.org/" title="Community documentation">Wiki</a></li>
-					<li id="anb-bugs"><a href="https://bugs.archlinux.org/" title="Report and track bugs">Bugs</a></li>
-					<li id="anb-security"><a href="https://security.archlinux.org/" title="Arch Linux Security Tracker">Security</a></li>
-					<li id="anb-aur"><a href="https://aur.archlinux.org/" title="Arch Linux User Repository">AUR</a></li>
-					<li id="anb-download"><a href="https://archlinux.org/download/" title="Get Arch Linux">Download</a></li>
-				</ul>
-			</div>
-		</div>
+		{%- macro navbar() %}{% include "navbar.html" %}{% endmacro %}
+		{{ navbar()|replace('\n', "\n\t\t") }}
 		<div class="content">
 			<div class="navbar">
 				<ul>

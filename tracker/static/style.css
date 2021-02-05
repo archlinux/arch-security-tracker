@@ -101,7 +101,8 @@ select {
 }
 
 #logo {
-	background: rgba(0, 0, 0, 0) url("archlogo.a2d0ef2df27d.png") no-repeat scroll 0 0 !important;
+	background: rgba(0, 0, 0, 0) url("archlogo.8a05bc7f6cd1.svg") no-repeat scroll 0 0 !important;
+	background-size: 100% !important;
 	height: 40px !important;
 	margin: 0 !important;
 	padding: 0 !important;
