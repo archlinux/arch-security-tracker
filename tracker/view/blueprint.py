@@ -7,13 +7,13 @@ from flask import url_for
 from jinja2.filters import do_urlize
 from jinja2.filters import evalcontextfilter
 from jinja2.utils import Markup
-from jinja2.utils import _punctuation_re
-from jinja2.utils import _word_split_re
 from jinja2.utils import escape
 
 from tracker.model.cve import cve_id_regex
 from tracker.model.cvegroup import vulnerability_group_regex
 from tracker.util import issue_to_numeric
+from tracker.util import punctuation_re
+from tracker.util import word_split_re
 
 blueprint = Blueprint('filters', __name__)
 
@@ -56,9 +56,9 @@ def urlize(ctx, text, trim_url_limit=None, rel=None, target=None):
     If target is not None, a target attribute will be added to the link.
     """
 
-    words = _word_split_re.split(escape(text))
+    words = word_split_re.split(escape(text))
     for i, word in enumerate(words):
-        match = _punctuation_re.match(word)
+        match = punctuation_re.match(word)
         if match:
             lead, word, trail = match.groups()
             word = sub('({})'.format(cve_id_regex), '<a href="/\\1" rel="noopener">\\1</a>', word)

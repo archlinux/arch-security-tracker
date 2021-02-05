@@ -1,9 +1,17 @@
+import re
 from functools import wraps
 
 from flask import json
 
 from config import atom_feeds
 
+word_split_re = re.compile(r'(\s+)')
+punctuation_re = re.compile(
+    '^(?P<lead>(?:%s)*)(?P<middle>.*?)(?P<trail>(?:%s)*)$' % (
+        '|'.join(map(re.escape, ('(', '<', '&lt;'))),
+        '|'.join(map(re.escape, ('.', ',', ')', '>', '\n', '&gt;')))
+    )
+)
 
 def multiline_to_list(data, whitespace_separator=True, unique_only=True, filter_empty=True):
     if not data:
