@@ -41,6 +41,7 @@ from tracker.view.error import forbidden
 from tracker.view.error import not_found
 
 WARNING_ADVISORY_ALREADY_PUBLISHED = 'WARNING: This advisory is already published!'
+ERROR_ISSUE_REFERENCED_BY_ADVISORY = 'Insufficient permissions to edit {} that is referenced by an already published advisory!'
 
 
 @tracker.route('/advisory/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
@@ -101,6 +102,7 @@ def edit_cve(cve):
     advisories = set(advisory for (cve, group, advisory) in entries if advisory)
 
     if not user_can_edit_issue(advisories):
+        flash(ERROR_ISSUE_REFERENCED_BY_ADVISORY.format(cve.id), 'error')
         return forbidden()
 
     form = CVEForm(edit=True)
