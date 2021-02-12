@@ -7,6 +7,7 @@ from tracker import tracker
 from tracker.form import CVEForm
 from tracker.form import GroupForm
 from tracker.model import CVE
+from tracker.model import Advisory
 from tracker.model import CVEGroup
 from tracker.model import CVEGroupEntry
 from tracker.model import CVEGroupPackage
@@ -17,13 +18,16 @@ from tracker.model.enum import Status
 from tracker.model.enum import affected_to_status
 from tracker.model.enum import highest_severity
 from tracker.user import reporter_required
+from tracker.user import user_can_edit_issue
 from tracker.util import multiline_to_list
+from tracker.view.error import forbidden
 
 ERROR_GROUP_WITH_ISSUE_EXISTS = 'The group AVG-{} already contains {} for the package {}'
 ERROR_OPEN_GROUP_EXISTS = 'The group AVG-{} already has open issues for the package {}'
 CVE_MERGED = 'Merged existing {} with the provided data'
 CVE_MERGED_PARTIALLY = 'Failed to fully merge {}, check the following fields: {}'
 ERROR_UNMERGEABLE = 'Unmergeable field, old value shown'
+ERROR_ISSUE_REFERENCED_BY_ADVISORY = 'Insufficient permissions to edit {} that is referenced by an already published advisory!'
 
 
 @tracker.route('/cve/add', methods=['GET', 'POST'])
@@ -38,6 +42,15 @@ def add_cve():
 
     cve = db.get(CVE, id=form.cve.data)
     if cve is not None:
+        advisories = (db.session.query(Advisory)
+                      .join(CVEGroupEntry, CVEGroupEntry.cve_id == cve.id)
+                      .join(CVEGroup, CVEGroupEntry.group)
+                      .join(CVEGroupPackage, CVEGroup.packages)
+                      .filter(Advisory.group_package_id == CVEGroupPackage.id)).all()
+        if not user_can_edit_issue(advisories):
+             flash(ERROR_ISSUE_REFERENCED_BY_ADVISORY.format(cve.id), 'error')
+             return forbidden()
+
         not_merged = []
         merged = False
 
