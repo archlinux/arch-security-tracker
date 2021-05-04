@@ -8,11 +8,13 @@ from tracker.form.validators import ERROR_INVALID_URL
 from tracker.form.validators import ERROR_ISSUE_ID_INVALID
 from tracker.model.cve import CVE
 from tracker.model.cve import issue_types
+from tracker.model.enum import Publication
 from tracker.model.enum import Remote
 from tracker.model.enum import Severity
 from tracker.model.enum import UserRole
 from tracker.view.add import CVE_MERGED
 from tracker.view.add import CVE_MERGED_PARTIALLY
+from tracker.view.add import ERROR_ISSUE_REFERENCED_BY_ADVISORY
 
 from .conftest import DEFAULT_ADVISORY_ID
 from .conftest import DEFAULT_GROUP_ID
@@ -413,3 +415,76 @@ def test_edit_issue_does_nothing_when_data_is_same(db, client):
 
     issue = CVE.query.get(DEFAULT_ISSUE_ID)
     assert issue.changed == issue_changed_old
+
+
+@create_issue
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.scheduled)
+@logged_in(role=UserRole.reporter)
+def test_edit_issue_as_reporter_with_referenced_advisory_fails(db, client):
+    resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
+                       data=default_issue_dict(dict(description='changed')))
+    assert Forbidden.code == resp.status_code
+
+    data = resp.data.decode()
+    assert f'Edited {DEFAULT_ISSUE_ID}' not in data
+    assert ERROR_ISSUE_REFERENCED_BY_ADVISORY.format(DEFAULT_ISSUE_ID) in data
+
+    issue = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert 'changed' not in issue.description
+
+
+@create_issue
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.scheduled)
+@logged_in(role=UserRole.security_team)
+def test_edit_issue_as_security_team_with_referenced_advisory(db, client):
+    resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
+                       data=default_issue_dict(dict(description='changed')))
+    assert 200 == resp.status_code
+
+    data = resp.data.decode()
+    assert f'Edited {DEFAULT_ISSUE_ID}' in data
+
+    issue = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert 'changed' == issue.description
+
+
+
+@create_issue
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.scheduled)
+@logged_in(role=UserRole.reporter)
+def test_merge_issue_as_reporter_with_referenced_advisory_fails(db, client):
+    resp = client.post(url_for('tracker.add_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
+                       data=default_issue_dict(dict(description='changed')))
+    assert Forbidden.code == resp.status_code
+
+    data = resp.data.decode()
+    assert CVE_MERGED.format(DEFAULT_ISSUE_ID) not in data
+    assert CVE_MERGED_PARTIALLY.format(DEFAULT_ISSUE_ID, '') not in data
+    assert ERROR_ISSUE_REFERENCED_BY_ADVISORY.format(DEFAULT_ISSUE_ID) in data
+
+    issue = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert 'changed' not in issue.description
+
+
+@create_issue
+@create_package(name='foo', version='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1], reference='https://security.archlinux.org', publication=Publication.scheduled)
+@logged_in(role=UserRole.security_team)
+def test_merge_issue_as_security_team_with_referenced_advisory(db, client):
+    resp = client.post(url_for('tracker.add_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
+                       data=default_issue_dict(dict(description='changed')))
+    assert 200 == resp.status_code
+
+    data = resp.data.decode()
+    assert CVE_MERGED.format(DEFAULT_ISSUE_ID) in data
+    assert CVE_MERGED_PARTIALLY.format(DEFAULT_ISSUE_ID, '') not in data
+
+    issue = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert 'changed' == issue.description
