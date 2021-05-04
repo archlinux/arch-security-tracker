@@ -1,9 +1,14 @@
+from os.path import exists
+from os.path import join
+
 from click import echo
 from click import option
 from click import pass_context
 from flask.cli import with_appcontext
+from flask_migrate import stamp
 from flask_migrate.cli import db as db_cli
 
+from config import basedir
 from tracker import db
 
 
@@ -47,7 +52,10 @@ def initdb(ctx, purge):
         ctx.invoke(drop)
 
     echo('Initializing database...', nl=False)
+    db_exists = exists(join(basedir, 'tracker.db'))
     db.create_all()
+    if not db_exists:
+        stamp()
     echo('done')
 
 
