@@ -9,11 +9,18 @@
 Keep indention and style consistency in mind and double-check your commit diffs before pushing.
 
 ### Definition
+  * **Always:**
+    * **End of line:** LF
+    * **Insert final newline:** yes
   * **Python:**
     * **Indention:** 4 spaces
     * **Style:** full PEP except max line length on judgement (E501)
   * **HTML/CSS:**
      * **Indention:** 1 tab
+  * **YAML:**
+    * **Indention:** 2 spaces
+  * **Markdown:**
+    * **Indention:** 2 spaces
 
 
 ### Vim settings
@@ -25,6 +32,14 @@ Keep indention and style consistency in mind and double-check your commit diffs 
   * **HTML/CSS:**
     ```
     foldmethod=indent noexpandtab
+    ```
+  * **YAML:**
+    ```
+     foldmethod=indent tabstop=2 expandtab
+    ```
+  * **Markdown:**
+    ```
+     foldmethod=indent tabstop=2 expandtab
     ```
 
 ## Git pull-request
