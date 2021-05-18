@@ -159,7 +159,7 @@
 {%- endmacro -%}
 
 {%- macro label_from_model(model) -%}
-	{%- if model.__class__.__name__ == 'CVEGroupVersion' %}AVG-{% endif %}{{ model.id }}
+	{%- if model.__class__.__name__ in ['CVEGroupVersion', 'CVEGroup'] %}AVG-{% endif %}{{ model.id }}
 {%- endmacro -%}
 
 {%- macro link_to_model(model) -%}

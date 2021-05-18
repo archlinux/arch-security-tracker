@@ -2,6 +2,9 @@
 {% block content %}
 			<h1>{{ title }}</h1>
 			<div class="wide size">
+				{%- if concurrent_modification %}
+				{%- include 'log/advisory_log_table.html' %}
+				{%- endif %}
 				<form action="" method="post" name="edit-advisory">
 					{{ form.hidden_tag() }}
 					<div class="row">
@@ -19,6 +22,13 @@
 							{{ render_field(form.impact, class='full size', maxlength=Advisory.IMPACT_LENGTH, placeholder='Overall impact...', indent=7, autofocus='') }}
 						</div>
 					</div>
+					{%- if concurrent_modification %}
+					<div class="row">
+						<div class="one-quarter column">
+							{{ render_checkbox(form.force_submit, indent=7) }}
+						</div>
+					</div>
+					{%- endif %}
 					{{ form.edit(class='button-primary', accesskey='s') }}
 				</form>
 			</div>

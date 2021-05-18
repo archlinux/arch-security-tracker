@@ -33,6 +33,7 @@ from .conftest import create_advisory_content
 from .conftest import create_group
 from .conftest import create_issue
 from .conftest import create_package
+from .conftest import default_advisory_dict
 from .conftest import default_group_dict
 from .conftest import default_issue_dict
 from .conftest import get_advisory
@@ -206,7 +207,7 @@ def test_edit_advisory(db, client):
     workaround = 'the cake is a lie'
     impact = 'Big shit and deep trouble!'
     resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
-                       data={'workaround': workaround, 'impact': impact})
+                       data=default_advisory_dict({'workaround': workaround, 'impact': impact}))
     assert 200 == resp.status_code
     assert 'text/html; charset=utf-8' == resp.content_type
     assert_advisory_data(DEFAULT_ADVISORY_ID, workaround=workaround, impact=impact)
@@ -216,7 +217,7 @@ def test_edit_advisory(db, client):
 @logged_in
 def test_edit_advisory_not_found(db, client):
     resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
-                       data={'workaround': 'nothing', 'impact': 'nothing'})
+                       data=default_advisory_dict({'workaround': 'nothing', 'impact': 'nothing'}))
     assert resp.status_code == NotFound.code
     assert 'text/html; charset=utf-8' == resp.content_type
 
@@ -666,7 +667,7 @@ def test_advisory_published_content_not_over_escaped(db, client, patch_get):
 def test_edit_advisory_non_relational_field_updates_changed_date(db, client):
     advisory_changed_old = Advisory.query.get(DEFAULT_ADVISORY_ID).changed
 
-    data = dict(impact='everything beyond repair', workaround='set computer on fire')
+    data = default_advisory_dict(dict(impact='everything beyond repair', workaround='set computer on fire'))
     resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert f'Edited {DEFAULT_ADVISORY_ID}' in resp.data.decode()
@@ -682,7 +683,7 @@ def test_edit_advisory_non_relational_field_updates_changed_date(db, client):
 def test_edit_advisory_does_nothing_when_data_is_same(db, client):
     advisory_changed_old = Advisory.query.get(DEFAULT_ADVISORY_ID).changed
 
-    data = dict(impact='everything beyond repair', workaround='set computer on fire')
+    data = default_advisory_dict(dict(impact='everything beyond repair', workaround='set computer on fire'))
     resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True, data=data)
     assert 200 == resp.status_code
     assert f'Edited {DEFAULT_ADVISORY_ID}' not in resp.data.decode()

@@ -1,5 +1,6 @@
 from pyalpm import vercmp
 from wtforms import BooleanField
+from wtforms import HiddenField
 from wtforms import SelectField
 from wtforms import StringField
 from wtforms import SubmitField
@@ -30,7 +31,10 @@ class GroupForm(BaseForm):
     reference = TextAreaField(u'References', validators=[Optional(), Length(max=CVEGroup.REFERENCES_LENGTH), ValidURLs()])
     notes = TextAreaField(u'Notes', validators=[Optional(), Length(max=CVEGroup.NOTES_LENGTH)])
     advisory_qualified = BooleanField(u'Advisory qualified', default=True, validators=[Optional()])
-    force_submit = BooleanField(u'Force creation', default=False, validators=[Optional()])
+    changed = HiddenField(u'Changed', validators=[Optional()])
+    changed_latest = HiddenField(u'Latest Changed', validators=[Optional()])
+    force_update = BooleanField(u'Force update', default=False, validators=[Optional()])
+    force_creation = BooleanField(u'Force creation', default=False, validators=[Optional()])
     submit = SubmitField(u'submit')
 
     def __init__(self, packages=[]):

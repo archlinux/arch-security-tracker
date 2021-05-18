@@ -1,4 +1,6 @@
 
+from datetime import datetime
+
 from flask import url_for
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
@@ -44,7 +46,8 @@ def set_and_assert_cve_data(db, client, cve_id, route):
                                  severity=severity.name,
                                  description=description,
                                  notes=notes,
-                                 reference=reference))
+                                 reference=reference,
+                                 changed=str(datetime.utcfromtimestamp(0))))
     assert 200 == resp.status_code
 
     cve = CVE.query.get(cve_id)

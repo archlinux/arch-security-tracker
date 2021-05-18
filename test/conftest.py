@@ -161,13 +161,15 @@ DEFAULT_ISSUE_ID = 'CVE-2016-1337'
 
 def default_issue_dict(overrides=dict()):
     data = dict(cve=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown.name,
-                severity=Severity.unknown.name, description='', notes='', reference='')
+                severity=Severity.unknown.name, description='', notes='', reference='',
+                changed=str(datetime.utcfromtimestamp(0)))
     data.update(overrides)
     return data
 
 
 def create_issue(func=None, id=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remote=Remote.unknown,
-                 severity=Severity.unknown, description='', notes='', reference='', count=1):
+                 severity=Severity.unknown, description='', notes='', reference='',
+                 changed=datetime.utcfromtimestamp(0), count=1):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
@@ -180,6 +182,7 @@ def create_issue(func=None, id=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remo
                 issue.description = description
                 issue.notes = notes
                 issue.reference = reference
+                issue.changed = changed
                 db.session.add(issue)
             db.session.commit()
             func(db=db, *args, **kwargs)
@@ -226,14 +229,15 @@ DEFAULT_GROUP_NAME = 'AVG-{}'.format(DEFAULT_GROUP_ID)
 def default_group_dict(overrides=dict()):
     data = dict(cve=DEFAULT_ISSUE_ID, pkgnames='foopkg', affected='1.0-1', fixed=None,
                 status=Affected.unknown.name, bug_ticket='', reference='', notes='',
-                advisory_qualified=True)
+                advisory_qualified=True, changed=str(datetime.utcfromtimestamp(0)))
     data.update(overrides)
     return data
 
 
 def create_group(func=None, id=None, status=None, severity=None,
                  affected='1.0-1', fixed=None, bug_ticket='', reference='', notes='',
-                 created=datetime.utcnow(), advisory_qualified=True, issues=[DEFAULT_ISSUE_ID], packages=['foo'], count=1):
+                 created=datetime.utcnow(), advisory_qualified=True, issues=[DEFAULT_ISSUE_ID], packages=['foo'],
+                 changed=datetime.utcfromtimestamp(0), count=1):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
@@ -255,6 +259,7 @@ def create_group(func=None, id=None, status=None, severity=None,
                 group.notes = notes
                 group.created = created
                 group.advisory_qualified = advisory_qualified
+                group.changed = changed
 
                 db.session.add(group)
                 db.session.commit()
@@ -323,9 +328,15 @@ https://security.archlinux.org/{group}
 DEFAULT_ADVISORY_CONTENT = create_advisory_content()
 
 
+def default_advisory_dict(overrides=dict()):
+    data = dict(changed=str(datetime.utcfromtimestamp(0)))
+    data.update(overrides)
+    return data
+
+
 def create_advisory(func=None, id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=None,
-                    publication=Publication.scheduled, workaround=None, impact=None, content=None, created=datetime.utcnow(),
-                    reference=None, count=1):
+                    publication=Publication.scheduled, workaround=None, impact=None, content=None, reference=None,
+                    created=datetime.utcnow(), changed=datetime.utcfromtimestamp(0), count=1):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
@@ -344,6 +355,7 @@ def create_advisory(func=None, id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_
                 advisory.impact = impact
                 advisory.content = content
                 advisory.created = created
+                advisory.changed = changed
                 advisory.reference = reference
 
                 db.session.add(advisory)

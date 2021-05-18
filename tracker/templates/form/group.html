@@ -2,6 +2,9 @@
 {% block content %}
 			<h1>{{ title }}</h1>
 			<div class="wide size">
+				{%- if concurrent_modification %}
+				{%- include 'log/group_log_table.html' %}
+				{%- endif %}
 				<form action="{{ action }}" method="post" name="add">
 					{{ form.hidden_tag() }}
 					<div class="row">
@@ -32,9 +35,14 @@
 						<div class="one-quarter column">
 							{{ render_checkbox(form.advisory_qualified, indent=7) }}
 						</div>
-						{%- if show_force %}
+						{%- if concurrent_modification %}
 						<div class="one-quarter column">
-							{{ render_checkbox(form.force_submit, indent=7) }}
+							{{ render_checkbox(form.force_update, indent=7) }}
+						</div>
+						{%- endif %}
+						{%- if show_force_creation %}
+						<div class="one-quarter column">
+							{{ render_checkbox(form.force_creation, indent=7) }}
 						</div>
 						{%- endif %}
 					</div>

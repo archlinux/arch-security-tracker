@@ -7,6 +7,9 @@ from flask import redirect
 from flask import render_template
 from sqlalchemy import func
 from sqlalchemy.orm import contains_eager
+from sqlalchemy_continuum import version_class
+from sqlalchemy_continuum import versioning_manager
+from werkzeug.exceptions import Conflict
 
 from tracker import db
 from tracker import tracker
@@ -35,6 +38,7 @@ from tracker.user import reporter_required
 from tracker.user import security_team_required
 from tracker.user import user_can_edit_group
 from tracker.user import user_can_edit_issue
+from tracker.user import user_can_watch_user_log
 from tracker.util import issue_to_numeric
 from tracker.util import multiline_to_list
 from tracker.view.error import forbidden
@@ -48,7 +52,7 @@ ERROR_ISSUE_REFERENCED_BY_ADVISORY = 'Insufficient permissions to edit {} that i
 @tracker.route('/<regex("{}"):advisory_id>/edit'.format(advisory_regex[1:-1]), methods=['GET', 'POST'])
 @security_team_required
 def edit_advisory(advisory_id):
-    advisory = db.get(Advisory, id=advisory_id)
+    advisory: Advisory = db.get(Advisory, id=advisory_id)
     if not advisory:
         return not_found()
 
@@ -59,13 +63,52 @@ def edit_advisory(advisory_id):
         form.reference.data = advisory.reference
         if not advisory.reference and Publication.published == advisory.publication:
             form.reference.data = advisory_fetch_reference_url_from_mailman(advisory)
-    if not form.validate_on_submit():
+        form.changed.data = str(advisory.changed)
+        form.changed_latest.data = str(advisory.changed)
+
+    concurrent_modification = str(advisory.changed) != form.changed.data
+
+    if not form.validate_on_submit() or (concurrent_modification and not
+                                         (form.force_submit.data and str(advisory.changed) == form.changed_latest.data)):
         if advisory.reference:
             flash(WARNING_ADVISORY_ALREADY_PUBLISHED, 'warning')
+
+        code = 200
+        advisory_new = None
+        if concurrent_modification:
+            flash('WARNING: The remote data has changed!', 'warning')
+            code = Conflict.code
+
+            advisory_new = Advisory()
+            advisory_new.id = form.advisory_id
+            advisory_new.workaround = form.workaround.data or None
+            advisory_new.workaround_mod = advisory.workaround != advisory_new.workaround
+            advisory_new.impact = form.impact.data or None
+            advisory_new.impact_mod = advisory.impact != advisory_new.impact
+            advisory_new.reference = form.reference.data or None
+            advisory_new.reference_mod = advisory.reference != advisory_new.reference
+
+            if form.changed_latest.data != advisory.changed:
+                form.force_submit.data = False
+            form.changed_latest.data = str(advisory.changed)
+
+            Transaction = versioning_manager.transaction_cls
+            VersionClassAdvisory = version_class(Advisory)
+            version = (db.session.query(Transaction, VersionClassAdvisory)
+                       .outerjoin(VersionClassAdvisory, Transaction.id == VersionClassAdvisory.transaction_id)
+                       .filter(VersionClassAdvisory.id == advisory.id)
+                       .order_by(Transaction.issued_at.desc())).first()[1]
+            advisory_new.transaction = version.transaction
+            advisory_new.operation_type = version.operation_type
+            advisory_new.previous = advisory
+
         return render_template('form/advisory.html',
                                title='Edit {}'.format(advisory.id),
                                Advisory=Advisory,
-                               form=form)
+                               advisory=advisory_new,
+                               form=form,
+                               concurrent_modification=concurrent_modification,
+                               can_watch_user_log=user_can_watch_user_log()), code
 
     advisory.impact = form.impact.data or None
     advisory.workaround = form.workaround.data or None
@@ -97,7 +140,7 @@ def edit_cve(cve):
     if not entries:
         return not_found()
 
-    cve = entries[0][0]
+    cve: CVE = entries[0][0]
     groups = set(group for (cve, group, advisory) in entries if group)
     advisories = set(advisory for (cve, group, advisory) in entries if advisory)
 
@@ -114,13 +157,58 @@ def edit_cve(cve):
         form.remote.data = cve.remote.name
         form.reference.data = cve.reference
         form.notes.data = cve.notes
-    if not form.validate_on_submit():
+        form.changed.data = str(cve.changed)
+        form.changed_latest.data = str(cve.changed)
+
+    concurrent_modification = str(cve.changed) != form.changed.data
+
+    if not form.validate_on_submit() or (concurrent_modification and not
+                                         (form.force_submit.data and str(cve.changed) == form.changed_latest.data)):
         if advisories:
             flash('WARNING: This is referenced by an already published advisory!', 'warning')
+
+        issue = None
+        code = 200
+        if concurrent_modification:
+            flash('WARNING: The remote data has changed!', 'warning')
+            code = Conflict.code
+
+            issue = CVE()
+            issue.id = form.cve.data
+            issue.issue_type = form.issue_type.data
+            issue.issue_type_mod = cve.issue_type != issue.issue_type
+            issue.description = form.description.data
+            issue.description_mod = cve.description != issue.description
+            issue.severity = Severity.fromstring(form.severity.data)
+            issue.severity_mod = cve.severity != issue.severity
+            issue.remote = Remote.fromstring(form.remote.data)
+            issue.remote_mod = cve.remote != issue.remote
+            issue.reference = form.reference.data
+            issue.reference_mod = cve.reference != issue.reference
+            issue.notes = form.notes.data
+            issue.notes_mod = cve.notes != issue.notes
+
+            if form.changed_latest.data != cve.changed:
+                form.force_submit.data = False
+            form.changed_latest.data = str(cve.changed)
+
+            Transaction = versioning_manager.transaction_cls
+            VersionClassCVE = version_class(CVE)
+            version = (db.session.query(Transaction, VersionClassCVE)
+                       .outerjoin(VersionClassCVE, Transaction.id == VersionClassCVE.transaction_id)
+                       .filter(VersionClassCVE.id == cve.id)
+                       .order_by(Transaction.issued_at.desc())).first()[1]
+            issue.transaction = version.transaction
+            issue.operation_type = version.operation_type
+            issue.previous = cve
+
         return render_template('form/cve.html',
                                title='Edit {}'.format(cve),
                                form=form,
-                               CVE=CVE)
+                               CVE=CVE,
+                               issue=issue,
+                               concurrent_modification=concurrent_modification,
+                               can_watch_user_log=user_can_watch_user_log()), code
 
     severity = Severity.fromstring(form.severity.data)
     severity_changed = cve.severity != severity
@@ -190,7 +278,7 @@ def edit_group(avg):
     if not group_data:
         return not_found()
 
-    group = group_data[0][0]
+    group: CVEGroup = group_data[0][0]
     issues = set([cve for (group, cve, pkg, advisory) in group_data])
     issue_ids = set([cve.id for cve in issues])
     pkgnames = set(chain.from_iterable([pkg.split(' ') for (group, cve, pkg, advisory) in group_data]))
@@ -209,16 +297,75 @@ def edit_group(avg):
         form.notes.data = group.notes
         form.bug_ticket.data = group.bug_ticket
         form.advisory_qualified.data = group.advisory_qualified and group.status is not Status.not_affected
+        form.changed.data = str(group.changed)
+        form.changed_latest.data = str(group.changed)
 
         issue_ids = sorted(issue_ids, key=issue_to_numeric)
         form.cve.data = "\n".join(issue_ids)
-    if not form.validate_on_submit():
+
+    concurrent_modification = str(group.changed) != form.changed.data
+
+    if not form.validate_on_submit() or (concurrent_modification and not
+                                         (form.force_update.data and str(group.changed) == form.changed_latest.data)):
         if advisories:
             flash('WARNING: This is referenced by an already published advisory!', 'warning')
+
+        group_new = None
+        code = 200
+        if concurrent_modification:
+            flash('WARNING: The remote data has changed!', 'warning')
+            code = Conflict.code
+
+            group_new = CVEGroup()
+            group_new.id = group.id
+            group_new.affected = form.affected.data
+            group_new.affected_mod = group.affected != group_new.affected
+            group_new.fixed = form.fixed.data
+            group_new.fixed_mod = group.fixed != group_new.fixed
+            group_new.status = Affected.fromstring(form.status.data)
+            group_new.status_mod = group.status != group_new.status
+            group_new.reference = form.reference.data
+            group_new.reference_mod = group.reference != group_new.reference
+            group_new.notes = form.notes.data
+            group_new.notes_mod = group.notes != group_new.notes
+            group_new.bug_ticket = form.bug_ticket.data
+            group_new.bug_ticket_mod = group.bug_ticket != group_new.bug_ticket
+            group_new.advisory_qualified = form.advisory_qualified.data
+            group_new.advisory_qualified_mod = group.advisory_qualified != group_new.advisory_qualified
+
+            group_new.packages = []
+            for pkgname in multiline_to_list(form.pkgnames.data):
+                entry = CVEGroupPackage()
+                entry.pkgname = pkgname
+                group_new.packages.append(entry)
+
+            group_new.issues = []
+            for cve in multiline_to_list(form.cve.data):
+                entry = CVEGroupEntry()
+                entry.cve_id = cve
+                group_new.issues.append(entry)
+
+            if form.changed_latest.data != group.changed:
+                form.force_update.data = False
+            form.changed_latest.data = str(group.changed)
+
+            Transaction = versioning_manager.transaction_cls
+            VersionClassCVEGroup = version_class(CVEGroup)
+            version = (db.session.query(Transaction, VersionClassCVEGroup)
+                       .outerjoin(VersionClassCVEGroup, Transaction.id == VersionClassCVEGroup.transaction_id)
+                       .filter(VersionClassCVEGroup.id == group.id)
+                       .order_by(Transaction.issued_at.desc())).first()[1]
+            group_new.transaction = version.transaction
+            group_new.operation_type = version.operation_type
+            group_new.previous = group
+
         return render_template('form/group.html',
                                title='Edit {}'.format(avg),
                                form=form,
-                               CVEGroup=CVEGroup)
+                               CVEGroup=CVEGroup,
+                               group=group_new,
+                               concurrent_modification=concurrent_modification,
+                               can_watch_user_log=user_can_watch_user_log()), code
 
     pkgnames_edited = multiline_to_list(form.pkgnames.data)
     group.affected = form.affected.data

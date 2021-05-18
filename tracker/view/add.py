@@ -166,7 +166,7 @@ def add_group():
     pkgnames = multiline_to_list(form.pkgnames.data)
 
     # check if a package with a CVE clashes with an existing group
-    if not form.force_submit.data:
+    if not form.force_creation.data:
         same_group = (db.session.query(CVEGroup, CVE, CVEGroupPackage)
                       .join(CVEGroupEntry, CVEGroup.issues)
                       .join(CVE, CVEGroupEntry.cve)
@@ -183,7 +183,7 @@ def add_group():
                                    title='Add AVG',
                                    form=form,
                                    CVEGroup=CVEGroup,
-                                   show_force=True)
+                                   show_force_creation=True)
 
     for cve_id in list(filter(lambda issue: issue not in existing_issue_ids, issue_ids)):
         cve = db.create(CVE, id=cve_id)

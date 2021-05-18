@@ -1,3 +1,4 @@
+{%- from "_formhelpers.html" import colorize_diff, log_transaction_header, boolean_value %}
 			<table class="styled-table column-major full size">
 				<thead>
 					<tr>
@@ -5,7 +6,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{%- if (group.packages or group.previous.packages) and group.packages != group.previous.packages %}
+					{%- if (group.packages or group.previous.packages) and group.packages|map(attribute='pkgname')|sort != group.previous.packages|map(attribute='pkgname')|sort %}
 					<tr>
 						<td>Packages</td>
 						<td class="full size">
@@ -13,7 +14,7 @@
 						</td>
 					</tr>
 					{%- endif %}
-					{%- if (group.issues or group.previous.issues) and group.issues != group.previous.issues %}
+					{%- if (group.issues or group.previous.issues) and group.issues|map(attribute='cve_id')|issuesort != group.previous.issues|map(attribute='cve_id')|issuesort %}
 					<tr>
 						<td>Issues</td>
 						<td class="full size">

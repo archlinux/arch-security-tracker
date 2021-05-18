@@ -2,6 +2,9 @@
 {% block content %}
 			<h1>{{ title }}</h1>
 			<div class="wide size">
+				{%- if concurrent_modification %}
+				{%- include 'log/cve_log_table.html' %}
+				{%- endif %}
 				<form action="{{ action }}" method="post" name="add">
 					{{ form.hidden_tag() }}
 					<div class="row">
@@ -23,6 +26,13 @@
 					{{ render_field(form.description, class='full size', maxlength=CVE.DESCRIPTION_LENGTH, placeholder='Detailed description...', indent=5) }}
 					{{ render_field(form.reference, class='full size', maxlength=CVE.REFERENCES_LENGTH, placeholder='Relevant external references...', indent=5) }}
 					{{ render_field(form.notes, class='full size', maxlength=CVE.NOTES_LENGTH, placeholder='Internal side notes...', indent=5) }}
+					{%- if concurrent_modification %}
+					<div class="row">
+						<div class="one-quarter column">
+							{{ render_checkbox(form.force_submit, indent=7) }}
+						</div>
+					</div>
+					{%- endif %}
 					{{ form.submit(class='button-primary', accesskey='s') }}
 				</form>
 			</div>

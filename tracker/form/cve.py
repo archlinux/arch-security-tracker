@@ -1,3 +1,5 @@
+from wtforms import BooleanField
+from wtforms import HiddenField
 from wtforms import SelectField
 from wtforms import StringField
 from wtforms import SubmitField
@@ -24,6 +26,9 @@ class CVEForm(BaseForm):
     remote = SelectField(u'Remote', choices=[(e.name, e.label) for e in [*Remote]], validators=[DataRequired()])
     reference = TextAreaField(u'References', validators=[Optional(), Length(max=CVE.REFERENCES_LENGTH), ValidURLs()])
     notes = TextAreaField(u'Notes', validators=[Optional(), Length(max=CVE.NOTES_LENGTH)])
+    changed = HiddenField(u'Changed', validators=[Optional()])
+    changed_latest = HiddenField(u'Latest Changed', validators=[Optional()])
+    force_submit = BooleanField(u'Force update', default=False, validators=[Optional()])
     submit = SubmitField(u'submit')
 
     def __init__(self, edit=False):
