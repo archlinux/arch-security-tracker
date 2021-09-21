@@ -101,7 +101,7 @@ def validate_password(ctx, param, password):
 @option('--email', prompt='E-mail', callback=validate_email, help='E-mail address of the user.')
 @password_option(default='generated', callback=validate_password, help='Password for the user.')
 @option('--role', type=Choice([role.name for role in UserRole]), default=UserRole.reporter.name,
-        prompt=True, callback=lambda ctx, param, role: UserRole.fromstring(role),
+        prompt=True,
         help='Permission group of the user.')
 @option('--active/--inactive', default=True, prompt=True, help='Enable or disable the user.')
 def user(username, email, password, role, active):
@@ -126,7 +126,7 @@ def user(username, email, password, role, active):
     user.email = email
     user.salt = random_string()
     user.password = hash_password(password, user.salt)
-    user.role = role
+    user.role = UserRole.fromstring(role)
     user.active = active
 
     db.session.add(user)
