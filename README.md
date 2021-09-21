@@ -42,10 +42,10 @@ vulnerability details and generating security advisories.
 
 ### Virtualenv
 
-Python dependencies can be installed in a virtual environment (`virtualenv`), by running:
+Python dependencies can be installed in a virtual environment (`venv`), by running:
 
 ```
-virtualenv .virtualenv
+python -m venv .virtualenv
 . .virtualenv/bin/activate
 pip install -r requirements.txt
 ```
