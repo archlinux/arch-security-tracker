@@ -80,7 +80,7 @@ select {
 }
 
 #archnavbarlist #anb-security a {
-	color: white; !important;
+	color: white !important;
 }
 
 .navbar {
@@ -316,7 +316,7 @@ select {
 	border-radius: 4px;
 	box-shadow: none;
 	box-sizing: border-box;
-	font-size: 0.8rem; !important
+	font-size: 0.8rem !important;
 }
 
 textarea {
@@ -456,15 +456,15 @@ input[readonly] {
 
 .error_icon_box {
 	text-align: center;
-	margin-top: -8vw; !important
+	margin-top: -8vw !important;
 }
 
 .error_icon_box .icon {
-	font-size: calc(13vw + 13vh + 6vmin); !important
+	font-size: calc(13vw + 13vh + 6vmin) !important;
 }
 
 .error_icon_box pre {
-	margin-top: -10vw; !important
+	margin-top: -10vw !important;
 	font-weight: bold;
 	font-size: calc(2vw + 2vh + 2vmin);
 	line-height: calc(2vw + 4vh + 2vmin);
