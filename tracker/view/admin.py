@@ -110,7 +110,7 @@ def edit_user(username):
     user.role = UserRole.fromstring(form.role.data)
     if form.random_password.data:
         form.password.data = random_string()
-    if 0 != len(form.password.data):
+    if form.password.data and 0 != len(form.password.data):
         user.salt = random_string()
         user.password = hash_password(form.password.data, user.salt)
     user.active = form.active.data

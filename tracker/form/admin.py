@@ -41,7 +41,7 @@ class UserForm(BaseForm):
         if not rv:
             return False
 
-        if self.username.data in self.password.data:
+        if self.password.data and self.username.data in self.password.data:
             self.password.errors.append('Password must not contain the username.')
             return False
 
