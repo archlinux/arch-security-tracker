@@ -8,6 +8,11 @@ basedir = abspath(dirname(__file__))
 
 config = ConfigParser()
 config_files = sorted(glob('{}/config/*.conf'.format(basedir)))
+
+# ignore local configs during test run or when explicitly deactivated
+if environ.get('TRACKER_CONFIG_LOCAL', 'true').lower() not in ['1', 'yes', 'true', 'on']:
+    config_files = list(filter(lambda f: not f.endswith(".local.conf"), config_files))
+
 for config_file in config_files:
     config.read(config_file)
 
