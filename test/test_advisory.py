@@ -2,7 +2,7 @@
 from collections import namedtuple
 
 from flask import url_for
-from jinja2.utils import escape
+from markupsafe import escape
 from pytest import mark
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound

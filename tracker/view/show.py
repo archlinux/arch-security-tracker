@@ -4,7 +4,7 @@ from collections import defaultdict
 from flask import redirect
 from flask import render_template
 from flask_login import current_user
-from jinja2.utils import escape
+from markupsafe import escape
 from sqlalchemy import and_
 from sqlalchemy_continuum import version_class
 from sqlalchemy_continuum import versioning_manager

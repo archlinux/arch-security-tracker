@@ -6,7 +6,7 @@ from re import escape
 from re import search
 from re import sub
 
-from jinja2.utils import escape as html_escape
+from markupsafe import escape as html_escape
 from requests import get
 
 from config import TRACKER_MAILMAN_URL
@@ -41,7 +41,7 @@ def advisory_fetch_reference_url_from_mailman(advisory):
         for line in response.text.split('\n'):
             if not '[{}]'.format(advisory.id) in line:
                 continue
-            match = search('HREF="(\d+.html)"', line)
+            match = search(r'HREF="(\d+.html)"', line)
             if not match:
                 continue
             return '{}{}'.format(mailman_url, match.group(1))
