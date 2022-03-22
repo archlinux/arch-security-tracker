@@ -33,6 +33,7 @@ vulnerability details and generating security advisories.
 * python-scrypt
 * python-feedgen
 * python-pytz
+* python-markupsafe
 * pyalpm
 * sqlite
 

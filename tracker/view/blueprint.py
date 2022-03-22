@@ -5,9 +5,9 @@ from flask import Blueprint
 from flask import request
 from flask import url_for
 from jinja2.filters import do_urlize
-from jinja2.filters import evalcontextfilter
-from jinja2.utils import Markup
-from jinja2.utils import escape
+from jinja2.filters import pass_eval_context
+from markupsafe import Markup
+from markupsafe import escape
 
 from tracker.model.cve import cve_id_regex
 from tracker.model.cvegroup import vulnerability_group_regex
@@ -37,7 +37,7 @@ def smartindent(s, width=1, indentfirst=False, indentchar=u'\t'):
     return rv
 
 
-@evalcontextfilter
+@pass_eval_context
 @blueprint.app_template_filter()
 def urlize(ctx, text, trim_url_limit=None, rel=None, target=None):
     """Converts any URLs in text into clickable links. Works on http://,
