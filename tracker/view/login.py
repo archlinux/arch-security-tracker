@@ -46,9 +46,9 @@ def login():
         args = request.args
         if args.get('state') and args.get('code'):
             return sso_auth()
-        else:
-            redirect_url = url_for('tracker.login', _external=True)
-            return oauth.idp.authorize_redirect(redirect_url)
+
+        redirect_url = url_for('tracker.login', _external=True)
+        return oauth.idp.authorize_redirect(redirect_url)
 
     form = LoginForm()
     if not form.validate_on_submit():
@@ -79,8 +79,8 @@ def logout():
         end_session_endpoint = metadata.get('end_session_endpoint')
         params = {'redirect_uri': url_for('tracker.index', _external=True)}
         return redirect(add_params_to_uri(end_session_endpoint, params))
-    else:
-        return redirect(url_for('tracker.index'))
+
+    return redirect(url_for('tracker.index'))
 
 
 def sso_auth():
