@@ -9,7 +9,7 @@ requests
 scrypt
 pyalpm
 SQLAlchemy-Continuum
-SQLAlchemy~=1.3.0
+SQLAlchemy
 feedgen
 pytz
 authlib
