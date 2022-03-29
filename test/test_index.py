@@ -1,5 +1,4 @@
 from flask import url_for
-from werkzeug.exceptions import NotFound
 
 from .conftest import DEFAULT_GROUP_ID
 from .conftest import DEFAULT_GROUP_NAME
@@ -12,6 +11,7 @@ from .conftest import create_package
 def test_index(db, client):
     resp = client.get(url_for('tracker.index'), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
     assert DEFAULT_GROUP_NAME not in resp.data.decode()
 
 
@@ -37,6 +37,7 @@ def test_index_json(db, client):
     resp = client.get(url_for('tracker.index_json', only_vulernable=False, path='all.json'), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.get_json()
+    assert 'application/json; charset=utf-8' == resp.content_type
     assert len(data) == 1
     assert data[0]['name'] == DEFAULT_GROUP_NAME
 

@@ -236,6 +236,7 @@ def test_copy_needs_login(db, client):
 def test_show_issue(db, client):
     resp = client.get(url_for('tracker.show_cve', cve=DEFAULT_ISSUE_ID, path=''))
     assert 200 == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
     assert DEFAULT_ISSUE_ID in resp.data.decode()
 
 
@@ -243,6 +244,7 @@ def test_show_issue(db, client):
 def test_show_issue_not_found(db, client):
     resp = client.get(url_for('tracker.show_cve', cve='CVE-2011-0000', path=''), follow_redirects=True)
     assert resp.status_code == NotFound.code
+    assert 'text/html; charset=utf-8' == resp.content_type
 
 
 @create_issue
@@ -278,6 +280,7 @@ def test_delete_issue_not_found(db, client):
 def test_issue_json(db, client):
     resp = client.get(url_for('tracker.show_cve_json', cve=DEFAULT_ISSUE_ID, path='', suffix='.json'), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'application/json; charset=utf-8' == resp.content_type
 
     data = resp.get_json()
     assert DEFAULT_ISSUE_ID == data['name']
@@ -286,6 +289,7 @@ def test_issue_json(db, client):
 def test_issue_json_not_found(db, client):
     resp = client.get(url_for('tracker.show_cve_json', cve=DEFAULT_ISSUE_ID, path='', suffix='.json'), follow_redirects=True)
     assert resp.status_code == NotFound.code
+    assert 'application/json; charset=utf-8' == resp.content_type
 
 
 @create_issue
@@ -426,6 +430,7 @@ def test_edit_issue_as_reporter_with_referenced_advisory_fails(db, client):
     resp = client.post(url_for('tracker.edit_cve', cve=DEFAULT_ISSUE_ID), follow_redirects=True,
                        data=default_issue_dict(dict(description='changed')))
     assert Forbidden.code == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
 
     data = resp.data.decode()
     assert f'Edited {DEFAULT_ISSUE_ID}' not in data

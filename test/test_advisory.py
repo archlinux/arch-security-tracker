@@ -208,6 +208,7 @@ def test_edit_advisory(db, client):
     resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
                        data={'workaround': workaround, 'impact': impact})
     assert 200 == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
     assert_advisory_data(DEFAULT_ADVISORY_ID, workaround=workaround, impact=impact)
     assert 1 == advisory_count()
 
@@ -217,6 +218,7 @@ def test_edit_advisory_not_found(db, client):
     resp = client.post(url_for('tracker.edit_advisory', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True,
                        data={'workaround': 'nothing', 'impact': 'nothing'})
     assert resp.status_code == NotFound.code
+    assert 'text/html; charset=utf-8' == resp.content_type
 
 
 @create_package(name='foo', version='1.2.3-4')
@@ -360,6 +362,7 @@ def test_advisory_atom(db, client):
 def test_advisory_json_no_data(db, client):
     resp = client.get(url_for('tracker.advisory_json', postfix='/json'), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'application/json; charset=utf-8' == resp.content_type
     data = resp.get_json()
     assert data == []
 
@@ -370,6 +373,7 @@ def test_advisory_json_no_data(db, client):
 def test_advisory_json(db, client):
     resp = client.get(url_for('tracker.advisory_json', postfix='/json'), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'application/json; charset=utf-8' == resp.content_type
     data = resp.get_json()
     assert len(data) == 1
     assert data[0]['name'] == DEFAULT_ADVISORY_ID
@@ -400,6 +404,7 @@ def test_advisory_format_issue_listing_raw(db, client):
                               advisory_id=DEFAULT_ADVISORY_ID),
                       follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'text/plain; charset=utf-8' == resp.content_type
     data = resp.data.decode()
     assert 'CVE-ID  : CVE-1111-1234  CVE-1111-12345  CVE-1234-11111 CVE-1234-11112\n' + \
            '          CVE-1234-12345 CVE-1234-123456\n' in data
@@ -466,6 +471,7 @@ def test_advisory_publish_advisory(db, client, patch_get):
 def test_advisory_raw(db, client):
     resp = client.get(url_for('tracker.show_advisory_raw', advisory_id=DEFAULT_ADVISORY_ID), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'text/plain; charset=utf-8' == resp.content_type
     data = resp.data.decode()
     assert 'Arch Linux Security Advisory {}'.format(DEFAULT_ADVISORY_ID) in data
 

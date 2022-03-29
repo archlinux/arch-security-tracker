@@ -143,6 +143,7 @@ def test_copy_needs_login(db, client):
 def test_show_group_not_found(db, client):
     resp = client.get(url_for('tracker.show_group', avg='AVG-42'), follow_redirects=True)
     assert resp.status_code == NotFound.code
+    assert 'text/html; charset=utf-8' == resp.content_type
 
 
 @logged_in
@@ -331,9 +332,18 @@ def test_show_group_sort_cve_entries(db, client):
 
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
+def test_show_group(db, client):
+    resp = client.get(url_for('tracker.show_group', avg=DEFAULT_GROUP_NAME), follow_redirects=True)
+    assert 200 == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
+    assert DEFAULT_GROUP_NAME in resp.data.decode()
+
+@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 def test_show_group_json(db, client):
     resp = client.get(url_for('tracker.show_group_json', avg=DEFAULT_GROUP_NAME, postfix='/json'), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'application/json; charset=utf-8' == resp.content_type
     data = resp.get_json()
     assert data['name'] == DEFAULT_GROUP_NAME
     assert data['issues'] == [DEFAULT_ISSUE_ID]
@@ -344,6 +354,7 @@ def test_show_group_json(db, client):
 def test_show_group_json_not_found(db, client):
     resp = client.get(url_for('tracker.show_group_json', avg=DEFAULT_GROUP_NAME, postfix='/json'), follow_redirects=True)
     assert NotFound.code == resp.status_code
+    assert 'application/json; charset=utf-8' == resp.content_type
 
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')

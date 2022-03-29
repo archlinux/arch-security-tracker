@@ -16,6 +16,7 @@ from .conftest import logged_in
 def test_login_view(db, client):
     resp = client.get(url_for('tracker.login'))
     assert 200 == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
 
 
 @create_user
@@ -31,6 +32,7 @@ def test_login_invalid_credentials(db, client):
     resp = client.post(url_for('tracker.login'), data={'username': DEFAULT_USERNAME,
                                                'password': 'N' * TRACKER_PASSWORD_LENGTH_MIN})
     assert_not_logged_in(resp, status_code=Unauthorized.code)
+    assert 'text/html; charset=utf-8' == resp.content_type
     assert ERROR_INVALID_USERNAME_PASSWORD in resp.data.decode()
 
 

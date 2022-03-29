@@ -4,8 +4,8 @@ from logging import error
 from os import urandom
 from random import randint
 
+from flask import make_response
 from flask import render_template
-from werkzeug import Response
 from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import Gone
@@ -34,10 +34,10 @@ def errorhandler(code_or_exception):
 def handle_error(e, code, json=False):
     if json:
         return {'message': e}, code
-    return Response(render_template('error.html',
-                                    smiley=smileys_sad[randint(0, len(smileys_sad) - 1)],
-                                    text=e,
-                                    title='{}'.format(code)), code)
+    return make_response(render_template('error.html',
+                         smiley=smileys_sad[randint(0, len(smileys_sad) - 1)],
+                         text=e,
+                         title='{}'.format(code)), code)
 
 
 @errorhandler(NotFound.code)

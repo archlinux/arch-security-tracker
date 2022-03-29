@@ -183,6 +183,7 @@ def test_edit_requires_admin(db, client):
     resp = client.post(url_for('tracker.edit_user', username=USERNAME), follow_redirects=True,
                        data=dict(username=USERNAME, email=EMAIL, password=PASSWORD))
     assert resp.status_code == Forbidden.code
+    assert 'text/html; charset=utf-8' == resp.content_type
 
 
 @create_user(username=USERNAME, password=PASSWORD)
@@ -190,4 +191,5 @@ def test_edit_requires_admin(db, client):
 def test_list_user(db, client):
     resp = client.get(url_for('tracker.list_user'), follow_redirects=True)
     assert resp.status_code == 200
+    assert 'text/html; charset=utf-8' == resp.content_type
     assert USERNAME in resp.data.decode()

@@ -18,6 +18,7 @@ from .util import AssertionHTMLParser
 def test_show_package_json(db, client):
     resp = client.get(url_for('tracker.show_package_json', pkgname='foo', suffix='/json'), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'application/json; charset=utf-8' == resp.content_type
     data = resp.get_json()
     assert len(data['groups']) == 1
     assert len(data['versions']) == 1
@@ -29,10 +30,14 @@ def test_show_package_json(db, client):
 def test_show_package_json_not_found(db, client):
     resp = client.get(url_for('tracker.show_package_json', pkgname='foo', suffix='/json'), follow_redirects=True)
     assert NotFound.code == resp.status_code
+    assert 'application/json; charset=utf-8' == resp.content_type
+
 
 def test_show_package_not_found(db, client):
     resp = client.get(url_for('tracker.show_package', pkgname='foo'), follow_redirects=True)
     assert NotFound.code == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
+
 
 @create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
@@ -42,4 +47,5 @@ def test_show_package(db, client):
     html = AssertionHTMLParser()
     html.feed(resp.data.decode())
     assert 200 == resp.status_code
+    assert 'text/html; charset=utf-8' == resp.content_type
     assert 'foo' in resp.data.decode()
