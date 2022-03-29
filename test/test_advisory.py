@@ -345,6 +345,7 @@ def test_advisory_cve_listing_sorted_numerically(db, client):
 def test_advisory_atom_no_data(db, client):
     resp = client.get(url_for('tracker.advisory_atom'), follow_redirects=True)
     assert 200 == resp.status_code
+    assert 'application/atom+xml; charset=utf-8' == resp.content_type
     data = resp.data.decode()
     assert DEFAULT_ADVISORY_ID not in data
 

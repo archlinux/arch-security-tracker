@@ -2,11 +2,10 @@ from collections import OrderedDict
 from re import match
 
 from feedgen.feed import FeedGenerator
+from flask import Response
 from flask import flash
-from flask import make_response
 from flask import redirect
 from flask import render_template
-from flask import request
 from pytz import UTC
 from sqlalchemy import and_
 
@@ -64,27 +63,31 @@ def advisory_atom():
     data = get_advisory_data()['published'][:TRACKER_FEED_ADVISORY_ENTRIES]
 
     feed = FeedGenerator()
-    feed.title('Arch Linux Security - Recent advisories')
-    feed.description('Arch Linux recent advsisories RSS feed')
-    feed.link(href=request.url_root)
+    feed.id(TRACKER_ISSUE_URL.format('advisory'))
+    feed.title('Arch Linux Security Advisories')
+    feed.subtitle('Feed containing the last published Arch Linux Security Advisories')
+    feed.link(href=TRACKER_ISSUE_URL.format('advisory'), rel='alternate')
+    feed.link(href=TRACKER_ISSUE_URL.format('advisory/feed.atom'), rel='self')
+    feed.language('en')
 
     for entry in data:
         package = entry['package']
         advisory = entry['advisory']
-        content=render_template('feed.html', content=advisory.content)
-        summary=render_template('feed.html', content=advisory.impact)
+        content = render_template('feed.html', content=advisory.content)
+        impact = render_template('feed.html', content=advisory.impact)
         published = updated = advisory.created.replace(tzinfo=UTC)
 
         entry = feed.add_entry()
+        entry.id(TRACKER_ISSUE_URL.format(advisory.id))
         entry.title(f'[{advisory.id}] {package.pkgname}: {advisory.advisory_type}')
         entry.author(name='Arch Linux Security Team')
-        entry.description(content)
-        entry.description(summary, isSummary=True)
+        entry.content(content.replace('\n', '<br/>'), type='html')
+        entry.summary(impact.replace('\n', '<br/>'), type='html')
         entry.published(published)
         entry.updated(updated)
-        entry.link(href=TRACKER_ISSUE_URL.format(advisory.id))
+        entry.link(href=TRACKER_ISSUE_URL.format(advisory.id), rel='alternate')
 
-    return make_response(feed.rss_str())
+    return Response(feed.atom_str(pretty=True), 200, content_type='application/atom+xml; charset=utf-8')
 
 
 @tracker.route('/advisory<regex("[./]json"):postfix>', methods=['GET'])
