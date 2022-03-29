@@ -68,7 +68,7 @@ def test_schedule_advisory(db, client):
 def test_schedule_advisory_invalid(db, client):
     resp = client.post(url_for('tracker.schedule_advisory', avg=DEFAULT_GROUP_NAME), data={'advisory_type': 'fooo'})
     assert 302 == resp.status_code
-    assert url_for('tracker.show_group', avg=DEFAULT_GROUP_NAME, _external=True) == resp.location
+    assert url_for('tracker.show_group', avg=DEFAULT_GROUP_NAME) == resp.location
 
 
 @create_package(name='foo', base='yay', version='1.2.3-4')
