@@ -1,5 +1,6 @@
 from flask import url_for
 from flask_login import current_user
+from werkzeug.exceptions import BadRequest
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
 from werkzeug.exceptions import Unauthorized
@@ -55,8 +56,7 @@ def test_delete_user_not_found(db, client):
 def test_delete_form_invalid(db, client):
     resp = client.post(url_for('tracker.delete_user', username=USERNAME),
                        data=dict())
-    assert resp.status_code == 302
-    assert resp.location == url_for('tracker.list_user', _external=True)
+    assert resp.status_code == BadRequest.code
 
 
 @logged_in
