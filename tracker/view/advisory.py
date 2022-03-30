@@ -10,6 +10,7 @@ from flask import request
 from pytz import UTC
 from sqlalchemy import and_
 
+from config import TRACKER_FEED_ADVISORY_ENTRIES
 from config import TRACKER_ISSUE_URL
 from tracker import db
 from tracker import tracker
@@ -60,8 +61,8 @@ def get_advisory_data():
 @tracker.route('/advisories/feed.atom', methods=['GET'])
 @tracker.route('/advisory/feed.atom', methods=['GET'])
 def advisory_atom():
-    last_recent_entries = 15
-    data = get_advisory_data()['published'][:last_recent_entries]
+    data = get_advisory_data()['published'][:TRACKER_FEED_ADVISORY_ENTRIES]
+
     feed = FeedGenerator()
     feed.title('Arch Linux Security - Recent advisories')
     feed.description('Arch Linux recent advsisories RSS feed')
