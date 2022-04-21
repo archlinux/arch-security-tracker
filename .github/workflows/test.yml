@@ -10,8 +10,9 @@ jobs:
           python-sqlalchemy python-sqlalchemy-continuum python-flask python-flask-sqlalchemy python-flask-wtf
           python-flask-login python-flask-migrate python-flask-talisman python-email-validator python-feedgen
           python-pytz python-requests python-scrypt python-markupsafe pyalpm sqlite
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Run tests
         run: |
+           git config --global --add safe.directory /__w/arch-security-tracker/arch-security-tracker
            python3 -m py_compile $(git ls-files '*.py')
            make test
