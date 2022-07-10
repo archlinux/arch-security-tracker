@@ -18,6 +18,7 @@ from tracker.view.login import \
 from tracker.view.login import LOGIN_ERROR_MISSING_EMAIL_FROM_TOKEN
 from tracker.view.login import LOGIN_ERROR_MISSING_GROUPS_FROM_TOKEN
 from tracker.view.login import LOGIN_ERROR_MISSING_USER_SUB_FROM_TOKEN
+from tracker.view.login import LOGIN_ERROR_MISSING_USERINFO_FROM_TOKEN
 from tracker.view.login import LOGIN_ERROR_MISSING_USERNAME_FROM_TOKEN
 from tracker.view.login import LOGIN_ERROR_PERMISSION_DENIED
 from tracker.view.login import \
@@ -34,20 +35,23 @@ TESTINGNAME = "Peter"
 
 class MockedIdp(object):
     def __init__(self, username=TESTINGNAME, email=DEFAULTEMAIL, sub=TESTINGSUB, groups=["Administrator"],
-                 verified=True, throws=None):
+                 verified=True, throws=None, has_userinfo=True):
         self.email = email
         self.sub = sub
         self.groups = groups
         self.verified = verified
         self.username = username
         self.throws = throws
+        self.has_userinfo = has_userinfo
 
     def authorize_access_token(self):
         if self.throws:
             raise self.throws
-        return "Schinken"
+        if self.has_userinfo:
+            return {'userinfo': self.parse_id_token(None, None)}
+        return {}
 
-    def parse_id_token(self, token):
+    def parse_id_token(self, token, nonce, claims_options=None, leeway=120):
         token = {}
         if self.sub is not None:
             token["sub"] = self.sub
@@ -147,6 +151,15 @@ def test_permission_denied_lack_of_group(app, db):
         assert not current_user.is_authenticated
         assert not User.query.all()
 
+@patch('tracker.oauth.idp', MockedIdp(has_userinfo=False), create=True)
+def test_missing_userinfo_from_token(app, db):
+    with app.test_request_context('/login'):
+        result = sso_auth()
+        assert BadRequest.code == result.status_code
+        assert LOGIN_ERROR_MISSING_USERINFO_FROM_TOKEN in result.data.decode()
+
+        assert not current_user.is_authenticated
+        assert not User.query.all()
 
 @patch('tracker.oauth.idp', MockedIdp(sub=None), create=True)
 def test_missing_sub_from_token(app, db):

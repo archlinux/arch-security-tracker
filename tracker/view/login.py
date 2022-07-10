@@ -34,6 +34,7 @@ LOGIN_ERROR_MISSING_USER_SUB_FROM_TOKEN = "Missing user sub from token"
 LOGIN_ERROR_MISSING_EMAIL_FROM_TOKEN = "Missing email address from token"
 LOGIN_ERROR_MISSING_USERNAME_FROM_TOKEN = "Missing username from token"
 LOGIN_ERROR_MISSING_GROUPS_FROM_TOKEN = "Missing groups from token"
+LOGIN_ERROR_MISSING_USERINFO_FROM_TOKEN = "Missing userinfo from token"
 
 
 @tracker.route('/login', methods=['GET', 'POST'])
@@ -86,27 +87,30 @@ def logout():
 def sso_auth():
     try:
         token = oauth.idp.authorize_access_token()
-        parsed_token = oauth.idp.parse_id_token(token)
     except AuthlibBaseError as e:
         return bad_request(f'{e.description}')
 
-    idp_user_sub = parsed_token.get('sub')
+    userinfo = token.get('userinfo')
+    if not userinfo:
+        return bad_request(LOGIN_ERROR_MISSING_USERINFO_FROM_TOKEN)
+
+    idp_user_sub = userinfo.get('sub')
     if not idp_user_sub:
         return bad_request(LOGIN_ERROR_MISSING_USER_SUB_FROM_TOKEN)
 
-    idp_email_verified = parsed_token.get('email_verified')
+    idp_email_verified = userinfo.get('email_verified')
     if not idp_email_verified:
         return forbidden(LOGIN_ERROR_EMAIL_ADDRESS_NOT_VERIFIED)
 
-    idp_email = parsed_token.get('email')
+    idp_email = userinfo.get('email')
     if not idp_email:
         return bad_request(LOGIN_ERROR_MISSING_EMAIL_FROM_TOKEN)
 
-    idp_username = parsed_token.get('preferred_username')
+    idp_username = userinfo.get('preferred_username')
     if not idp_username:
         return bad_request(LOGIN_ERROR_MISSING_USERNAME_FROM_TOKEN)
 
-    idp_groups = parsed_token.get('groups')
+    idp_groups = userinfo.get('groups')
     if idp_groups is None:
         return bad_request(LOGIN_ERROR_MISSING_GROUPS_FROM_TOKEN)
 
