@@ -90,10 +90,12 @@ def advisory_atom():
     return Response(feed.atom_str(pretty=True), 200, content_type='application/atom+xml; charset=utf-8')
 
 
-@tracker.route('/advisory<regex("[./]json"):postfix>', methods=['GET'])
-@tracker.route('/advisories<regex("[./]json"):postfix>', methods=['GET'])
+@tracker.route('/advisory.json', methods=['GET'])
+@tracker.route('/advisory/json', methods=['GET'])
+@tracker.route('/advisories.json', methods=['GET'])
+@tracker.route('/advisories/json', methods=['GET'])
 @json_response
-def advisory_json(postfix=None):
+def advisory_json():
     data = get_advisory_data()
 
     def to_json_data(entry):

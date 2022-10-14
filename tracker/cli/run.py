@@ -23,13 +23,10 @@ from .util import cli
 @option('--debugger/--no-debugger', default=None,
         help='Enable or disable the debugger.  By default the debugger '
         'is active if debug is enabled.')
-@option('--eager-loading/--lazy-loader', default=None,
-        help='Enable or disable eager loading.  By default eager '
-        'loading is enabled if the reloader is disabled.')
 @option('--with-threads/--without-threads', default=False,
         help='Enable or disable multithreading.')
 @pass_script_info
-def run(info, host, port, debug, reload, debugger, eager_loading, with_threads):
+def run(info, host, port, debug, reload, debugger, with_threads):
     """Runs a local development server for the Flask application.
 
     This local server is recommended for development purposes only but it
@@ -43,7 +40,6 @@ def run(info, host, port, debug, reload, debugger, eager_loading, with_threads):
     """
     import os
 
-    from flask.cli import DispatchingApp
     from werkzeug.serving import run_simple
 
     if debug != FLASK_DEBUG:
@@ -52,10 +48,8 @@ def run(info, host, port, debug, reload, debugger, eager_loading, with_threads):
         reload = bool(debug)
     if debugger is None:
         debugger = bool(debug)
-    if eager_loading is None:
-        eager_loading = not reload
 
-    app = DispatchingApp(info.load_app, use_eager_loading=eager_loading)
+    app = info.load_app()
 
     # Extra startup messages.  This depends a bit on Werkzeug internals to
     # not double execute when the reloader kicks in.

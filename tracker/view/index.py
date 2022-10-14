@@ -53,8 +53,8 @@ def get_index_data(only_vulnerable=False, only_in_repo=True):
     return groups
 
 
-@tracker.route('/', defaults={'path': '', 'only_vulnerable': True}, methods=['GET'])
-def index(only_vulnerable=True, path=None):
+@tracker.route('/', defaults={'only_vulnerable': True}, methods=['GET'])
+def index(only_vulnerable=True):
     groups = get_index_data(only_vulnerable)
     return render_template('index.html',
                            title='Issues' if not only_vulnerable else 'Vulnerable issues',
@@ -62,21 +62,26 @@ def index(only_vulnerable=True, path=None):
                            only_vulnerable=only_vulnerable)
 
 
-@tracker.route('/<regex("issues(/(open|vulnerable))?"):path>', defaults={'path': 'issues'}, methods=['GET'])
-def index_vulnerable(path=None):
+@tracker.route('/issues', methods=['GET'])
+@tracker.route('/issues/open', methods=['GET'])
+@tracker.route('/issues/vulnerable', methods=['GET'])
+def index_vulnerable():
     return index(only_vulnerable=True)
 
 
-@tracker.route('/<regex("(issues/)?all"):path>', defaults={'path': 'issues/all'}, methods=['GET'])
-def index_all(path=None):
+@tracker.route('/all', methods=['GET'])
+@tracker.route('/issues/all', methods=['GET'])
+def index_all():
     return index(only_vulnerable=False)
 
 
 # TODO: temporarily keep /json this way until tools adopted new endpoint
-@tracker.route('/json', defaults={'path': 'json', 'only_vulnerable': False}, methods=['GET'])
-@tracker.route('/<regex("(issues/?)?(all)?.json"):path>', defaults={'path': 'all.json', 'only_vulnerable': False}, methods=['GET'])
+@tracker.route('/json', defaults={'only_vulnerable': False}, methods=['GET'])
+@tracker.route('/all.json', defaults={'only_vulnerable': False}, methods=['GET'])
+@tracker.route('/issues.json', defaults={'only_vulnerable': False}, methods=['GET'])
+@tracker.route('/issues/all.json', defaults={'only_vulnerable': False}, methods=['GET'])
 @json_response
-def index_json(only_vulnerable=False, path=None):
+def index_json(only_vulnerable=False):
     entries = get_index_data(only_vulnerable)
     json_data = []
     for entry in entries:
@@ -98,6 +103,8 @@ def index_json(only_vulnerable=False, path=None):
     return json_data
 
 
-@tracker.route('/<regex("(issues/?)?(open|vulnerable).json"):path>', methods=['GET'])
-def index_vulnerable_json(path=None):
+@tracker.route('/issues.json', methods=['GET'])
+@tracker.route('/issues/open.json', methods=['GET'])
+@tracker.route('/issues/vulnerable.json', methods=['GET'])
+def index_vulnerable_json():
     return index_json(only_vulnerable=True)

@@ -140,9 +140,10 @@ def get_cve_data(cve):
             'advisories': advisories}
 
 
-@tracker.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve><regex("[./]json"):suffix>'.format(cve_id_regex[1:-1]), methods=['GET'])
+@tracker.route('/<regex("{}"):cve>.json'.format(cve_id_regex[1:-1]), methods=['GET'])
+@tracker.route('/<regex("{}"):cve>/json'.format(cve_id_regex[1:-1]), methods=['GET'])
 @json_response
-def show_cve_json(cve, path=None, suffix=None):
+def show_cve_json(cve):
     data = get_cve_data(cve)
     if not data:
         return not_found(json=True)
@@ -168,9 +169,11 @@ def show_cve_json(cve, path=None, suffix=None):
     return json_data
 
 
-@tracker.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
-def show_cve(cve, path=None):
+@tracker.route('/<regex("{}"):cve>'.format(cve_id_regex[1:]), methods=['GET'])
+def show_cve(cve):
+
     data = get_cve_data(cve)
+
     if not data:
         return not_found()
 
@@ -194,8 +197,8 @@ def show_cve(cve, path=None):
                            can_delete=user_can_delete_issue(advisories))
 
 
-@tracker.route('/<regex("((issues?|cve)/)?"):path><regex("{}"):cve>/log'.format(cve_id_regex[1:-1]), methods=['GET'])
-def show_cve_log(cve, path=None):
+@tracker.route('/<regex("{}"):cve>/log'.format(cve_id_regex[1:-1]), methods=['GET'])
+def show_cve_log(cve):
     data = get_cve_data(cve)
     if not data:
         return not_found()
@@ -254,11 +257,14 @@ def get_group_data(avg):
     }
 
 
-@tracker.route('/group/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
-@tracker.route('/avg/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
-@tracker.route('/<regex("{}"):avg><regex("[./]json"):postfix>'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/group/<regex("{}"):avg>.json'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/group/<regex("{}"):avg>/json'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/avg/<regex("{}"):avg>.json'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/avg/<regex("{}"):avg>/json'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/<regex("{}"):avg>.json'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
+@tracker.route('/<regex("{}"):avg>/json'.format(vulnerability_group_regex[1:-1]), methods=['GET'])
 @json_response
-def show_group_json(avg, postfix=None):
+def show_group_json(avg):
     data = get_group_data(avg)
     if not data:
         return not_found(json=True)
@@ -405,9 +411,10 @@ def show_group_log(avg):
                            can_watch_user_log=user_can_watch_user_log())
 
 
-@tracker.route('/package/<regex("{}"):pkgname><regex("[./]json"):suffix>'.format(pkgname_regex[1:-1]), methods=['GET'])
+@tracker.route('/package/<regex("{}"):pkgname>.json'.format(pkgname_regex[1:-1]), methods=['GET'])
+@tracker.route('/package/<regex("{}"):pkgname>/json'.format(pkgname_regex[1:-1]), methods=['GET'])
 @json_response
-def show_package_json(pkgname, suffix=None):
+def show_package_json(pkgname):
     data = get_package_data(pkgname)
     if not data:
         return not_found(json=True)
@@ -612,7 +619,7 @@ def show_generated_advisory(advisory_id, raw=False):
 
 @tracker.route('/advisory/<regex("{}"):advisory_id>/log'.format(advisory_regex[1:-1]), methods=['GET'])
 @tracker.route('/<regex("{}"):advisory_id>/log'.format(advisory_regex[1:-1]), methods=['GET'])
-def show_advisory_log(advisory_id, path=None):
+def show_advisory_log(advisory_id):
     advisory = (db.session.query(Advisory)
                 .filter(Advisory.id == advisory_id)
                 ).first()

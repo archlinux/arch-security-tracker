@@ -15,7 +15,6 @@ from tracker.model import CVE
 from tracker.model import Advisory
 from tracker.model import CVEGroup
 from tracker.model import User
-from tracker.model.user import username_regex
 from tracker.user import hash_password
 from tracker.user import only_without_sso
 from tracker.user import random_string
@@ -43,8 +42,8 @@ def edit_own_user_profile():
 
 
 # TODO: define permission to view this
-@tracker.route('/user/<regex("{}"):username>/log'.format(username_regex[1:-1]), defaults={'page': 1}, methods=['GET'])
-@tracker.route('/user/<regex("{}"):username>/log/page/<int:page>'.format(username_regex[1:-1]), methods=['GET'])
+@tracker.route('/user/<string:username>/log', defaults={'page': 1}, methods=['GET'])
+@tracker.route('/user/<string:username>/log/page/<int:page>', methods=['GET'])
 @login_required
 def show_user_log(username, page=1):
     MAX_ENTRIES_PER_PAGE = 10
