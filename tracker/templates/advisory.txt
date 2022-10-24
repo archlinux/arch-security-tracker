@@ -1,5 +1,6 @@
-Subject: [{{ advisory.id }}] {{ package.pkgname }}: {{ advisory.advisory_type }}
+{%- if with_subject %}Subject: [{{ advisory.id }}] {{ package.pkgname }}: {{ advisory.advisory_type }}
 
+{% endif -%}
 {% set asa_title = 'Arch Linux Security Advisory ' + advisory.id %}
 {{- asa_title }}
 {% set asa_title_separator = '=' * asa_title|length %}

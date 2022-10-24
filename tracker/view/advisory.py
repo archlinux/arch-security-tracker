@@ -13,7 +13,6 @@ from config import TRACKER_FEED_ADVISORY_ENTRIES
 from config import TRACKER_ISSUE_URL
 from tracker import db
 from tracker import tracker
-from tracker.advisory import advisory_extend_model_from_advisory_text
 from tracker.advisory import advisory_fetch_reference_url_from_mailman
 from tracker.advisory import advisory_get_date_label
 from tracker.advisory import advisory_get_label
@@ -219,7 +218,6 @@ def publish_advisory(asa):
 
     if advisory.reference != form.reference.data:
         advisory.content = form.advisory_content
-        advisory_extend_model_from_advisory_text(advisory)
     advisory.reference = form.reference.data
     advisory.publication = Publication.published
     db.session.commit()

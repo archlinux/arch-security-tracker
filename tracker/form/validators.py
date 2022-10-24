@@ -6,6 +6,7 @@ from wtforms.validators import ValidationError
 
 from tracker import db
 from tracker.advisory import advisory_fetch_from_mailman
+from tracker.advisory import generate_advisory
 from tracker.model import Package
 from tracker.model.advisory import advisory_regex
 from tracker.model.cve import cve_id_regex
@@ -21,17 +22,19 @@ class ValidAdvisoryReference(object):
         if not field.data:
             return
 
-        form.advisory_content = advisory_fetch_from_mailman(field.data)
-        if not form.advisory_content:
+        mailman_content = advisory_fetch_from_mailman(field.data)
+        if not mailman_content:
             raise ValidationError('Failed to fetch advisory')
 
-        m = search(advisory_regex[1:-1], form.advisory_content)
+        m = search(advisory_regex[1:-1], mailman_content)
         if not m:
             raise ValidationError('Failed to fetch advisory')
 
         found = m.group(1)
         if found != form.advisory_id:
             raise ValidationError('Advisory mismatched: {}'.format(found))
+
+        form.advisory_content = generate_advisory(advisory_id=form.advisory_id, with_subject=False, raw=True)
 
 
 class ValidPackageName(object):

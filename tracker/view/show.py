@@ -20,6 +20,8 @@ from tracker import tracker
 from tracker.advisory import advisory_escape_html
 from tracker.advisory import advisory_extend_html
 from tracker.advisory import advisory_format_issue_listing
+from tracker.advisory import generate_advisory
+from tracker.advisory import render_html_advisory
 from tracker.form.advisory import AdvisoryForm
 from tracker.model import CVE
 from tracker.model import Advisory
@@ -488,17 +490,6 @@ def show_package(pkgname):
                            package=data)
 
 
-def render_html_advisory(advisory, package, group, raw_asa, generated):
-    return render_template('advisory.html',
-                           title='[{}] {}: {}'.format(advisory.id, package.pkgname, advisory.advisory_type),
-                           advisory=advisory,
-                           package=package,
-                           raw_asa=raw_asa,
-                           generated=generated,
-                           can_handle_advisory=user_can_handle_advisory(),
-                           Publication=Publication)
-
-
 @tracker.route('/advisory/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
 @tracker.route('/<regex("{}"):advisory_id>/raw'.format(advisory_regex[1:-1]), methods=['GET'])
 def show_advisory_raw(advisory_id):
@@ -554,67 +545,10 @@ def show_advisory(advisory_id, raw=False):
 @tracker.route('/advisory/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
 @tracker.route('/<regex("{}"):advisory_id>/generate'.format(advisory_regex[1:-1]), methods=['GET'])
 def show_generated_advisory(advisory_id, raw=False):
-    entries = (db.session.query(Advisory, CVEGroup, CVEGroupPackage, CVE)
-               .filter(Advisory.id == advisory_id)
-               .join(CVEGroupPackage, Advisory.group_package)
-               .join(CVEGroup, CVEGroupPackage.group)
-               .join(CVEGroupEntry, CVEGroup.issues)
-               .join(CVE, CVEGroupEntry.cve)
-               .order_by(CVE.id)
-               ).all()
-    if not entries:
+    advisory = generate_advisory(advisory_id, with_subject=True, raw=raw)
+    if not advisory:
         return not_found()
-
-    advisory = entries[0][0]
-    group = entries[0][1]
-    package = entries[0][2]
-    issues = sorted([issue for (advisory, group, package, issue) in entries])
-    severity_sorted_issues = sorted(issues, key=lambda issue: issue.issue_type)
-    severity_sorted_issues = sorted(severity_sorted_issues, key=lambda issue: issue.severity)
-    remote = any([issue.remote is Remote.remote for issue in issues])
-    issue_listing_formatted = advisory_format_issue_listing([issue.id for issue in issues])
-
-    link = TRACKER_ADVISORY_URL.format(advisory.id, group.id)
-    upstream_released = group.affected.split('-')[0].split('+')[0] != group.fixed.split('-')[0].split('+')[0]
-    upstream_version = group.fixed.split('-')[0].split('+')[0]
-    if ':' in upstream_version:
-        upstream_version = upstream_version[upstream_version.index(':') + 1:]
-    unique_issue_types = []
-    for issue in severity_sorted_issues:
-        if issue.issue_type not in unique_issue_types:
-            unique_issue_types.append(issue.issue_type)
-
-    references = []
-    if group.bug_ticket:
-        references.append(TRACKER_BUGTRACKER_URL.format(group.bug_ticket))
-    references.extend([ref for ref in multiline_to_list(group.reference)
-                       if ref not in references])
-    list(map(lambda issue: references.extend(
-        [ref for ref in multiline_to_list(issue.reference) if ref not in references]), issues))
-
-    raw_asa = render_template('advisory.txt',
-                              advisory=advisory,
-                              group=group,
-                              package=package,
-                              issues=issues,
-                              remote=remote,
-                              issue_listing_formatted=issue_listing_formatted,
-                              link=link,
-                              workaround=advisory.workaround,
-                              impact=advisory.impact,
-                              upstream_released=upstream_released,
-                              upstream_version=upstream_version,
-                              unique_issue_types=unique_issue_types,
-                              references=references,
-                              TRACKER_ISSUE_URL=TRACKER_ISSUE_URL,
-                              TRACKER_GROUP_URL=TRACKER_GROUP_URL)
-    if raw:
-        return raw_asa
-
-    raw_asa = '\n'.join(raw_asa.split('\n')[2:])
-    raw_asa = str(escape(raw_asa))
-    raw_asa = advisory_extend_html(raw_asa, issues, package)
-    return render_html_advisory(advisory=advisory, package=package, group=group, raw_asa=raw_asa, generated=True)
+    return advisory
 
 
 @tracker.route('/advisory/<regex("{}"):advisory_id>/log'.format(advisory_regex[1:-1]), methods=['GET'])

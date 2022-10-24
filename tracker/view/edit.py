@@ -13,7 +13,6 @@ from werkzeug.exceptions import Conflict
 
 from tracker import db
 from tracker import tracker
-from tracker.advisory import advisory_extend_model_from_advisory_text
 from tracker.advisory import advisory_fetch_reference_url_from_mailman
 from tracker.form import CVEForm
 from tracker.form import GroupForm
@@ -114,7 +113,6 @@ def edit_advisory(advisory_id):
     advisory.workaround = form.workaround.data or None
     if advisory.reference != form.reference.data:
         advisory.content = form.advisory_content
-        advisory_extend_model_from_advisory_text(advisory)
     advisory.reference = form.reference.data or None
 
     # update changed date on modification
