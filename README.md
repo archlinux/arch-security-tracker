@@ -109,7 +109,7 @@ A simple test environment for SSO can be configured using Keycloak:
 1. Run a local Keycloak installation via docker as [described
    upstream](https://www.keycloak.org/getting-started/getting-started-docker).
 
-2. Create an ```arch-securiy-tracker``` client in Keycloak like in
+2. Create an ```arch-security-tracker``` client in Keycloak like in
    [test/data/openid-client.json](test/data/openid-client.json).
    Make sure the client contains a mapper for the group memberships called
    ```groups``` which is included as a claim.
