@@ -24,9 +24,9 @@ class LoginForm(BaseForm):
     password = PasswordField(u'Password', validators=[DataRequired(), Length(min=TRACKER_PASSWORD_LENGTH_MIN, max=TRACKER_PASSWORD_LENGTH_MAX)])
     login = SubmitField(u'login')
 
-    def validate(self):
+    def validate(self, **kwargs):
         self.user = None
-        rv = BaseForm.validate(self)
+        rv = BaseForm.validate(self, kwargs)
         if not rv:
             return False
 

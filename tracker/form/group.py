@@ -41,8 +41,8 @@ class GroupForm(BaseForm):
         super().__init__()
         self.packages = packages
 
-    def validate(self):
-        rv = BaseForm.validate(self)
+    def validate(self, **kwargs):
+        rv = BaseForm.validate(self, kwargs)
         if not rv:
             return False
         if self.fixed.data and 0 <= vercmp(self.affected.data, self.fixed.data):

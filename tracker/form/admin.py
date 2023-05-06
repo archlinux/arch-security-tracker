@@ -36,8 +36,8 @@ class UserForm(BaseForm):
         super().__init__()
         self.edit = edit
 
-    def validate(self):
-        rv = BaseForm.validate(self)
+    def validate(self, **kwargs):
+        rv = BaseForm.validate(self, kwargs)
         if not rv:
             return False
 
