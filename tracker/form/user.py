@@ -26,8 +26,8 @@ class UserPasswordForm(BaseForm):
     def __init__(self, edit=False):
         super().__init__()
 
-    def validate(self):
-        rv = BaseForm.validate(self)
+    def validate(self, **kwargs):
+        rv = BaseForm.validate(self, kwargs)
         if not rv:
             return False
 
