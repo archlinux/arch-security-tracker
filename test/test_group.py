@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import url_for
 from werkzeug.exceptions import Forbidden
 from werkzeug.exceptions import NotFound
@@ -338,7 +340,7 @@ def test_show_group(db, client):
     assert 'text/html; charset=utf-8' == resp.content_type
     assert DEFAULT_GROUP_NAME in resp.data.decode()
 
-@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
+@create_group(id=DEFAULT_GROUP_ID, created=datetime(2023, 5, 10), packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 def test_show_group_json(db, client):
     resp = client.get(url_for('tracker.show_group_json', avg=DEFAULT_GROUP_NAME, postfix='/json'), follow_redirects=True)
@@ -346,6 +348,7 @@ def test_show_group_json(db, client):
     assert 'application/json; charset=utf-8' == resp.content_type
     data = resp.get_json()
     assert data['name'] == DEFAULT_GROUP_NAME
+    assert data['date'] == '2023-05-10'
     assert data['issues'] == [DEFAULT_ISSUE_ID]
     assert data['packages'] == ['foo']
     assert data['affected'] == '1.2.3-3'

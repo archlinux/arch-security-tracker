@@ -282,6 +282,7 @@ def show_group_json(avg):
 
     json_data = OrderedDict()
     json_data['name'] = group.name
+    json_data['date'] = group.created.strftime('%Y-%m-%d')
     json_data['packages'] = [package.pkgname for package in packages]
     json_data['status'] = group.status.label
     json_data['severity'] = group.severity.label
