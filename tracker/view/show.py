@@ -52,8 +52,8 @@ from tracker.view.error import not_found
 
 def get_bug_project(databases):
     bug_project_mapping = {
-        1: ['core', 'extra', 'testing'],
-        5: ['community', 'community-testing', 'multilib', 'multilib-testing']
+        1: ['core', 'core-testing', 'extra', 'extra-testing'],
+        5: ['multilib', 'multilib-testing']
     }
 
     for category, repos in bug_project_mapping.items():

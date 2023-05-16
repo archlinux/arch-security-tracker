@@ -116,10 +116,10 @@ def test_edit_group_bug_url_core(db, client):
     set_and_assert_group_data(db, client, url_for('tracker.add_group'), bug_ticket='')
 
 
-@create_package(name='foo', version='1.2.3-4', database='community')
+@create_package(name='foo', version='1.2.3-4', database='extra')
 @logged_in
-def test_edit_group_bug_url_community(db, client):
-    set_and_assert_group_data(db, client, url_for('tracker.add_group'), bug_ticket='', database='community')
+def test_edit_group_bug_url_extra(db, client):
+    set_and_assert_group_data(db, client, url_for('tracker.add_group'), bug_ticket='', database='extra')
 
 
 def test_add_needs_login(db, client):
@@ -392,10 +392,10 @@ def test_affected_to_status_testing_only(db, client):
     status = affected_to_status(Affected.affected, 'foo', avg.fixed)
     assert status == Status.testing
 
-@create_package(name='foo', version='1.2.3-3', database='community')
-@create_package(name='foo', version='1.2.3-4', database='community-testing')
+@create_package(name='foo', version='1.2.3-3', database='extra')
+@create_package(name='foo', version='1.2.3-4', database='extra-testing')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
-def test_affected_to_status_community_testing(db, client):
+def test_affected_to_status_extra_testing(db, client):
     avg = CVEGroup.query.get(DEFAULT_GROUP_ID)
     status = affected_to_status(Affected.affected, 'foo', avg.fixed)
     assert status == Status.testing

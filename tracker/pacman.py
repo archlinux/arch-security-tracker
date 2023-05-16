@@ -11,7 +11,7 @@ from tracker.util import cmp_to_key
 
 archs = ['x86_64']
 primary_arch = 'x86_64'
-repos = {'x86_64': ['core', 'extra', 'community', 'multilib', 'testing', 'community-testing', 'multilib-testing']}
+repos = {'x86_64': ['core', 'core-testing', 'extra', 'extra-testing', 'multilib', 'multilib-testing']}
 configpath = './pacman/arch/{}/pacman.conf'
 handles = {}
 chdir(basedir)
