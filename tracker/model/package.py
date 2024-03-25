@@ -18,7 +18,6 @@ class Package(db.Model):
     description = db.Column(db.String(256), nullable=False)
     url = db.Column(db.String(192))
     filename = db.Column(db.String(128), nullable=False)
-    md5sum = db.Column(db.String(32), nullable=False)
     sha256sum = db.Column(db.String(64), nullable=False)
     builddate = db.Column(db.Integer(), nullable=False)
 

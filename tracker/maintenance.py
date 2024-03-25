@@ -86,7 +86,6 @@ def update_package_cache():
             'arch': package.arch,
             'database': package.db.name,
             'filename': package.filename,
-            'md5sum': package.md5sum,
             'sha256sum': package.sha256sum,
             'builddate': package.builddate
         })

@@ -194,7 +194,7 @@ def create_issue(func=None, id=DEFAULT_ISSUE_ID, issue_type=issue_types[0], remo
 
 def create_package(func=None, id=None, name=None, base=None, version='1.0-1', arch='any',
                    database='core', description='', url=None, filename='somefile-1.0-1-any.tar.xz',
-                   md5sum='md5', sha256sum='sha256', builddate=0):
+                   sha256sum='sha256', builddate=0):
     def decorator(func):
         @wraps(func)
         def wrapper(db, *args, **kwargs):
@@ -209,7 +209,6 @@ def create_package(func=None, id=None, name=None, base=None, version='1.0-1', ar
             package.description = description
             package.url = url
             package.filename = filename
-            package.md5sum = md5sum
             package.sha256sum = sha256sum
             package.builddate = builddate
 
