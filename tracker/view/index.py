@@ -90,6 +90,7 @@ def index_json(only_vulnerable=False):
 
         json_entry = OrderedDict()
         json_entry['name'] = group.name
+        json_entry['date'] = group.created.strftime('%Y-%m-%d')
         json_entry['packages'] = entry['pkgs']
         json_entry['status'] = group.status.label
         json_entry['severity'] = group.severity.label

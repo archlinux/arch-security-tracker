@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import url_for
 
 from .conftest import DEFAULT_GROUP_ID
@@ -32,7 +34,7 @@ def test_index_all(db, client):
 
 
 @create_package(name='foo', version='1.2.3-4')
-@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3')
+@create_group(id=DEFAULT_GROUP_ID, created=datetime(2023, 5, 10), packages=['foo'], affected='1.2.3-3')
 def test_index_json(db, client):
     resp = client.get(url_for('tracker.index_json', only_vulernable=False), follow_redirects=True)
     assert 200 == resp.status_code
@@ -40,13 +42,15 @@ def test_index_json(db, client):
     assert 'application/json; charset=utf-8' == resp.content_type
     assert len(data) == 1
     assert data[0]['name'] == DEFAULT_GROUP_NAME
+    assert data[0]['date'] == '2023-05-10'
 
 
 @create_package(name='foo', version='1.2.3-4')
-@create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3')
+@create_group(id=DEFAULT_GROUP_ID, created=datetime(2023, 5, 10), packages=['foo'], affected='1.2.3-3')
 def test_index_vulnerable_json(db, client):
     resp = client.get(url_for('tracker.index_vulnerable_json'), follow_redirects=True)
     assert 200 == resp.status_code
     data = resp.get_json()
     assert len(data) == 1
     assert data[0]['name'] == DEFAULT_GROUP_NAME
+    assert data[0]['date'] == '2023-05-10'
