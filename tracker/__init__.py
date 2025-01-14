@@ -156,4 +156,17 @@ def create_app(script_info=None):
                     Advisory=Advisory, CVE=CVE, CVEGroup=CVEGroup, CVEGroupEntry=CVEGroupEntry,
                     CVEGroupPackage=CVEGroupPackage, User=User, Package=Package, oauth=oauth)
 
+    @app.template_filter('gitlab_encode')
+    def gitlab_encode(name: str) -> str:
+        '''Convert a Gitlab project name to variant which the Gitlab encodes in
+        its url / API for example mysql++ becomes mysqlplusplus.'''
+        from re import sub
+
+        name = sub(r'([a-zA-Z0-9]+)\+([a-zA-Z]+)', r'\1-\2', name)
+        name = sub(r'\+', r'plus', name)
+        name = sub(r'[^a-zA-Z0-9_\-\.]', r'-', name)
+        name = sub(r'[_\-]{2,}', r'-', name)
+        name = sub(r'^tree$', r'unix-tree', name)
+        return name
+
     return app
