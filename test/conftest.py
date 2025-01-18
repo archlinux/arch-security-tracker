@@ -63,22 +63,12 @@ def db(app, request):
 @pytest.fixture(autouse=True, scope='function')
 def run_scoped(app, db, client, request):
     with app.app_context():
-        connection = db.engine.connect()
-        transaction = connection.begin()
-
-        options = dict(bind=connection, binds={})
-        session = db.create_scoped_session(options=options)
-
-        db.session = session
         db.create_all()
 
         with client:
             yield
 
         db.drop_all()
-        transaction.rollback()
-        connection.close()
-        session.remove()
 
 
 @pytest.fixture(scope='function')
