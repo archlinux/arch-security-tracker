@@ -87,6 +87,7 @@ def index_json(only_vulnerable=False):
     for entry in entries:
         group = entry['group']
         types = list(set([cve.issue_type for cve in entry['issues']]))
+        references = group.reference.replace('\r', '').split('\n') if group.reference else []
 
         json_entry = OrderedDict()
         json_entry['name'] = group.name
@@ -99,6 +100,7 @@ def index_json(only_vulnerable=False):
         json_entry['ticket'] = group.bug_ticket if group.bug_ticket else None
         json_entry['issues'] = [str(cve) for cve in entry['issues']]
         json_entry['advisories'] = entry['advisories']
+        json_data['references'] = references
         json_data.append(json_entry)
     return json_data
 
