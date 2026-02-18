@@ -583,7 +583,7 @@ def show_log(page=1):
                   .filter((VersionClassCVE.transaction_id) |
                           (VersionClassGroup.transaction_id) |
                           (VersionClassAdvisory.transaction_id))
-                  ).paginate(page, TRACKER_LOG_ENTRIES_PER_PAGE, True)
+                  ).paginate(page=page, per_page=TRACKER_LOG_ENTRIES_PER_PAGE, error_out=True)
 
     return render_template('log/log.html',
                            title=f'Log',

@@ -59,7 +59,7 @@ def show_user_log(username, page=1):
                   .join(User)
                   .filter(User.name == username)
                   .order_by(Transaction.issued_at.desc())
-                  ).paginate(page, MAX_ENTRIES_PER_PAGE, True)
+                  ).paginate(page=page, per_page=MAX_ENTRIES_PER_PAGE, error_out=True)
 
     return render_template('log/log.html',
                            title=f'User {username} - log',
