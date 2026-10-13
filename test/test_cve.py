@@ -64,6 +64,30 @@ def set_and_assert_cve_data(db, client, cve_id, route):
 def test_add_cve(db, client):
     set_and_assert_cve_data(db, client, 'CVE-1122-0042', url_for('tracker.add_cve'))
 
+@logged_in
+def test_add_cve_normalizes_wrapped_description(db, client):
+    description = (
+        'This vulnerability description contains enough characters to exceed the seventy-character wrapping threshold\n'
+        'and the continuation should be joined to the preceding line.\n\n'
+        'Second paragraph stays separate.'
+    )
+
+    expected = (
+        'This vulnerability description contains enough characters to exceed the seventy-character wrapping threshold '
+        'and the continuation should be joined to the preceding line.\n\n'
+        'Second paragraph stays separate.'
+    )
+
+    response = client.post(
+        url_for('tracker.add_cve'),
+        follow_redirects=True,
+        data=default_issue_dict(dict(description=description)),
+    )
+
+    assert response.status_code == 200
+
+    cve = CVE.query.get(DEFAULT_ISSUE_ID)
+    assert cve.description == expected
 
 @logged_in(role=UserRole.reporter)
 def test_reporter_can_add(db, client):

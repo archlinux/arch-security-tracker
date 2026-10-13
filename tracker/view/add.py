@@ -1,3 +1,5 @@
+import re
+
 from flask import flash
 from flask import redirect
 from flask import render_template
@@ -28,6 +30,37 @@ CVE_MERGED = 'Merged existing {} with the provided data'
 CVE_MERGED_PARTIALLY = 'Failed to fully merge {}, check the following fields: {}'
 ERROR_UNMERGEABLE = 'Unmergeable field, old value shown'
 ERROR_ISSUE_REFERENCED_BY_ADVISORY = 'Insufficient permissions to edit {} that is referenced by an already published advisory!'
+
+
+def normalize_description(description):
+    if not description:
+        return description
+
+    description = (
+        description.replace('\r\n', '\n')
+        .replace('\r', '\n')
+        .strip()
+    )
+
+    paragraphs = re.split(r'\n[ \t]*\n+', description)
+    normalized_paragraphs = []
+
+    for paragraph in paragraphs:
+        lines = paragraph.splitlines()
+        if not lines:
+            continue
+
+        normalized = lines[0].strip()
+
+        for previous, line in zip(lines, lines[1:]):
+            if len(previous.strip()) >= 70:
+                normalized += ' ' + line.strip()
+            else:
+                normalized += '\n' + line.strip()
+
+        normalized_paragraphs.append(normalized)
+
+    return '\n\n'.join(normalized_paragraphs)
 
 
 @tracker.route('/cve/add', methods=['GET', 'POST'])
@@ -84,11 +117,12 @@ def add_cve():
         form.remote.data = cve.remote.name
 
         # try to merge description
-        if form.description.data:
+        description = normalize_description(form.description.data)
+        if description:
             if not cve.description:
-                cve.description = form.description.data
+                cve.description = description
                 merged = True
-            elif form.description.data != cve.description:
+            elif description != cve.description:
                 not_merged.append(form.description)
         form.description.data = cve.description
 
@@ -136,7 +170,7 @@ def add_cve():
     cve = CVE()
     cve.id = form.cve.data
     cve.issue_type = form.issue_type.data
-    cve.description = form.description.data
+    cve.description = normalize_description(form.description.data)
     cve.severity = Severity.fromstring(form.severity.data)
     cve.remote = Remote.fromstring(form.remote.data)
     cve.reference = form.reference.data
