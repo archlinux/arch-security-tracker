@@ -283,6 +283,15 @@ def show_group_json(avg):
     json_data = OrderedDict()
     json_data['name'] = group.name
     json_data['packages'] = [package.pkgname for package in packages]
+    json_data['versions'] = [
+        {
+            'name': package.name,
+            'version': package.version,
+            'arch': package.arch,
+            'repository': package.database,
+        }
+        for package in data['versions']
+    ]
     json_data['status'] = group.status.label
     json_data['severity'] = group.severity.label
     json_data['type'] = 'multiple issues' if len(issue_types) > 1 else issue_types[0]

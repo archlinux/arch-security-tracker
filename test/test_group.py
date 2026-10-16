@@ -338,6 +338,7 @@ def test_show_group(db, client):
     assert 'text/html; charset=utf-8' == resp.content_type
     assert DEFAULT_GROUP_NAME in resp.data.decode()
 
+@create_package(name='foo', version='1.2.3-4')
 @create_group(id=DEFAULT_GROUP_ID, packages=['foo'], affected='1.2.3-3', fixed='1.2.3-4')
 @create_advisory(id=DEFAULT_ADVISORY_ID, group_package_id=DEFAULT_GROUP_ID, advisory_type=issue_types[1])
 def test_show_group_json(db, client):
@@ -348,6 +349,14 @@ def test_show_group_json(db, client):
     assert data['name'] == DEFAULT_GROUP_NAME
     assert data['issues'] == [DEFAULT_ISSUE_ID]
     assert data['packages'] == ['foo']
+    assert data['versions'] == [
+        {
+            'name': 'foo',
+            'version': '1.2.3-4',
+            'arch': 'any',
+            'repository': 'core',
+        }
+    ]
     assert data['affected'] == '1.2.3-3'
     assert data['fixed'] == '1.2.3-4'
 
